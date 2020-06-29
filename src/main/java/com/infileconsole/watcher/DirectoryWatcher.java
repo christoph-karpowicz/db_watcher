@@ -4,18 +4,17 @@ import java.io.IOException;
 import java.nio.file.*;
 
 public class DirectoryWatcher implements Runnable {
-    private String dirName;
+    private Path dirPath;
     
-    public DirectoryWatcher(String dirName) {
-        this.dirName = dirName;
+    public DirectoryWatcher(Path dirPath) {
+        this.dirPath = dirPath;
     }
 
     @Override
     public void run() {
         try {
             WatchService watchService = FileSystems.getDefault().newWatchService();
-            Path path = Paths.get(dirName);
-            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            dirPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
             boolean poll = true;
             while (poll) {
                 WatchKey key = watchService.take();

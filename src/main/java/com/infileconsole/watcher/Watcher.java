@@ -1,22 +1,33 @@
 package com.infileconsole.watcher;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import com.infileconsole.fs.DirectoryTraverser;
+
 public class Watcher implements Runnable {
     private boolean alive;
-    private String dirName;
+    private Path root;
     private HashMap<String, DirectoryWatcher> dirWatchers;
 
-    public Watcher(String dirName) {
-        this.dirName = dirName;
+    public Watcher(Path root) {
+        this.root = root;
         this.alive = true;
         this.dirWatchers = new HashMap<String, DirectoryWatcher>();
     }
 
     public void init() {
-        DirectoryWatcher dirWatcher = new DirectoryWatcher(dirName);
-        dirWatchers.put(dirName, dirWatcher);
+        DirectoryTraverser dirTraverser = new DirectoryTraverser(root);
+        dirTraverser.init();
+        ArrayList<Path> dirs = dirTraverser.traverse();
+
+        for (Path path : dirs) {
+            DirectoryWatcher dirWatcher = new DirectoryWatcher(path);
+            dirWatchers.put(path.toString(), dirWatcher);
+        }
+        System.out.println(dirWatchers);
     }
 
     public boolean isAlive() {
