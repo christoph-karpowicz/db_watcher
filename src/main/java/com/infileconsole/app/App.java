@@ -3,15 +3,18 @@ package com.infileconsole.app;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.infileconsole.watcher.Watcher;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
-// java -cp target/infileconsole-1.0-SNAPSHOT.jar com.infileconsole.app.App
+// mvn package shade:shade
+// java -jar ./target/infileconsole-1.0-SNAPSHOT.jar
 
 public class App {
     public static void main(String[] args) {
         Path root = Paths.get("/home/chris/Documents/work/i-fc/test");
-        Watcher watcher = new Watcher(root);
-        Dispatch dispatch = new Dispatch(watcher);
+        Injector injector = Guice.createInjector(new AppModule());
+        Dispatch dispatch = injector.getInstance(Dispatch.class);
+        dispatch.setRoot(root);
         dispatch.init();
     }
 }
