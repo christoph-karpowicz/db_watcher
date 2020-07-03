@@ -10,7 +10,7 @@ import com.infileconsole.app.Dispatch;
 import com.infileconsole.fs.DirectoryTraverser;
 
 @Singleton
-public class DirectoryTreeWatcher implements Runnable, Watcher {
+public class DirectoryTreeWatcher implements Runnable, Watchable {
     private Dispatch dispatch;
     private boolean alive;
     private HashMap<String, DirectoryWatcher> dirWatchers;
@@ -24,7 +24,7 @@ public class DirectoryTreeWatcher implements Runnable, Watcher {
         ArrayList<Path> dirs = dirTraverser.traverse();
 
         for (Path path : dirs) {
-            DirectoryWatcher dirWatcher = new DirectoryWatcher(path);
+            DirectoryWatcher dirWatcher = new DirectoryWatcher(path, dispatch);
             dirWatchers.put(path.toString(), dirWatcher);
         }
         System.out.println(dirWatchers);

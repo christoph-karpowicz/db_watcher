@@ -2,24 +2,33 @@ package com.infileconsole.watcher;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.logging.Logger;
+
+import com.infileconsole.app.Dispatch;
 
 public class DirectoryWatcher implements Runnable {
-    private Path dirPath;
+    private Path path;
+    private Dispatch dispatch;
+    private Logger logger;
     
-    public DirectoryWatcher(Path dirPath) {
-        this.dirPath = dirPath;
+    public DirectoryWatcher(Path path, Dispatch dispatch) {
+        this.path = path;
+        this.dispatch = dispatch;
+        this.logger = Logger.getGlobal();
     }
 
     @Override
     public void run() {
         try {
             WatchService watchService = FileSystems.getDefault().newWatchService();
-            dirPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
             boolean poll = true;
             while (poll) {
                 WatchKey key = watchService.take();
                 for (WatchEvent<?> event : key.pollEvents()) {
-                    System.out.println("Event kind : " + event.kind() + " - File : " + event.context());
+                    Path filePath = Paths.get(path.toString() + "/" + event.context());
+                    logger.info(filePath.toString() + " modified.");
+                    dispatch.queueFileEval(filePath);
                 }
                 poll = key.reset();
             }
