@@ -23,13 +23,11 @@ public class Dispatch {
 
         watcher.setDispatch(this);
         watcher.init();
-
-        Thread watcherThread = new Thread(watcher, "watcher");
-        watcherThread.start();
+        watcher.startDirectoryWatchers();
 
         while (!closeSignal) {
             if (evalQueue.size() > 0) {
-                System.out.println(evalQueue);
+                // System.out.println(evalQueue);
                 Evaluable evaluator = evalQueue.poll();
                 Thread evaluatorThread = new Thread((Evaluator)evaluator, "evaluator");
                 evaluatorThread.start();
