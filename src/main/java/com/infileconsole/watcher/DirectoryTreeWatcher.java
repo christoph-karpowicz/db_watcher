@@ -24,7 +24,7 @@ public class DirectoryTreeWatcher implements Watchable {
         ArrayList<Path> dirs = dirTraverser.traverse();
 
         for (Path path : dirs) {
-            DirectoryWatcher dirWatcher = new DirectoryWatcher(path, dispatch);
+            DirectoryWatcher dirWatcher = new DirectoryWatcher(dispatch, path);
             dirWatchers.put(path.toString(), dirWatcher);
         }
         System.out.println(dirWatchers);

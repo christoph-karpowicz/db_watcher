@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.infileconsole.eval.Evaluable;
 import com.infileconsole.eval.Evaluator;
 import com.infileconsole.watcher.DirectoryTreeWatcher;
+import com.infileconsole.watcher.WatchedFile;
 
 public class Dispatch {
     private Path root;
@@ -35,8 +36,8 @@ public class Dispatch {
         }
     }
 
-    public void queueFileEval(Path path) {
-        Evaluable evaluator = new Evaluator(path);
+    public void queueFileEval(WatchedFile file) {
+        Evaluable evaluator = new Evaluator(file);
         evalQueue.add(evaluator);
     }
 

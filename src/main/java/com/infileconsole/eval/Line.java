@@ -10,7 +10,8 @@ import com.infileconsole.cmd.Snap;
 import com.infileconsole.cmd.CmdType;
 
 public class Line {
-    private final Pattern initCmdRgxp = Pattern.compile("\\s*\\/\\/\\s*@ifc(\\s+)?([a-z]+)?(\\s+)?(.+)?\\s*", Pattern.CASE_INSENSITIVE);
+    private final String CMD_PATTERN = "\\s*\\/\\/\\s*@ifc(\\s+)?([a-z]+)?(\\s+)?(.+)?\\s*";
+
     private final String content;
     private final int number;
     private Optional<Executable> cmd = Optional.empty();
@@ -21,7 +22,8 @@ public class Line {
     }
 
     public void findCmd() {
-        Matcher matcher = initCmdRgxp.matcher(content);
+        Pattern ptrn = Pattern.compile(CMD_PATTERN, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = ptrn.matcher(content);
 
         while (matcher.find()) {
             String cmdStr = matcher.group(2);
@@ -36,7 +38,7 @@ public class Line {
                     break;
             }
 
-            if (cmd.isPresent()) {
+            if (hasCmd()) {
                 String arg = matcher.group(4);
                 if (arg != null && !arg.isEmpty()) {
                     cmd.get().setArg(arg);

@@ -3,20 +3,21 @@ package com.infileconsole.eval;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.infileconsole.watcher.WatchedFile;
+
 public class Evaluator implements Evaluable, Runnable {
-    Path filePath;
+    WatchedFile file;
     List<Line> linesWithCmd = new ArrayList<Line>();
 
-    public Evaluator(Path filePath) {
-        this.filePath = filePath;
+    public Evaluator(WatchedFile file) {
+        this.file = file;
     }
     
     public void evalauteFile() throws IOException {
-        BufferedReader reader = Files.newBufferedReader(filePath);
+        BufferedReader reader = Files.newBufferedReader(file.toPath());
         int lineCounter = 1;
         String rawLine;
         while ((rawLine = reader.readLine()) != null) {
@@ -30,6 +31,7 @@ public class Evaluator implements Evaluable, Runnable {
     private void evalauteLine(Line line) {
         line.findCmd();
         if (line.hasCmd()) {
+            System.out.println(file.getId());
             linesWithCmd.add(line);
         }
     }

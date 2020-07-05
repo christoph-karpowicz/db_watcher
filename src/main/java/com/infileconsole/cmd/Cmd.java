@@ -1,8 +1,8 @@
 package com.infileconsole.cmd;
 
 public class Cmd implements Executable {
-    private final CmdType type;
     private String arg;
+    private final CmdType type;
 
     public Cmd(CmdType type) {
         this.type = type;
@@ -16,6 +16,10 @@ public class Cmd implements Executable {
         this.arg = arg;
     }
 
+    public CmdType getType() {
+        return type;
+    }
+    
     public void execute() {
     }
 }
