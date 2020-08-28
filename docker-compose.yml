@@ -4,7 +4,7 @@ services:
 
   postgres:
     image: postgres
-    container_name: uni-postgres
+    container_name: dbw-postgres
     environment:
       - POSTGRES_USER=chris
       - POSTGRES_PASSWORD=1111

@@ -1,8 +1,13 @@
 package com.dbw.app;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 import com.dbw.cfg.Config;
+import com.dbw.cfg.DatabaseConfig;
+import com.dbw.db.Database;
+import com.dbw.db.DatabaseFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -17,8 +22,6 @@ import org.apache.commons.cli.ParseException;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("test");
-
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("c", "config", true, "point to a configuration file");
@@ -31,7 +34,11 @@ public class App {
                 ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                 try {
                     Config config = mapper.readValue(new File(configPath), Config.class);
-                    System.out.println(config);
+
+                    DatabaseConfig dbConfig = config.getDatabase();
+                    Database db = DatabaseFactory.getDatabase(dbConfig);
+                    db.connect();
+
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
