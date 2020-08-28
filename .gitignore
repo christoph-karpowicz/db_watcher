@@ -1,6 +1,6 @@
-test/
 target/
 .classpath
 .project
 .settings/
 .vscode/
+config/
