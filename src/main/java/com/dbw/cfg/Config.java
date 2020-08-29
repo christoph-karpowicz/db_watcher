@@ -3,6 +3,8 @@ package com.dbw.cfg;
 import java.util.List;
 
 public class Config {
+    public static final String DEFAULT_PATH = "./config.yml";
+    
     private DatabaseConfig database;
     private List<String> tables;
 
