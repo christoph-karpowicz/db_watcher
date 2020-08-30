@@ -16,6 +16,7 @@ public class Watcher {
     public void init() {
         this.setDb();
         this.connectToDb();
+        prepareAuditTable();
     }
 
     private void setDb() {
@@ -30,4 +31,20 @@ public class Watcher {
     private void connectToDb() {
         db.connect();
     }
+
+    private void prepareAuditTable() {
+        System.out.println(db.findAuditTable());
+        if (!db.findAuditTable()) {
+            db.createAuditTable();
+        }
+    }
+
+    public void start() {
+
+    }
+
+    public void end() {
+        db.close();
+    }
+    
 }

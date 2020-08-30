@@ -10,4 +10,11 @@ public abstract class Database {
     }
 
     public abstract void connect();
+
+    public abstract boolean findAuditTable();
+
+    public abstract void createAuditTable();
+
+    public abstract void close();
+    
 }

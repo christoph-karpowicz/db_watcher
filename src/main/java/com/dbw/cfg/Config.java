@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Config {
     public static final String DEFAULT_PATH = "./config.yml";
+    public static final String DEFAULT_AUDIT_TABLE_NAME = "dbw_audit";
+    public static final String DEFAULT_SCHEMA = "public";
     
     private DatabaseConfig database;
     private List<String> tables;

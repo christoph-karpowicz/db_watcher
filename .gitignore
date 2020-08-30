@@ -5,3 +5,5 @@ target/
 .vscode/
 config/
 lib/
+docker-compose.yml
+data/

@@ -17,6 +17,8 @@ public class App {
         Config config = ConfigParser.fromYMLFile(options.configPath);
         watcher.setConfig(config);
         watcher.init();
+        watcher.start();
+        watcher.end();
     }
 
     private static CLI.ParsedOptions handleArgs(String[] args) {
