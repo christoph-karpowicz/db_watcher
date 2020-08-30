@@ -16,7 +16,7 @@ public class Watcher {
     public void init() {
         this.setDb();
         this.connectToDb();
-        prepareAuditTable();
+        prepareAuditObjects();
     }
 
     private void setDb() {
@@ -32,10 +32,18 @@ public class Watcher {
         db.connect();
     }
 
-    private void prepareAuditTable() {
-        System.out.println(db.findAuditTable());
-        if (!db.findAuditTable()) {
+    private void prepareAuditObjects() {
+        System.out.println(db.auditTableExists());
+        System.out.println(db.auditFunctionExists());
+        System.out.println(db.auditTriggerExists("actor"));
+        if (!db.auditTableExists()) {
             db.createAuditTable();
+        }
+        if (!db.auditFunctionExists()) {
+            db.createAuditFunction();
+        }
+        if (!db.auditTriggerExists("actor")) {
+            db.createAuditTrigger("actor");
         }
     }
 

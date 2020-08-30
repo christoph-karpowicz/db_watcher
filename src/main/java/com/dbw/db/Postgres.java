@@ -1,4 +1,4 @@
-package com.dbw.db;
+package com.dbw.db; 
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,6 @@ import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 
 public class Postgres extends Database {
-    private Connection conn;
 
     public Postgres(DatabaseConfig config) {
         super(config);
@@ -38,44 +37,56 @@ public class Postgres extends Database {
             .toString();
     }
 
-    public boolean findAuditTable() {
-        boolean auditTableFound = false;
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(
-                "SELECT EXISTS (" +
-                "    SELECT FROM information_schema.tables " +
-                "    WHERE  table_schema = ?" +
-                "    AND    table_name   = ?" +
-                ") as audit_table_exists;"
-            );
-            pstmt.setString(1, Config.DEFAULT_SCHEMA);
-            pstmt.setString(2, Config.DEFAULT_AUDIT_TABLE_NAME);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                auditTableFound = rs.getBoolean("audit_table_exists");
-            }
-            pstmt.close();
-        } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-        }
-        return auditTableFound;
+    public boolean auditTableExists() {
+        String[] stringArgs = {Config.DEFAULT_SCHEMA, Config.DEFAULT_AUDIT_TABLE_NAME};
+        return objectExists(PostgresQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 
     public void createAuditTable() {
-        try {
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(
-                "CREATE TABLE " + Config.DEFAULT_AUDIT_TABLE_NAME + " " +
-                "(id            INT PRIMARY KEY NOT NULL," +
-                " old           TEXT, " +
-                " new           TEXT, " +
-                " operation     VARCHAR(6) NOT NULL, " +
-                " timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
-            );
-            stmt.close();
-        } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-        }
+        executeUpdate(
+            "CREATE TABLE " + Config.DEFAULT_AUDIT_TABLE_NAME + " " +
+            "(id            SERIAL PRIMARY KEY NOT NULL," +
+            " table_name    VARCHAR(100), " +
+            " old           TEXT, " +
+            " new           TEXT, " +
+            " operation     VARCHAR(6) NOT NULL, " +
+            " query         TEXT, " +
+            " timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
+        );
+    }
+
+    public void dropAuditTable() {
+        executeUpdate("DROP TABLE " + Config.DEFAULT_AUDIT_TABLE_NAME);
+    }
+
+    public boolean auditFunctionExists() {
+        String[] stringArgs = {};
+        return objectExists(PostgresQueries.FIND_AUDIT_FUNCTION, stringArgs);
+    }
+
+    public void createAuditFunction() {
+        executeUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION);
+    }
+
+    public void dropAuditFunction() {
+        executeUpdate("DROP FUNCTION IF EXISTS dbw_audit_func;");
+    }
+
+    public boolean auditTriggerExists(String tableName) {
+        String[] stringArgs = {"dbw_" + tableName + "_audit"};
+        return objectExists(PostgresQueries.FIND_AUDIT_TRIGGER, stringArgs);
+    }
+
+    public void createAuditTrigger(String tableName) {
+        executeUpdate(
+            "CREATE TRIGGER dbw_" + tableName + "_audit" +
+            " AFTER INSERT OR UPDATE OR DELETE ON " + tableName +
+            " FOR EACH ROW EXECUTE PROCEDURE dbw_audit_func();"
+        );
+    }
+
+    public void dropAuditTrigger(String tableName) {
+        executeUpdate("DROP TRIGGER IF EXISTS dbw_" + tableName + "_audit ON " + tableName + ";");
     }
 
     public void close() {
