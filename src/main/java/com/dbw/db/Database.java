@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.dbw.cfg.DatabaseConfig;
 
@@ -18,17 +20,21 @@ public abstract class Database {
 
     public abstract void connect();
 
-    public void executeUpdate(String query) {
+    protected void executeUpdate(String query, Object... args) {
         try {
             Statement stmt = conn.createStatement();
-            stmt.executeUpdate(query);
+            stmt.executeUpdate(prepareQuery(query, args));
             stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
     }
 
-    public boolean objectExists(String query, String[] stringArgs) {
+    private static String prepareQuery(String query, Object... args) {
+        return String.format(query, args);
+    }
+
+    protected boolean objectExists(String query, String[] stringArgs) {
         boolean exists = false;
         try {
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -46,6 +52,24 @@ public abstract class Database {
         return exists;
     }
 
+    protected List<String> selectStringArray(String query, String[] stringArgs) {
+        List<String> result = new ArrayList<String>();
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            for (short i = 0; i < stringArgs.length; i++) {
+                pstmt.setString(i + 1, stringArgs[i]);
+            }
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("item"));
+            }
+            pstmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+        }
+        return result;
+    }
+
     public abstract boolean auditTableExists();
 
     public abstract void createAuditTable();
@@ -57,6 +81,10 @@ public abstract class Database {
     public abstract boolean auditTriggerExists(String tableName);
 
     public abstract void createAuditTrigger(String tableName);
+
+    public abstract void dropAuditTrigger(String tableName);
+    
+    public abstract String[] selectAuditTriggers();
 
     public abstract void close();
     

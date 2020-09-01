@@ -2,13 +2,27 @@ package com.dbw.db;
 
 public class PostgresQueries {
 
-    // public static final String CREATE_AUDIT_TABLE = 
-
     public static final String FIND_AUDIT_TABLE = 
         "SELECT EXISTS (" +
         "    SELECT FROM information_schema.tables " +
         "    WHERE  table_schema = ?" +
         "    AND    table_name   = ?" +
+        ");";
+    
+    public static final String CREATE_AUDIT_TABLE = 
+        "CREATE TABLE %s " +
+            "(id            SERIAL PRIMARY KEY NOT NULL," +
+            " table_name    VARCHAR(100), " +
+            " old           TEXT, " +
+            " new           TEXT, " +
+            " operation     VARCHAR(6) NOT NULL, " +
+            " query         TEXT, " +
+            " timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
+
+    public static final String FIND_AUDIT_FUNCTION = 
+        "SELECT EXISTS (" +
+        "    SELECT FROM pg_proc " +
+        "    WHERE  proname = 'dbw_audit_func'" +
         ");";
 
     public static final String CREATE_AUDIT_FUNCTION = 
@@ -51,6 +65,8 @@ public class PostgresQueries {
         "$$" +
         "LANGUAGE plpgsql;";
 
+    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION IF EXISTS dbw_audit_func;";
+
     public static final String FIND_AUDIT_TRIGGER = 
         "SELECT EXISTS (" +
         "    SELECT FROM pg_trigger " +
@@ -58,10 +74,13 @@ public class PostgresQueries {
         "    AND    tgname = ?" +
         ");";
 
-    public static final String FIND_AUDIT_FUNCTION = 
-        "SELECT EXISTS (" +
-        "    SELECT FROM pg_proc " +
-        "    WHERE  proname = 'dbw_audit_func'" +
-        ");";
-    
+    public static final String CREATE_AUDIT_TRIGGER = 
+        "CREATE TRIGGER dbw_%s_audit" +
+        " AFTER INSERT OR UPDATE OR DELETE ON %s" +
+        " FOR EACH ROW EXECUTE PROCEDURE dbw_audit_func();";
+
+    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER IF EXISTS dbw_%s_audit ON %s;";
+
+    public static final String SELECT_AUDIT_TRIGGERS = "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE 'dbw_%_audit'";
+
 }

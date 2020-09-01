@@ -1,5 +1,7 @@
 package com.dbw.watcher;
 
+import java.util.List;
+
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.db.Database;
@@ -33,17 +35,24 @@ public class Watcher {
     }
 
     private void prepareAuditObjects() {
-        System.out.println(db.auditTableExists());
-        System.out.println(db.auditFunctionExists());
-        System.out.println(db.auditTriggerExists("actor"));
         if (!db.auditTableExists()) {
             db.createAuditTable();
         }
         if (!db.auditFunctionExists()) {
             db.createAuditFunction();
         }
-        if (!db.auditTriggerExists("actor")) {
-            db.createAuditTrigger("actor");
+        String[] auditTriggers = db.selectAuditTriggers();
+        for (String auditTriggerName : auditTriggers) {
+            if (!config.getTables().contains(auditTriggerName)) {
+                System.out.println(auditTriggerName);
+                db.dropAuditTrigger(auditTriggerName);
+            }
+        }
+        for (String tableName : config.getTables()) {
+            if (!db.auditTriggerExists(tableName)) {
+                System.out.println(tableName);
+                db.createAuditTrigger(tableName);
+            }
         }
     }
 
