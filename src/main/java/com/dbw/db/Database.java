@@ -18,8 +18,6 @@ public abstract class Database {
         this.config = config;
     }
 
-    public abstract void connect();
-
     protected void executeUpdate(String query, Object... args) {
         try {
             Statement stmt = conn.createStatement();
@@ -70,6 +68,8 @@ public abstract class Database {
         return result;
     }
 
+    public abstract void connect();
+    
     public abstract boolean auditTableExists();
 
     public abstract void createAuditTable();

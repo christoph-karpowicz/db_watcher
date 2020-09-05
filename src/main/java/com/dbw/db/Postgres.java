@@ -1,4 +1,4 @@
-package com.dbw.db; 
+package com.dbw.db;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -6,9 +6,11 @@ import java.util.List;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.log.Level;
+import com.dbw.log.Logger;
 
 public class Postgres extends Database {
-
+    
     public Postgres(DatabaseConfig config) {
         super(config);
     }
@@ -22,7 +24,7 @@ public class Postgres extends Database {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             System.exit(0);
         }
-        System.out.println("Opened database successfully");
+        Logger.log(Level.INFO, "Database opened successfully.");
     }
 
     private String getConnectionString() {
@@ -41,10 +43,12 @@ public class Postgres extends Database {
 
     public void createAuditTable() {
         executeUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Config.DEFAULT_AUDIT_TABLE_NAME);
+        Logger.log(Level.INFO, "Audit table has been created.");
     }
 
     public void dropAuditTable() {
         executeUpdate("DROP TABLE " + Config.DEFAULT_AUDIT_TABLE_NAME);
+        Logger.log(Level.INFO, "Audit table has been dropped.");
     }
 
     public boolean auditFunctionExists() {
@@ -54,10 +58,12 @@ public class Postgres extends Database {
 
     public void createAuditFunction() {
         executeUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION);
+        Logger.log(Level.INFO, "Audit function has been created.");
     }
 
     public void dropAuditFunction() {
         executeUpdate(PostgresQueries.DROP_AUDIT_FUNCTION);
+        Logger.log(Level.INFO, "Audit function has been dropped.");
     }
 
     public boolean auditTriggerExists(String tableName) {
@@ -67,10 +73,12 @@ public class Postgres extends Database {
 
     public void createAuditTrigger(String tableName) {
         executeUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, tableName, tableName);
+        Logger.log(Level.INFO, String.format("Audit trigger for table \"%s\" has been created.", tableName));
     }
 
     public void dropAuditTrigger(String tableName) {
         executeUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, tableName, tableName);
+        Logger.log(Level.INFO, String.format("Audit trigger for table \"%s\" has been dropped.", tableName));
     }
 
     public String[] selectAuditTriggers() {
@@ -90,6 +98,6 @@ public class Postgres extends Database {
         } catch (SQLException e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
-        System.out.println("Database connection closed.");
+        Logger.log(Level.INFO, "Database connection closed.");
     }
 }

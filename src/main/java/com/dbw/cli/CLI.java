@@ -18,8 +18,8 @@ public class CLI {
     public void init() {
         parser = new DefaultParser();
         options = new Options();
-        this.setOptions();
-        this.setCmd();
+        setOptions();
+        setCmd();
     }
 
     private void setOptions() {
