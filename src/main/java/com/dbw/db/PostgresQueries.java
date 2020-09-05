@@ -83,4 +83,8 @@ public class PostgresQueries {
 
     public static final String SELECT_AUDIT_TRIGGERS = "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE 'dbw_%_audit'";
 
+    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(id) FROM dbw_audit;";
+
+    public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM dbw_audit WHERE id > ?;";
+
 }

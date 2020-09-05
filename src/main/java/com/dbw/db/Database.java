@@ -50,6 +50,30 @@ public abstract class Database {
         return exists;
     }
 
+    public List<AuditRecord> selectAuditRecords(String query, int fromId) {
+        List<AuditRecord> result = new ArrayList<AuditRecord>();
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, fromId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                AuditRecord auditRecord = new AuditRecord();
+                auditRecord.setId(rs.getInt("id"));
+                auditRecord.setTableName(rs.getString("table_name"));
+                auditRecord.setOldData(rs.getString("old"));
+                auditRecord.setNewData(rs.getString("new"));
+                auditRecord.setOperation(rs.getString("operation"));
+                auditRecord.setQuery(rs.getString("query"));
+                auditRecord.setTimestamp(rs.getDate("timestamp"));
+                result.add(auditRecord);
+            }
+            pstmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+        }
+        return result;
+    }
+
     protected List<String> selectStringArray(String query, String[] stringArgs) {
         List<String> result = new ArrayList<String>();
         try {
@@ -68,8 +92,25 @@ public abstract class Database {
         return result;
     }
 
+    public int selectMaxId(String query) {
+        int result = 0;
+        try {
+            Statement pstmt = conn.createStatement();
+            ResultSet rs = pstmt.executeQuery(query);
+            if (rs.next()) {
+                result = rs.getInt("max");
+            } else {
+                throw new Exception("Couldn't select audit table's max id.");
+            }
+            pstmt.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+        }
+        return result;
+    }
+
     public abstract void connect();
-    
+
     public abstract boolean auditTableExists();
 
     public abstract void createAuditTable();

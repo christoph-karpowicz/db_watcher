@@ -1,15 +1,20 @@
 package com.dbw.watcher;
 
+import java.util.List;
+
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
+import com.dbw.db.PostgresQueries;
 
 public class Watcher {
     private Config config;
     private Database db;
     private boolean isRunning;
     private int runCounter = 0;
+    private int lastId;
 
     public void setConfig(Config config) {
         this.config = config;
@@ -75,16 +80,34 @@ public class Watcher {
     }
     
     public void start() {
+        findLastId();
         setIsRunning(true);
         while (getIsRunning()) {
             try {
                 Thread.sleep(1000);
-                System.out.println("tst");
+                List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, getLastId());
+                for (AuditRecord auditRecord : auditRecords) {
+                    String diff = auditRecord.findDiff();
+                    System.out.println(diff);
+                }
+                findLastId();
                 incrementRunCounter();
             } catch (InterruptedException e) {
 
             }
         }
+    }
+
+    private void findLastId() {
+        setLastId(db.selectMaxId(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID));
+    }
+
+    private int getLastId() {
+        return lastId;
+    }
+
+    private void setLastId(int lastId) {
+        this.lastId = lastId;
     }
 
     private boolean getIsRunning() {
