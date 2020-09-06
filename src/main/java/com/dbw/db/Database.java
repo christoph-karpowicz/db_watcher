@@ -12,7 +12,7 @@ import com.dbw.cfg.DatabaseConfig;
 
 public abstract class Database {
     protected DatabaseConfig config;
-    protected Connection conn;
+    private Connection conn;
 
     public Database(DatabaseConfig config) {
         this.config = config;
@@ -107,6 +107,14 @@ public abstract class Database {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
         return result;
+    }
+
+    public Connection getConn() {
+        return conn;
+    }
+
+    protected void setConn(Connection conn) {
+        this.conn = conn;
     }
 
     public abstract void connect();

@@ -10,6 +10,8 @@ import com.dbw.db.DatabaseFactory;
 import com.dbw.db.PostgresQueries;
 
 public class Watcher {
+    private final short RUN_INTERVAL = 1000;
+    
     private Config config;
     private Database db;
     private boolean isRunning;
@@ -83,18 +85,22 @@ public class Watcher {
         findLastId();
         setIsRunning(true);
         while (getIsRunning()) {
-            try {
-                Thread.sleep(1000);
-                List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, getLastId());
-                for (AuditRecord auditRecord : auditRecords) {
-                    String diff = auditRecord.findDiff();
-                    System.out.println(diff);
-                }
-                findLastId();
-                incrementRunCounter();
-            } catch (InterruptedException e) {
+            run();
+        }
+    }
 
+    private void run() {
+        try {
+            Thread.sleep(RUN_INTERVAL);
+            List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, getLastId());
+            for (AuditRecord auditRecord : auditRecords) {
+                String diff = auditRecord.findDiff();
+                System.out.println(diff);
             }
+            findLastId();
+            incrementRunCounter();
+        } catch (InterruptedException e) {
+
         }
     }
 

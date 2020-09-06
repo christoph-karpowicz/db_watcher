@@ -1,5 +1,6 @@
 package com.dbw.db;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,7 +19,8 @@ public class Postgres extends Database {
     public void connect() {
         try {
             Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
+            Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
+            setConn(conn);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -94,7 +96,7 @@ public class Postgres extends Database {
 
     public void close() {
         try {
-            conn.close();
+            getConn().close();
         } catch (SQLException e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }

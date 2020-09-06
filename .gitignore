@@ -3,7 +3,8 @@ target/
 .project
 .settings/
 .vscode/
-config/
+config/*
+!config/test.yml
 lib/
 docker-compose.yml
 data/

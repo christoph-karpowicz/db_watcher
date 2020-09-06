@@ -1,0 +1,11 @@
+database:
+    name      : dvdrental
+    type      : postgresql
+    host      : "127.0.0.1"
+    port      : 5432
+    user      : chris
+    password  : "1111"
+tables:
+    - film
+    - actor
+    - address
