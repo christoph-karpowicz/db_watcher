@@ -58,7 +58,7 @@
           <configuration>
             <transformers>
               <transformer>
-                <mainClass>com.dbw.app.App</mainClass>
+                <mainClass>com.dbw.app.Main</mainClass>
               </transformer>
             </transformers>
           </configuration>

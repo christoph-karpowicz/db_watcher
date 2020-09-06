@@ -2,43 +2,31 @@ package com.dbw.watcher;
 
 import java.util.List;
 
-import com.dbw.cfg.Config;
-import com.dbw.cfg.DatabaseConfig;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
-import com.dbw.db.DatabaseFactory;
 import com.dbw.db.PostgresQueries;
+import com.google.inject.Singleton;
 
+@Singleton
 public class Watcher {
     private final short RUN_INTERVAL = 1000;
     
-    private Config config;
+    private List<String> watchedTables;
     private Database db;
     private boolean isRunning;
     private int runCounter = 0;
     private int lastId;
 
-    public void setConfig(Config config) {
-        this.config = config;
+    public void setWatchedTables(List<String> watchedTables) {
+        this.watchedTables = watchedTables;
+    }
+
+    public void setDb(Database db) {
+        this.db = db;
     }
 
     public void init() {
-        setDb();
-        connectToDb();
         prepareAuditObjects();
-    }
-
-    private void setDb() {
-        DatabaseConfig dbConfig = config.getDatabase();
-        try {
-            db = DatabaseFactory.getDatabase(dbConfig);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private void connectToDb() {
-        db.connect();
     }
 
     private void prepareAuditObjects() {
@@ -67,14 +55,14 @@ public class Watcher {
     private void dropUnusedAuditTriggers() {
         String[] auditTriggers = db.selectAuditTriggers();
         for (String auditTriggerName : auditTriggers) {
-            if (!config.getTables().contains(auditTriggerName)) {
+            if (!watchedTables.contains(auditTriggerName)) {
                 db.dropAuditTrigger(auditTriggerName);
             }
         }
     }
 
     private void createAuditTriggers() {
-        for (String tableName : config.getTables()) {
+        for (String tableName : watchedTables) {
             if (!db.auditTriggerExists(tableName)) {
                 db.createAuditTrigger(tableName);
             }
@@ -100,7 +88,7 @@ public class Watcher {
             findLastId();
             incrementRunCounter();
         } catch (InterruptedException e) {
-
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
     }
 
@@ -130,10 +118,6 @@ public class Watcher {
 
     private void incrementRunCounter() {
         runCounter++;
-    }
-
-    public void end() {
-        db.close();
     }
     
 }

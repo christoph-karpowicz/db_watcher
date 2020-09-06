@@ -29,7 +29,10 @@ public abstract class Database {
     }
 
     private static String prepareQuery(String query, Object... args) {
-        return String.format(query, args);
+        if (args.length > 0) {
+            return String.format(query, args);
+        }
+        return query;
     }
 
     protected boolean objectExists(String query, String[] stringArgs) {
@@ -117,15 +120,23 @@ public abstract class Database {
         this.conn = conn;
     }
 
+    public DatabaseConfig getConfig() {
+        return config;
+    }
+
     public abstract void connect();
 
     public abstract boolean auditTableExists();
 
     public abstract void createAuditTable();
 
+    public abstract void dropAuditTable();
+
     public abstract boolean auditFunctionExists();
 
     public abstract void createAuditFunction();
+
+    public abstract void dropAuditFunction();
 
     public abstract boolean auditTriggerExists(String tableName);
 

@@ -9,6 +9,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CLI {
+    private final String OPTIONS_CONFIG = "config";
+    private final String OPTIONS_CLEAN = "clean";
+    
     private CommandLineParser parser;
     private Options options;
     private CommandLine cmd;
@@ -23,7 +26,8 @@ public class CLI {
     }
 
     private void setOptions() {
-        options.addOption("c", "config", true, "point to a configuration file");
+        options.addOption("c", OPTIONS_CONFIG, true, "point to a configuration file");
+        options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
     }
 
     private void setCmd() {
@@ -41,20 +45,30 @@ public class CLI {
     public ParsedOptions parseArgs() {
         parsedOptions = new ParsedOptions();
         parsedOptions.configPath = getConfigOption();
+        parsedOptions.clean = getCleanOption();
         return parsedOptions;
     }
 
     private String getConfigOption() {
         String configPath;
-        if(cmd.hasOption("config")) {
-            configPath = cmd.getOptionValue("config");
+        if(cmd.hasOption(OPTIONS_CONFIG)) {
+            configPath = cmd.getOptionValue(OPTIONS_CONFIG);
         } else {
             configPath = Config.DEFAULT_PATH;
         }
         return configPath;
     }
 
+    private boolean getCleanOption() {
+        boolean clean = false;
+        if(cmd.hasOption(OPTIONS_CLEAN)) {
+            clean = cmd.hasOption(OPTIONS_CLEAN);
+        }
+        return clean;
+    }
+
     public class ParsedOptions {
         public String configPath;
+        public boolean clean;
     }
 }

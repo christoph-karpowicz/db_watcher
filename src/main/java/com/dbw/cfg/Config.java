@@ -1,5 +1,6 @@
 package com.dbw.cfg;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Config {
@@ -14,15 +15,7 @@ public class Config {
         return database;
     }
 
-    public void setDatabase(DatabaseConfig database) {
-        this.database = database;
-    }
-
     public List<String> getTables() {
-        return tables;
-    }
-
-    public void setTables(List<String> tables) {
-        this.tables = tables;
+        return Collections.unmodifiableList(tables);
     }
 }

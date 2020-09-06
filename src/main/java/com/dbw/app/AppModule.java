@@ -1,6 +1,5 @@
 package com.dbw.app;
 
-import com.dbw.log.Logger;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 

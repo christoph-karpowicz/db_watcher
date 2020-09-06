@@ -4,7 +4,6 @@ import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cfg.ConfigParserTest;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -18,17 +17,13 @@ public class WatcherTest
     public static void setup() {
         watcher = new Watcher();
         config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
-        watcher.setConfig(config);
+        watcher.setWatchedTables(config.getTables());
     }
     
     @Test
     public void shouldInit()
     {
-        watcher.init();
+        // watcher.init();
     }
 
-    @AfterClass
-    public static void end() {
-        watcher.end();
-    }
 }

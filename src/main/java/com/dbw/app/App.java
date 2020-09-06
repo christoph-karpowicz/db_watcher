@@ -2,40 +2,83 @@ package com.dbw.app;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
+import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cli.CLI;
+import com.dbw.db.Database;
+import com.dbw.db.DatabaseFactory;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.watcher.Watcher;
 
-// mvn package shade:shade
-// java -jar ./target/dbw-1.0-SNAPSHOT.jar -c config/example.yml
-
 public class App {
 
-    public static Watcher watcher = new Watcher();
+    public Watcher watcher = new Watcher();
     
-    public static void main(String[] args) {
-        CLI.ParsedOptions options = handleArgs(args);
-        Config config = ConfigParser.fromYMLFile(options.configPath);
-        addShutdownHook();
-        watcher.setConfig(config);
-        watcher.init();
-        watcher.start();
+    private CLI.ParsedOptions options;
+    private Config config;
+    private Database db;
+    
+    public void init(String[] args) {
+        options = handleArgs(args);
+        config = ConfigParser.fromYMLFile(options.configPath);
+        setDb();
+        connectToDb();
     }
-
-    private static CLI.ParsedOptions handleArgs(String[] args) {
+    
+    private CLI.ParsedOptions handleArgs(String[] args) {
         CLI cli = new CLI();
         cli.setArgs(args);
         cli.init();
         return cli.parseArgs();
     }
 
-    private static void addShutdownHook() {
+    private void setDb() {
+        DatabaseConfig dbConfig = config.getDatabase();
+        try {
+            db = DatabaseFactory.getDatabase(dbConfig);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void connectToDb() {
+        db.connect();
+    }
+
+    public void start() {
+        if (options.clean) {
+            clean();
+        } else {
+            addShutdownHook();
+            startWatcher();
+        }
+    }
+
+    private void clean() {
+        for (String tableName : config.getTables()) {
+            db.dropAuditTrigger(tableName);
+        }
+        db.dropAuditFunction();
+        db.dropAuditTable();
+    }
+
+    private void startWatcher() {
+        watcher.setWatchedTables(config.getTables());
+        watcher.setDb(db);
+        watcher.init();
+        watcher.start();
+    }
+
+    private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 Logger.log(Level.INFO, "Shutting down ...");
-                watcher.end();
+                shutdown();
             }
         });
+    }
+
+    private void shutdown() {
+        db.close();
     }
 }
