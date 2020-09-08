@@ -10,7 +10,7 @@ import org.junit.Test;
 public class WatcherTest 
 {
 
-    private static Watcher watcher;
+    private static Watchable watcher;
     private static Config config;
     
     @BeforeClass

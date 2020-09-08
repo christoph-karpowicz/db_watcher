@@ -60,11 +60,7 @@ public class CLI {
     }
 
     private boolean getCleanOption() {
-        boolean clean = false;
-        if(cmd.hasOption(OPTIONS_CLEAN)) {
-            clean = cmd.hasOption(OPTIONS_CLEAN);
-        }
-        return clean;
+        return cmd.hasOption(OPTIONS_CLEAN);
     }
 
     public class ParsedOptions {

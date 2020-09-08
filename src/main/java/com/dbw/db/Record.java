@@ -25,7 +25,14 @@ public class Record {
             parsedData = new HashMap<String,Object>();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
-        System.out.println(parsedData);
         return parsedData;
+    }
+
+    public Map<String, Object> getOldState() {
+        return oldState;
+    }
+
+    public Map<String, Object> getNewState() {
+        return newState;
     }
 }

@@ -5,10 +5,16 @@ import java.util.List;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.PostgresQueries;
+import com.dbw.diff.DiffService;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class Watcher {
+public class Watcher implements Watchable {
+
+    @Inject
+    private DiffService diffService;
+    
     private final short RUN_INTERVAL = 1000;
     
     private List<String> watchedTables;
@@ -80,9 +86,10 @@ public class Watcher {
     private void run() {
         try {
             Thread.sleep(RUN_INTERVAL);
-            List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, getLastId());
+            // List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, getLastId());
+            List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, 0);
             for (AuditRecord auditRecord : auditRecords) {
-                String diff = auditRecord.findDiff();
+                String diff = diffService.findDiff(auditRecord);
                 System.out.println(diff);
             }
             findLastId();

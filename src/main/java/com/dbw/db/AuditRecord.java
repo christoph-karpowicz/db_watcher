@@ -11,19 +11,6 @@ public class AuditRecord {
     private String query;
     private Date timestamp;
 
-    public String findDiff() {
-        StringBuilder diffBuilder = new StringBuilder();
-        Operation dbOperation = Operation.valueOf(operation);
-        Record record = new Record();
-        record.parseOldData(oldData);
-        record.parseNewData(newData);
-        switch (dbOperation) {
-            case UPDATE: 
-                break;
-        }
-        return diffBuilder.toString();
-    }
-
     public int getId() {
         return id;
     }
