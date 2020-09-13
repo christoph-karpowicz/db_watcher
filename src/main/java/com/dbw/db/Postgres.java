@@ -30,6 +30,10 @@ public class Postgres extends Database {
     }
 
     private String getConnectionString() {
+        if (config.getConnectionString() != null) {
+            return config.getConnectionString();
+        }
+        
         return new StringBuilder()
             .append("jdbc:" + config.getType())
             .append("://" + config.getHost())

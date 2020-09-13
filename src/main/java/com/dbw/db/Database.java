@@ -63,8 +63,8 @@ public abstract class Database {
                 AuditRecord auditRecord = new AuditRecord();
                 auditRecord.setId(rs.getInt("id"));
                 auditRecord.setTableName(rs.getString("table_name"));
-                auditRecord.setOldData(rs.getString("old"));
-                auditRecord.setNewData(rs.getString("new"));
+                auditRecord.setOldData(rs.getString("old_state"));
+                auditRecord.setNewData(rs.getString("new_state"));
                 auditRecord.setOperation(rs.getString("operation"));
                 auditRecord.setQuery(rs.getString("query"));
                 auditRecord.setTimestamp(rs.getDate("timestamp"));

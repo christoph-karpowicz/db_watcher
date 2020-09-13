@@ -1,7 +1,8 @@
 package com.dbw.db;
 
 public enum DatabaseType {
-    POSTGRES("postgresql");
+    POSTGRES("postgresql"),
+    ORCL("oracle");
 
     public final String type;
 

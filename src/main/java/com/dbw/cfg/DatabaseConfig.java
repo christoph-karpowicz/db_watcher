@@ -5,6 +5,7 @@ public class DatabaseConfig {
     private String type;
     private String host;
     private int port;
+    private String connectionString;
     private String user;
     private String password;
 
@@ -22,6 +23,10 @@ public class DatabaseConfig {
 
     public int getPort() {
         return port;
+    }
+
+    public String getConnectionString() {
+        return connectionString;
     }
 
     public String getUser() {

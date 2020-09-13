@@ -10,14 +10,15 @@ public class PostgresQueries {
         ");";
     
     public static final String CREATE_AUDIT_TABLE = 
-        "CREATE TABLE %s " +
-            "(id            SERIAL PRIMARY KEY NOT NULL," +
-            " table_name    VARCHAR(100), " +
-            " old           TEXT, " +
-            " new           TEXT, " +
-            " operation     VARCHAR(6) NOT NULL, " +
-            " query         TEXT, " +
-            " timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
+        "CREATE TABLE %s (" +
+            "id            SERIAL PRIMARY KEY NOT NULL," +
+            "table_name    VARCHAR(100), " +
+            "old_state     TEXT, " +
+            "new_state     TEXT, " +
+            "operation     VARCHAR(6) NOT NULL, " +
+            "query         TEXT, " +
+            "timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
+        ")";
 
     public static final String FIND_AUDIT_FUNCTION = 
         "SELECT EXISTS (" +
