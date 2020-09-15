@@ -42,6 +42,11 @@ public class Postgres extends Database {
             .toString();
     }
 
+    public void prepare(List<String> watchedTables) {
+        PostgresPrepareService postgresPrepareService = new PostgresPrepareService(this, watchedTables);
+        postgresPrepareService.prepare();
+    }
+
     public boolean auditTableExists() {
         String[] stringArgs = {Config.DEFAULT_SCHEMA, Config.DEFAULT_AUDIT_TABLE_NAME};
         return objectExists(PostgresQueries.FIND_AUDIT_TABLE, stringArgs);
@@ -96,6 +101,14 @@ public class Postgres extends Database {
             auditTriggerNames[i] = auditTriggerName;
         }
         return auditTriggerNames;
+    }
+
+    public void clean(List<String> watchedTables) {
+        for (String tableName : watchedTables) {
+            dropAuditTrigger(tableName);
+        }
+        dropAuditFunction();
+        dropAuditTable();
     }
 
     public void close() {

@@ -36,32 +36,21 @@ public class PostgresQueries {
         "    IF (TG_OP = 'UPDATE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
-        "        INSERT INTO dbw_audit(old, new, table_name, operation, query) " +
+        "        INSERT INTO dbw_audit(old_state, new_state, table_name, operation, query) " +
         "            VALUES (v_old, v_new, TG_TABLE_NAME::TEXT , TG_OP, current_query());" +
         "        RETURN NEW;" +
         "    ELSIF (TG_OP = 'DELETE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
-        "        INSERT INTO dbw_audit(old, table_name, operation, query)" +
+        "        INSERT INTO dbw_audit(old_state, table_name, operation, query)" +
         "            VALUES (v_old, TG_TABLE_NAME::TEXT, TG_OP, current_query());" +
         "        RETURN OLD;" +
         "    ELSIF (TG_OP = 'INSERT') THEN" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
-        "        INSERT INTO dbw_audit(new, table_name, operation, query)" +
+        "        INSERT INTO dbw_audit(new_state, table_name, operation, query)" +
         "            VALUES (v_new, TG_TABLE_NAME::TEXT, TG_OP, current_query());" +
         "        RETURN NEW;" +
         "    END IF;" +
         "    RETURN NEW;" +
-        "" +
-        "EXCEPTION" +
-        "    WHEN data_exception THEN" +
-        "        RAISE WARNING '[AUDIT.IF_MODIFIED_FUNC] - UDF ERROR [DATA EXCEPTION] - SQLSTATE: %, SQLERRM: %',SQLSTATE,SQLERRM;" +
-        "        RETURN NULL;" +
-        "    WHEN unique_violation THEN" +
-        "        RAISE WARNING '[AUDIT.IF_MODIFIED_FUNC] - UDF ERROR [UNIQUE] - SQLSTATE: %, SQLERRM: %',SQLSTATE,SQLERRM;" +
-        "        RETURN NULL;" +
-        "    WHEN others THEN" +
-        "        RAISE WARNING '[AUDIT.IF_MODIFIED_FUNC] - UDF ERROR [OTHER] - SQLSTATE: %, SQLERRM: %',SQLSTATE,SQLERRM;" +
-        "        RETURN NULL;" +
         "END;" +
         "$$" +
         "LANGUAGE plpgsql;";

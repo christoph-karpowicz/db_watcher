@@ -35,6 +35,30 @@ public class Orcl extends Database {
         return config.getConnectionString();
     }
 
+    public void prepare(List<String> watchedTables) {
+        OrclPrepareService orclPrepareService = new OrclPrepareService(this, watchedTables);
+        orclPrepareService.prepare();
+    }
+
+    public boolean auditTableExists() {
+        String[] stringArgs = {config.getUser().toUpperCase(), Config.DEFAULT_AUDIT_TABLE_NAME.toUpperCase()};
+        return objectExists(OrclQueries.FIND_AUDIT_TABLE, stringArgs);
+    }
+
+    public void createAuditTable() {
+        executeUpdate(OrclQueries.CREATE_AUDIT_TABLE, Config.DEFAULT_AUDIT_TABLE_NAME);
+        Logger.log(Level.INFO, "Audit table has been created.");
+    }
+
+    public void dropAuditTable() {
+        executeUpdate("DROP TABLE " + Config.DEFAULT_AUDIT_TABLE_NAME);
+        Logger.log(Level.INFO, "Audit table has been dropped.");
+    }
+
+    public void clean(List<String> watchedTables) {
+
+    }
+
     public void close() {
         try {
             getConn().close();

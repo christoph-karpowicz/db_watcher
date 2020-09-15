@@ -32,49 +32,9 @@ public class Watcher implements Watchable {
     }
 
     public void init() {
-        prepareAuditObjects();
+        db.prepare(watchedTables);
     }
 
-    private void prepareAuditObjects() {
-        prepareAuditTable();
-        prepareAuditFunction();
-        prepareAuditTriggers();
-    }
-
-    private void prepareAuditTable() {
-        if (!db.auditTableExists()) {
-            db.createAuditTable();
-        }
-    }
-
-    private void prepareAuditFunction() {
-        if (!db.auditFunctionExists()) {
-            db.createAuditFunction();
-        }
-    }
-
-    private void prepareAuditTriggers() {
-        dropUnusedAuditTriggers();
-        createAuditTriggers();
-    }
-
-    private void dropUnusedAuditTriggers() {
-        String[] auditTriggers = db.selectAuditTriggers();
-        for (String auditTriggerName : auditTriggers) {
-            if (!watchedTables.contains(auditTriggerName)) {
-                db.dropAuditTrigger(auditTriggerName);
-            }
-        }
-    }
-
-    private void createAuditTriggers() {
-        for (String tableName : watchedTables) {
-            if (!db.auditTriggerExists(tableName)) {
-                db.createAuditTrigger(tableName);
-            }
-        }
-    }
-    
     public void start() {
         findLastId();
         setIsRunning(true);

@@ -15,6 +15,6 @@ public class Main {
         Injector injector = Guice.createInjector(new AppModule());
         app = injector.getInstance(App.class);
         app.init(args);
-        // app.start();
+        app.start();
     }
 }

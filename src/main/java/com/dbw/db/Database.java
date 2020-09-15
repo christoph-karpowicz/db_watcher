@@ -42,6 +42,7 @@ public abstract class Database {
             for (short i = 0; i < stringArgs.length; i++) {
                 pstmt.setString(i + 1, stringArgs[i]);
             }
+
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 exists = rs.getBoolean("exists");
@@ -126,25 +127,9 @@ public abstract class Database {
 
     public abstract void connect();
 
-    public abstract boolean auditTableExists();
+    public abstract void prepare(List<String> watchedTables);
 
-    public abstract void createAuditTable();
-
-    public abstract void dropAuditTable();
-
-    public abstract boolean auditFunctionExists();
-
-    public abstract void createAuditFunction();
-
-    public abstract void dropAuditFunction();
-
-    public abstract boolean auditTriggerExists(String tableName);
-
-    public abstract void createAuditTrigger(String tableName);
-
-    public abstract void dropAuditTrigger(String tableName);
-    
-    public abstract String[] selectAuditTriggers();
+    public abstract void clean(List<String> watchedTables);
 
     public abstract void close();
     

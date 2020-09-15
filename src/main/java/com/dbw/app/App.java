@@ -57,18 +57,14 @@ public class App {
     }
 
     private void clean() {
-        for (String tableName : config.getTables()) {
-            db.dropAuditTrigger(tableName);
-        }
-        db.dropAuditFunction();
-        db.dropAuditTable();
+        db.clean(config.getTables());
     }
 
     private void startWatcher() {
         watcher.setWatchedTables(config.getTables());
         watcher.setDb(db);
         watcher.init();
-        watcher.start();
+        // watcher.start();
     }
 
     private void addShutdownHook() {
