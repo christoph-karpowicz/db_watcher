@@ -15,7 +15,7 @@ public class PostgresQueries {
             "table_name    VARCHAR(100), " +
             "old_state     TEXT, " +
             "new_state     TEXT, " +
-            "operation     VARCHAR(6) NOT NULL, " +
+            "operation     CHAR(1) NOT NULL, " +
             "query         TEXT, " +
             "timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
         ")";
@@ -37,17 +37,17 @@ public class PostgresQueries {
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
         "        INSERT INTO dbw_audit(old_state, new_state, table_name, operation, query) " +
-        "            VALUES (v_old, v_new, TG_TABLE_NAME::TEXT , TG_OP, current_query());" +
+        "            VALUES (v_old, v_new, TG_TABLE_NAME::TEXT , 'U', current_query());" +
         "        RETURN NEW;" +
         "    ELSIF (TG_OP = 'DELETE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
         "        INSERT INTO dbw_audit(old_state, table_name, operation, query)" +
-        "            VALUES (v_old, TG_TABLE_NAME::TEXT, TG_OP, current_query());" +
+        "            VALUES (v_old, TG_TABLE_NAME::TEXT, 'D', current_query());" +
         "        RETURN OLD;" +
         "    ELSIF (TG_OP = 'INSERT') THEN" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
         "        INSERT INTO dbw_audit(new_state, table_name, operation, query)" +
-        "            VALUES (v_new, TG_TABLE_NAME::TEXT, TG_OP, current_query());" +
+        "            VALUES (v_new, TG_TABLE_NAME::TEXT, 'I', current_query());" +
         "        RETURN NEW;" +
         "    END IF;" +
         "    RETURN NEW;" +
