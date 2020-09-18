@@ -31,7 +31,6 @@ public class OrclPrepareService {
 
     private void dropUnusedAuditTriggers() {
         String[] auditTriggers = db.selectAuditTriggers();
-        System.out.println(Arrays.toString(auditTriggers));
         for (String auditTriggerName : auditTriggers) {
             if (!watchedTables.contains(auditTriggerName)) {
                 db.dropAuditTrigger(auditTriggerName);
@@ -41,27 +40,43 @@ public class OrclPrepareService {
 
     private void createAuditTriggers() {
         for (String tableName : watchedTables) {
-            String stateConcat = prepareStateConcat("NEW", tableName);
-            System.out.println(stateConcat);
-        //     if (!db.auditTriggerExists(tableName)) {
-        //         db.createAuditTrigger(tableName);
-        //     }
+            String newStateConcat = prepareStateConcat("NEW", tableName);
+            String oldStateConcat = prepareStateConcat("OLD", tableName);
+            String auditTriggerQuery = db.prepareQuery(
+                OrclQueries.CREATE_AUDIT_TRIGGER, 
+                tableName, 
+                tableName, 
+                newStateConcat, 
+                oldStateConcat, 
+                tableName, 
+                newStateConcat, 
+                tableName, 
+                oldStateConcat, 
+                tableName);
+            if (!db.auditTriggerExists(tableName)) {
+                db.createAuditTrigger(tableName, auditTriggerQuery);
+            }
         }
     }
 
-    private String prepareStateConcat(String agePrefix, String tableName) {
+    private String prepareStateConcat(String statePrefix, String tableName) {
         List<String> stateConcat = new ArrayList<String>();
+        stateConcat.add("'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'");
+        stateConcat.add("'<table_data>'");
         Column[] tableColumns = db.selectTableColumns(tableName);
         for (Column tableColumn : tableColumns) {
             StringBuilder columnValueToStringInvocation = new StringBuilder();
             columnValueToStringInvocation
+                .append("'<column_data name=\"" + tableColumn.getName() + "\">' || ")
                 .append("TO_CHAR(:")
-                .append(agePrefix)
+                .append(statePrefix)
                 .append(".")
                 .append(tableColumn.getName())
-                .append(")");
+                .append(")")
+                .append(" || '</column_data>'");
             stateConcat.add(columnValueToStringInvocation.toString());
         }
-        return String.join(" /dbw_break/ ", stateConcat);
+        stateConcat.add("'</table_data>'");
+        return String.join(" || ", stateConcat);
     }
 }

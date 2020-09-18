@@ -21,9 +21,34 @@ public class OrclQueries {
     public static final String FIND_AUDIT_TRIGGER = "SELECT COUNT(*) AS \"exists\" from sys.all_triggers WHERE TRIGGER_NAME = ?";
 
     public static final String CREATE_AUDIT_TRIGGER = 
-        "CREATE TRIGGER dbw_%s_audit" +
-        " AFTER INSERT OR UPDATE OR DELETE ON %s" +
-        " FOR EACH ROW EXECUTE PROCEDURE dbw_audit_func()";
+        "CREATE TRIGGER DBW_%s_AUDIT " +
+        "AFTER INSERT OR UPDATE OR DELETE ON %s " +
+        "FOR EACH ROW " +
+        "DECLARE " +
+        "v_operation VARCHAR2(6) := " +
+        "    case when updating then 'U' " +
+        "        when deleting then 'D' " +
+        "        else 'I' end; " +
+        "next_id DBW_AUDIT.ID%%TYPE;" +
+        "v_old_state VARCHAR2(2000);" +
+        "v_new_state VARCHAR2(2000);" +
+        "BEGIN " +
+        "    SELECT COALESCE(MAX(ID), 0)+1 INTO next_id from DBW_AUDIT;" +
+        "    IF updating THEN" +
+        "        v_old_state := %s;" +
+        "        v_new_state := %s;" +
+        "        INSERT INTO DBW_AUDIT(id, table_name, old_state, new_state, operation)" +
+        "            VALUES(next_id, '%s', v_old_state, v_new_state, v_operation);" +
+        "    ELSIF inserting THEN" +
+        "       v_new_state := %s;" +
+        "       INSERT INTO DBW_AUDIT(id, table_name, new_state, operation)" +
+        "            VALUES(next_id, '%s', v_new_state, v_operation);" +
+        "    ELSE " +
+        "        v_old_state := %s;" +
+        "        INSERT INTO DBW_AUDIT(id, table_name, old_state, operation)" +
+        "            VALUES(next_id, '%s', v_old_state, v_operation);" +
+        "    END IF;" +
+        "END;";
 
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER DBW_%S_AUDIT";
 

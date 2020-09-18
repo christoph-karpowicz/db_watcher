@@ -59,12 +59,12 @@ public class Orcl extends Database {
     }
 
     public boolean auditTriggerExists(String tableName) {
-        String[] stringArgs = {"dbw_" + tableName + "_audit"};
+        String[] stringArgs = {"DBW_" + tableName + "_AUDIT"};
         return objectExists(OrclQueries.FIND_AUDIT_TRIGGER, stringArgs);
     }
 
-    public void createAuditTrigger(String tableName) {
-        executeUpdate(OrclQueries.CREATE_AUDIT_TRIGGER, tableName, tableName);
+    public void createAuditTrigger(String tableName, String query) {
+        executeUpdate(query);
         Logger.log(Level.INFO, String.format("Audit trigger for table \"%s\" has been created.", tableName));
     }
 
@@ -105,7 +105,10 @@ public class Orcl extends Database {
     }
  
     public void clean(List<String> watchedTables) {
-
+        for (String tableName : watchedTables) {
+            dropAuditTrigger(tableName);
+        }
+        dropAuditTable();
     }
 
     public void close() {

@@ -64,7 +64,7 @@ public class App {
         watcher.setWatchedTables(config.getTables());
         watcher.setDb(db);
         watcher.init();
-        // watcher.start();
+        watcher.start();
     }
 
     private void addShutdownHook() {

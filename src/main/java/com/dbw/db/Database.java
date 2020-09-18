@@ -28,7 +28,7 @@ public abstract class Database {
         }
     }
 
-    private static String prepareQuery(String query, Object... args) {
+    public static String prepareQuery(String query, Object... args) {
         if (args.length > 0) {
             return String.format(query, args);
         }
