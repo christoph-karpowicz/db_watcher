@@ -54,7 +54,9 @@ public abstract class Database {
         return exists;
     }
 
-    public List<AuditRecord> selectAuditRecords(String query, int fromId) {
+    public abstract List<AuditRecord> selectAuditRecords(int fromId);
+    
+    protected List<AuditRecord> selectAuditRecords(String query, int fromId) {
         List<AuditRecord> result = new ArrayList<AuditRecord>();
         try {
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -67,7 +69,9 @@ public abstract class Database {
                 auditRecord.setOldData(rs.getString("old_state"));
                 auditRecord.setNewData(rs.getString("new_state"));
                 auditRecord.setOperation(rs.getString("operation"));
-                auditRecord.setQuery(rs.getString("query"));
+                if (columnExists(rs, "query")) {
+                    auditRecord.setQuery(rs.getString("query"));
+                }
                 auditRecord.setTimestamp(rs.getDate("timestamp"));
                 result.add(auditRecord);
             }
@@ -76,6 +80,15 @@ public abstract class Database {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
         return result;
+    }
+
+    private boolean columnExists(ResultSet rs, String columnName) {
+        try {
+            rs.findColumn(columnName);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     protected List<String> selectStringArray(String query, String[] stringArgs) {
@@ -96,7 +109,9 @@ public abstract class Database {
         return result;
     }
 
-    public int selectMaxId(String query) {
+    public abstract int selectMaxId();
+
+    protected int selectMaxId(String query) {
         int result = 0;
         try {
             Statement pstmt = conn.createStatement();

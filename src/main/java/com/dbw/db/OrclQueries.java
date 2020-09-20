@@ -54,7 +54,7 @@ public class OrclQueries {
 
     public static final String SELECT_AUDIT_TRIGGERS = "SELECT TRIGGER_NAME AS \"item\" from sys.all_triggers WHERE TRIGGER_NAME LIKE 'DBW_%_AUDIT'";
 
-    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(ID) FROM DBW_AUDIT";
+    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(ID) AS \"max\" FROM DBW_AUDIT";
 
     public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM DBW_AUDIT WHERE id > ?";
 

@@ -5,7 +5,7 @@ import java.util.List;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.PostgresQueries;
-import com.dbw.diff.DiffService;
+import com.dbw.diff.StateDiffService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -13,7 +13,7 @@ import com.google.inject.Singleton;
 public class Watcher implements Watchable {
 
     @Inject
-    private DiffService diffService;
+    private StateDiffService diffService;
     
     private final short RUN_INTERVAL = 1000;
     
@@ -46,8 +46,8 @@ public class Watcher implements Watchable {
     private void run() {
         try {
             Thread.sleep(RUN_INTERVAL);
-            // List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, getLastId());
-            List<AuditRecord> auditRecords = db.selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, 0);
+            // List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
+            List<AuditRecord> auditRecords = db.selectAuditRecords(0);
             for (AuditRecord auditRecord : auditRecords) {
                 String diff = diffService.findDiff(auditRecord);
                 System.out.println(diff);
@@ -60,7 +60,7 @@ public class Watcher implements Watchable {
     }
 
     private void findLastId() {
-        setLastId(db.selectMaxId(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID));
+        setLastId(db.selectMaxId());
     }
 
     private int getLastId() {

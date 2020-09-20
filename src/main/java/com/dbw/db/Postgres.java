@@ -103,6 +103,14 @@ public class Postgres extends Database {
         return auditTriggerNames;
     }
 
+    public int selectMaxId() {
+        return selectMaxId(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID);
+    }
+
+    public List<AuditRecord> selectAuditRecords(int fromId) {
+        return selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, fromId);
+    }
+
     public void clean(List<String> watchedTables) {
         for (String tableName : watchedTables) {
             dropAuditTrigger(tableName);

@@ -103,6 +103,14 @@ public class Orcl extends Database {
         Column[] columns = new Column[result.size()];
         return result.toArray(columns);
     }
+
+    public int selectMaxId() {
+        return selectMaxId(OrclQueries.SELECT_AUDIT_TABLE_MAX_ID);
+    }
+
+    public List<AuditRecord> selectAuditRecords(int fromId) {
+        return selectAuditRecords(OrclQueries.SELECT_AUDIT_RECORDS, fromId);
+    }
  
     public void clean(List<String> watchedTables) {
         for (String tableName : watchedTables) {

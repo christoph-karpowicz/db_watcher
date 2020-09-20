@@ -52,7 +52,8 @@ public class OrclPrepareService {
                 newStateConcat, 
                 tableName, 
                 oldStateConcat, 
-                tableName);
+                tableName
+            );
             if (!db.auditTriggerExists(tableName)) {
                 db.createAuditTrigger(tableName, auditTriggerQuery);
             }
@@ -62,21 +63,21 @@ public class OrclPrepareService {
     private String prepareStateConcat(String statePrefix, String tableName) {
         List<String> stateConcat = new ArrayList<String>();
         stateConcat.add("'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'");
-        stateConcat.add("'<table_data>'");
+        stateConcat.add("'<XmlColumnStates><columnStates>'");
         Column[] tableColumns = db.selectTableColumns(tableName);
         for (Column tableColumn : tableColumns) {
             StringBuilder columnValueToStringInvocation = new StringBuilder();
             columnValueToStringInvocation
-                .append("'<column_data name=\"" + tableColumn.getName() + "\">' || ")
+                .append("'<columnState name=\"" + tableColumn.getName() + "\">' || ")
                 .append("TO_CHAR(:")
                 .append(statePrefix)
                 .append(".")
                 .append(tableColumn.getName())
                 .append(")")
-                .append(" || '</column_data>'");
+                .append(" || '</columnState>'");
             stateConcat.add(columnValueToStringInvocation.toString());
         }
-        stateConcat.add("'</table_data>'");
+        stateConcat.add("'</columnStates></XmlColumnStates>'");
         return String.join(" || ", stateConcat);
     }
 }
