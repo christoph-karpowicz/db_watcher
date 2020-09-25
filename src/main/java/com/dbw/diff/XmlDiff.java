@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
+import com.google.common.collect.ImmutableMap;
+import com.dbw.state.XmlColumnState;
 import com.dbw.state.XmlColumnStates;
 
 public class XmlDiff extends Diff {
@@ -14,12 +15,15 @@ public class XmlDiff extends Diff {
         try {
             XmlMapper xmlMapper = new XmlMapper();
             XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
-            System.out.println(state.getColumnState());
+            for (XmlColumnState columnState : state.getColumnStates()) {
+                parsedData.put(columnState.getName(), columnState.getValue());
+            }
         } catch (Exception e) {
             parsedData = new HashMap<String, Object>();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
-        return parsedData;
+        // System.out.println(parsedData);
+        return ImmutableMap.copyOf(parsedData);
     }
 
 }

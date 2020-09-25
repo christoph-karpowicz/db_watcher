@@ -6,13 +6,13 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 public class XmlColumnStates {
     @JacksonXmlElementWrapper(localName = "columnStates")
-    private List<String> columnState;
+    private List<XmlColumnState> columnStates;
 
-    public List<String> getColumnState() {
-        return columnState;
+    public List<XmlColumnState> getColumnStates() {
+        return columnStates;
     }
 
-    public void setColumnState(List<String> columnState) {
-        this.columnState = columnState;
+    public void setColumnStates(List<XmlColumnState> columnStates) {
+        this.columnStates = columnStates;
     }
 }

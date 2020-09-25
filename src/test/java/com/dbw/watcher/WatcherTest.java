@@ -10,12 +10,12 @@ import org.junit.Test;
 public class WatcherTest 
 {
 
-    private static Watchable watcher;
+    private static Watcher watcher;
     private static Config config;
     
     @BeforeClass
     public static void setup() {
-        watcher = new Watcher();
+        watcher = new AuditTableWatcher();
         config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
         watcher.setWatchedTables(config.getTables());
     }

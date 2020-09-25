@@ -8,13 +8,13 @@ import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
-import com.dbw.watcher.Watchable;
+import com.dbw.watcher.Watcher;
 import com.google.inject.Inject;
 
 public class App {
 
     @Inject
-    private Watchable watcher;
+    private Watcher watcher;
     
     private CLI.ParsedOptions options;
     private Config config;
