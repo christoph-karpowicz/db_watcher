@@ -1,12 +1,13 @@
 package com.dbw.db;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.dbw.state.XmlStateBuilder;
 
 public class OrclPrepareService {
+    private final static String NEW_STATE_PREFIX = "NEW.";
+    private final static String OLD_STATE_PREFIX = "OLD.";
+    
     private XmlStateBuilder xmlStateBuilder;
     private Orcl db;
     private List<String> watchedTables;
@@ -45,8 +46,8 @@ public class OrclPrepareService {
     private void createAuditTriggers() {
         for (String tableName : watchedTables) {
             Column[] tableColumns = db.selectTableColumns(tableName);
-            String newStateConcat = xmlStateBuilder.build("NEW", tableColumns);
-            String oldStateConcat = xmlStateBuilder.build("OLD", tableColumns);
+            String newStateConcat = xmlStateBuilder.build(NEW_STATE_PREFIX, tableColumns);
+            String oldStateConcat = xmlStateBuilder.build(OLD_STATE_PREFIX, tableColumns);
             String auditTriggerQuery = db.prepareQuery(
                 OrclQueries.CREATE_AUDIT_TRIGGER, 
                 tableName,

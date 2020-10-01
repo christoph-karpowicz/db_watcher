@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XmlStateTag {
-    private final static String TAG_START = "<";
-    private final static String TAG_END = ">";
+    private final static String SPACE = " ";
+    private final static String TAG_START = "'<";
+    private final static String TAG_END = ">'";
     private final static String TAG_END_NAME_PREFIX = "/";
     
     private String name;
@@ -24,8 +25,21 @@ public class XmlStateTag {
         baseTagComponents.add(TAG_END);
     }
 
+    public void addAttribute(XmlStateTagAttribute attribute) {
+        attributes.add(attribute);
+    }
+
+    public void resetAttributes() {
+        attributes.clear();
+    }
+
     public String start() {
-        return String.join("", baseTagComponents);
+        List<String> startTagComponents = new ArrayList<String>(baseTagComponents);
+        for (XmlStateTagAttribute attr : attributes) {
+            startTagComponents.add(2, SPACE);
+            startTagComponents.add(3, attr.toString());
+        }
+        return String.join("", startTagComponents);
     }
 
     public String end() {

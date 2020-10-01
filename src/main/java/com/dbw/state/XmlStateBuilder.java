@@ -10,32 +10,60 @@ public class XmlStateBuilder {
     private final String XML_DECLARATION = "'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'";
     private final String XML_ROOT_TAG = "XmlColumnStates";
     private final String XML_COLUMN_STATES_TAG = "columnStates";
+    private final String XML_COLUMN_STATE_TAG = "columnState";
+    private final String XML_COLUMN_STATE_NAME_ATTRIBUTE = "name";
+    private final String PLSQL_TO_CHAR_FUNCTION_START = "TO_CHAR(:";
+    private final String PLSQL_TO_CHAR_FUNCTION_END = ")";
     private final String PLSQL_STRING_CONCAT_OPERATOR = " || ";
 
-    public XmlStateBuilder() {
+    XmlStateTag xmlRootTag;
+    XmlStateTag columnStatesTag;
+    XmlStateTag columnStateTag;
 
+    public XmlStateBuilder() {
+        prepareTags();
+    }
+
+    private void prepareTags() {
+        xmlRootTag = new XmlStateTag(XML_ROOT_TAG);
+        columnStatesTag = new XmlStateTag(XML_COLUMN_STATES_TAG);
+        columnStateTag = new XmlStateTag(XML_COLUMN_STATE_TAG);
     }
 
     public String build(String statePrefix, Column[] tableColumns) {
         List<String> stateConcat = new ArrayList<String>();
         stateConcat.add(XML_DECLARATION);
-        stateConcat.add(XML_ROOT_START_TAG);
-        stateConcat.add(XML_COLUMN_STATES_START_TAG);
+        stateConcat.add(xmlRootTag.start());
+        stateConcat.add(columnStatesTag.start());
         for (Column tableColumn : tableColumns) {
-            StringBuilder columnValueToStringInvocation = new StringBuilder();
-            columnValueToStringInvocation
-                .append("'<columnState name=\"" + tableColumn.getName() + "\">' || ")
-                .append("TO_CHAR(:")
-                .append(statePrefix)
-                .append(".")
-                .append(tableColumn.getName())
-                .append(")")
-                .append(" || '</columnState>'");
-            stateConcat.add(columnValueToStringInvocation.toString());
+            stateConcat.add(buildForColumn(statePrefix, tableColumn));
         }
-        stateConcat.add(XML_ROOT_END_TAG);
-        stateConcat.add(XML_COLUMN_STATES_END_TAG);
-        return String.join(" || ", stateConcat);
+        stateConcat.add(columnStatesTag.end());
+        stateConcat.add(xmlRootTag.end());
+        return String.join(PLSQL_STRING_CONCAT_OPERATOR, stateConcat);
+    }
+
+    private String buildForColumn(String statePrefix, Column tableColumn) {
+        addNameAttributeToColumnStateTag(tableColumn.getName());
+
+        StringBuilder columnValueToStringInvocation = new StringBuilder();
+        columnValueToStringInvocation
+            .append(columnStateTag.start())
+            .append(PLSQL_STRING_CONCAT_OPERATOR)
+            .append(PLSQL_TO_CHAR_FUNCTION_START)
+            .append(statePrefix)
+            .append(tableColumn.getName())
+            .append(PLSQL_TO_CHAR_FUNCTION_END)
+            .append(PLSQL_STRING_CONCAT_OPERATOR)
+            .append(columnStateTag.end());
+
+        return columnValueToStringInvocation.toString();
+    }
+
+    private void addNameAttributeToColumnStateTag(String value) {
+        XmlStateTagAttribute columnStateNameAttribute = new XmlStateTagAttribute(XML_COLUMN_STATE_NAME_ATTRIBUTE, value);
+        columnStateTag.resetAttributes();
+        columnStateTag.addAttribute(columnStateNameAttribute);
     }
     
 }
