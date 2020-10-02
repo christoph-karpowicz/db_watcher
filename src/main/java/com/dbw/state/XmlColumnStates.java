@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 public class XmlColumnStates {
-    @JacksonXmlElementWrapper(localName = "columnStates")
+    @JacksonXmlElementWrapper(localName = XmlStateBuilder.XML_COLUMN_STATES_TAG)
     private List<XmlColumnState> columnStates;
 
     public List<XmlColumnState> getColumnStates() {

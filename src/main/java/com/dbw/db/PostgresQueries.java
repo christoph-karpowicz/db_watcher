@@ -3,7 +3,7 @@ package com.dbw.db;
 public class PostgresQueries {
 
     public static final String FIND_AUDIT_TABLE = 
-        "SELECT EXISTS (" +
+        "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM information_schema.tables " +
         "    WHERE  table_schema = ?" +
         "    AND    table_name   = ?" +
@@ -11,23 +11,45 @@ public class PostgresQueries {
     
     public static final String CREATE_AUDIT_TABLE = 
         "CREATE TABLE %s (" +
-            "id            SERIAL PRIMARY KEY NOT NULL," +
-            "table_name    VARCHAR(100), " +
-            "old_state     TEXT, " +
-            "new_state     TEXT, " +
-            "operation     CHAR(1) NOT NULL, " +
-            "query         TEXT, " +
-            "timestamp     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
+            Postgres.COLUMN_NAMES[0] + "            SERIAL PRIMARY KEY NOT NULL," +
+            Postgres.COLUMN_NAMES[1] + "    VARCHAR(100), " +
+            Postgres.COLUMN_NAMES[2] + "     TEXT, " +
+            Postgres.COLUMN_NAMES[3] + "     TEXT, " +
+            Postgres.COLUMN_NAMES[4] + "     CHAR(1) NOT NULL, " +
+            Postgres.COLUMN_NAMES[5] + "         TEXT, " +
+            Postgres.COLUMN_NAMES[6] + "     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
         ")";
 
     public static final String FIND_AUDIT_FUNCTION = 
-        "SELECT EXISTS (" +
+        "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM pg_proc " +
-        "    WHERE  proname = 'dbw_audit_func'" +
+        "    WHERE  proname = '" + Common.DBW_AUDIT_FUNC_NAME + "'" +
         ");";
 
+    private static final String UPDATE_COL_LIST = QueryBuilder.buildColumNameList(
+        Common.COLNAME_OLD_STATE, 
+        Common.COLNAME_NEW_STATE, 
+        Common.COLNAME_TABLE_NAME, 
+        Common.COLNAME_OPERATION, 
+        Common.COLNAME_QUERY
+    );
+
+    private static final String DELETE_COL_LIST = QueryBuilder.buildColumNameList(
+        Common.COLNAME_OLD_STATE, 
+        Common.COLNAME_TABLE_NAME, 
+        Common.COLNAME_OPERATION, 
+        Common.COLNAME_QUERY
+    );
+
+    private static final String INSERT_COL_LIST = QueryBuilder.buildColumNameList(
+        Common.COLNAME_NEW_STATE, 
+        Common.COLNAME_TABLE_NAME, 
+        Common.COLNAME_OPERATION, 
+        Common.COLNAME_QUERY
+    );
+
     public static final String CREATE_AUDIT_FUNCTION = 
-        "CREATE FUNCTION dbw_audit_func() RETURNS trigger AS " +
+        "CREATE FUNCTION " + Common.DBW_AUDIT_FUNC_NAME + "() RETURNS trigger AS " +
         "$$" +
         "DECLARE" +
         "    v_old TEXT;" +
@@ -36,17 +58,17 @@ public class PostgresQueries {
         "    IF (TG_OP = 'UPDATE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
-        "        INSERT INTO dbw_audit(old_state, new_state, table_name, operation, query) " +
+        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + UPDATE_COL_LIST + ") " +
         "            VALUES (v_old, v_new, TG_TABLE_NAME::TEXT , 'U', current_query());" +
         "        RETURN NEW;" +
         "    ELSIF (TG_OP = 'DELETE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
-        "        INSERT INTO dbw_audit(old_state, table_name, operation, query)" +
+        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + DELETE_COL_LIST + ")" +
         "            VALUES (v_old, TG_TABLE_NAME::TEXT, 'D', current_query());" +
         "        RETURN OLD;" +
         "    ELSIF (TG_OP = 'INSERT') THEN" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
-        "        INSERT INTO dbw_audit(new_state, table_name, operation, query)" +
+        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + INSERT_COL_LIST + ")" +
         "            VALUES (v_new, TG_TABLE_NAME::TEXT, 'I', current_query());" +
         "        RETURN NEW;" +
         "    END IF;" +
@@ -55,26 +77,26 @@ public class PostgresQueries {
         "$$" +
         "LANGUAGE plpgsql;";
 
-    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION IF EXISTS dbw_audit_func;";
+    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION IF EXISTS " + Common.DBW_AUDIT_FUNC_NAME + ";";
 
     public static final String FIND_AUDIT_TRIGGER = 
-        "SELECT EXISTS (" +
+        "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM pg_trigger " +
         "    WHERE  NOT tgisinternal" +
         "    AND    tgname = ?" +
         ");";
 
     public static final String CREATE_AUDIT_TRIGGER = 
-        "CREATE TRIGGER dbw_%s_audit" +
+        "CREATE TRIGGER %s" +
         " AFTER INSERT OR UPDATE OR DELETE ON %s" +
-        " FOR EACH ROW EXECUTE PROCEDURE dbw_audit_func();";
+        " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME + "();";
 
-    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER IF EXISTS dbw_%s_audit ON %s;";
+    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER IF EXISTS %s ON %s;";
 
-    public static final String SELECT_AUDIT_TRIGGERS = "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE 'dbw_%_audit'";
+    public static final String SELECT_AUDIT_TRIGGERS = "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
 
-    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(id) FROM dbw_audit;";
+    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(id) FROM " + Common.DBW_AUDIT_TABLE_NAME + ";";
 
-    public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM dbw_audit WHERE id > ?;";
+    public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?;";
 
 }

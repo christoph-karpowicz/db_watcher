@@ -8,7 +8,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.log.ErrorMessages;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
 
 public abstract class Database {
     protected DatabaseConfig config;
@@ -16,6 +21,11 @@ public abstract class Database {
 
     public Database(DatabaseConfig config) {
         this.config = config;
+    }
+
+    public void dropAuditTable() {
+        executeUpdate("DROP TABLE " + Common.DBW_AUDIT_TABLE_NAME);
+        Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_DROPPED);
     }
 
     protected void executeUpdate(String query, Object... args) {
@@ -45,7 +55,7 @@ public abstract class Database {
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                exists = rs.getBoolean("exists");
+                exists = rs.getBoolean(Common.EXISTS);
             }
             pstmt.close();
         } catch (SQLException e) {
@@ -64,15 +74,15 @@ public abstract class Database {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 AuditRecord auditRecord = new AuditRecord();
-                auditRecord.setId(rs.getInt("id"));
-                auditRecord.setTableName(rs.getString("table_name"));
-                auditRecord.setOldData(rs.getString("old_state"));
-                auditRecord.setNewData(rs.getString("new_state"));
-                auditRecord.setOperation(rs.getString("operation"));
-                if (columnExists(rs, "query")) {
-                    auditRecord.setQuery(rs.getString("query"));
+                auditRecord.setId(rs.getInt(Common.COLNAME_ID));
+                auditRecord.setTableName(rs.getString(Common.COLNAME_TABLE_NAME));
+                auditRecord.setOldData(rs.getString(Common.COLNAME_OLD_STATE));
+                auditRecord.setNewData(rs.getString(Common.COLNAME_NEW_STATE));
+                auditRecord.setOperation(rs.getString(Common.COLNAME_OPERATION));
+                if (columnExists(rs, Common.COLNAME_QUERY)) {
+                    auditRecord.setQuery(rs.getString(Common.COLNAME_QUERY));
                 }
-                auditRecord.setTimestamp(rs.getDate("timestamp"));
+                auditRecord.setTimestamp(rs.getDate(Common.COLNAME_TIMESTAMP));
                 result.add(auditRecord);
             }
             pstmt.close();
@@ -100,7 +110,7 @@ public abstract class Database {
             }
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                result.add(rs.getString("item"));
+                result.add(rs.getString(Common.ITEM));
             }
             pstmt.close();
         } catch (SQLException e) {
@@ -117,9 +127,9 @@ public abstract class Database {
             Statement pstmt = conn.createStatement();
             ResultSet rs = pstmt.executeQuery(query);
             if (rs.next()) {
-                result = rs.getInt("max");
+                result = rs.getInt(Common.MAX);
             } else {
-                throw new Exception("Couldn't select audit table's max id.");
+                throw new Exception(ErrorMessages.COULDNT_SELECT_MAX);
             }
             pstmt.close();
         } catch (Exception e) {

@@ -13,9 +13,13 @@ import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
+import com.dbw.log.LogMessages;
 
 public class Orcl extends Database {
     public final static short STATE_COLUMN_MAX_LENGTH = 2000;
+    public final String DRIVER = "oracle.jdbc.driver.OracleDriver";
+    public final String COL_NAME_ALIAS = "COLUMN_NAME";
+    public final String DATA_TYPE_ALIAS = "DATA_TYPE";
 
     public Orcl(DatabaseConfig config) {
         super(config);
@@ -23,7 +27,7 @@ public class Orcl extends Database {
 
     public void connect() {
         try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Class.forName(DRIVER);
             Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
             setConn(conn);
         } catch (Exception e) {
@@ -31,7 +35,7 @@ public class Orcl extends Database {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             System.exit(0);
         }
-        Logger.log(Level.INFO, "Database opened successfully.");
+        Logger.log(Level.INFO, LogMessages.DB_OPENED);
     }
 
     private String getConnectionString() {
@@ -44,18 +48,13 @@ public class Orcl extends Database {
     }
 
     public boolean auditTableExists() {
-        String[] stringArgs = {config.getUser().toUpperCase(), Config.DEFAULT_AUDIT_TABLE_NAME.toUpperCase()};
+        String[] stringArgs = {config.getUser().toUpperCase(), Common.DBW_AUDIT_TABLE_NAME};
         return objectExists(OrclQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 
     public void createAuditTable() {
-        executeUpdate(OrclQueries.CREATE_AUDIT_TABLE, Config.DEFAULT_AUDIT_TABLE_NAME);
-        Logger.log(Level.INFO, "Audit table has been created.");
-    }
-
-    public void dropAuditTable() {
-        executeUpdate("DROP TABLE " + Config.DEFAULT_AUDIT_TABLE_NAME);
-        Logger.log(Level.INFO, "Audit table has been dropped.");
+        executeUpdate(OrclQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME);
+        Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_CREATED);
     }
 
     public boolean auditTriggerExists(String tableName) {
@@ -65,12 +64,12 @@ public class Orcl extends Database {
 
     public void createAuditTrigger(String tableName, String query) {
         executeUpdate(query);
-        Logger.log(Level.INFO, String.format("Audit trigger for table \"%s\" has been created.", tableName));
+        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
     public void dropAuditTrigger(String tableName) {
-        executeUpdate(OrclQueries.DROP_AUDIT_TRIGGER, tableName, tableName);
-        Logger.log(Level.INFO, String.format("Audit trigger for table \"%s\" has been dropped.", tableName));
+        executeUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName));
+        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
     public String[] selectAuditTriggers() {
@@ -92,8 +91,8 @@ public class Orcl extends Database {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 Column column = new Column();
-                column.setName(rs.getString("COLUMN_NAME"));
-                column.setDataType(rs.getString("DATA_TYPE"));
+                column.setName(rs.getString(COL_NAME_ALIAS));
+                column.setDataType(rs.getString(DATA_TYPE_ALIAS));
                 result.add(column);
             }
             pstmt.close();
@@ -125,7 +124,7 @@ public class Orcl extends Database {
         } catch (SQLException e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
-        Logger.log(Level.INFO, "Database connection closed.");
+        Logger.log(Level.INFO, LogMessages.DB_CLOSED);
     }
     
 }

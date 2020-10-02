@@ -22,7 +22,6 @@ public class XmlDiff extends Diff {
             parsedData = new HashMap<String, Object>();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
-        // System.out.println(parsedData);
         return ImmutableMap.copyOf(parsedData);
     }
 

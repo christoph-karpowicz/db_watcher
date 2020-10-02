@@ -1,8 +1,8 @@
 package com.dbw.state;
 
 public class XmlStateTagAttribute {
-    private final static String EQUALS_START = "=\"";
-    private final static String EQUALS_END = "\"";
+    private final String EQUALS_START = "=\"";
+    private final String EQUALS_END = "\"";
     
     private String name;
     private String value;
