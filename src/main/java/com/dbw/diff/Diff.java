@@ -1,10 +1,17 @@
 package com.dbw.diff;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.dbw.state.StatePair;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public abstract class Diff {
     private Map<String, Object> oldState;
     private Map<String, Object> newState;
+    private List<StatePair> statePairs;
     
     public void parseOldData(String oldData) {
         oldState = parseData(oldData);
@@ -17,11 +24,26 @@ public abstract class Diff {
     protected abstract Map<String, Object> parseData(String data);
     
     public Map<String, Object> getOldState() {
-        return oldState;
+        return ImmutableMap.copyOf(oldState);
     }
 
     public Map<String, Object> getNewState() {
-        return newState;
+        return ImmutableMap.copyOf(newState);
+    }
+
+    public void createStatePairs() {
+        Set<String> columnNames = oldState.keySet();
+        for (String columnName : columnNames) {
+            String oldStateValue = (String)oldState.get(columnName);
+            String newStateValue = (String)newState.get(columnName);
+            StatePair statePair = new StatePair(columnName, oldStateValue, newStateValue);
+            statePair.compare();
+            statePairs.add(statePair);
+        }
+    }
+
+    public List<StatePair> getStatePairs() {
+        return ImmutableList.copyOf(statePairs);
     }
 
 }

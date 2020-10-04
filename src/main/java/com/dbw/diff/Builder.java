@@ -1,5 +1,5 @@
 package com.dbw.diff;
 
-public interface Buildable {
+public interface Builder {
     
 }

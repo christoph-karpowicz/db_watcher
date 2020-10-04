@@ -50,7 +50,7 @@ public class OrclPrepareService {
             String oldStateConcat = xmlStateBuilder.build(OLD_STATE_PREFIX, tableColumns);
             String auditTriggerQuery = db.prepareQuery(
                 OrclQueries.CREATE_AUDIT_TRIGGER, 
-                tableName,
+                QueryBuilder.buildAuditTriggerName(tableName),
                 tableName,
                 newStateConcat,
                 oldStateConcat,

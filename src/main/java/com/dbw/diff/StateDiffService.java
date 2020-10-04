@@ -24,16 +24,8 @@ public class StateDiffService implements DiffService {
         }
         diff.parseOldData(auditRecord.getOldData());
         diff.parseNewData(auditRecord.getNewData());
-        switch (dbOperation) {
-            case UPDATE:
-                for (Object value : diff.getOldState().values()) {
-                    diffBuilder.append(value);
-                }
-                for (Object value : diff.getNewState().values()) {
-                    diffBuilder.append(value);
-                }
-                break;
-        }
+        diff.createStatePairs();
+        diffBuilder.build(dbOperation);
         return diffBuilder.toString();
     }
     

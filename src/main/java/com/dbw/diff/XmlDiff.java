@@ -1,6 +1,6 @@
 package com.dbw.diff;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -11,7 +11,7 @@ import com.dbw.state.XmlColumnStates;
 public class XmlDiff extends Diff {
     
     protected Map<String, Object> parseData(String data) {
-        Map<String, Object> parsedData = new HashMap<String, Object>();
+        Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
         try {
             XmlMapper xmlMapper = new XmlMapper();
             XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
@@ -19,7 +19,7 @@ public class XmlDiff extends Diff {
                 parsedData.put(columnState.getName(), columnState.getValue());
             }
         } catch (Exception e) {
-            parsedData = new HashMap<String, Object>();
+            parsedData = new LinkedHashMap<String, Object>();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
         return ImmutableMap.copyOf(parsedData);
