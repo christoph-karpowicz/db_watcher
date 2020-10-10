@@ -2,19 +2,18 @@ package com.dbw.watcher;
 
 import java.util.List;
 
+import com.dbw.app.AppModule;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
-import com.dbw.diff.StateDiffService;
-import com.google.inject.Inject;
+import com.dbw.frame.AuditFrame;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 @Singleton
 public class AuditTableWatcher implements Watcher {
 
-    @Inject
-    private StateDiffService diffService;
-    
-    private final short RUN_INTERVAL = 1000;
+    private final short RUN_INTERVAL = 2000;
     
     private List<String> watchedTables;
     private Database db;
@@ -48,8 +47,11 @@ public class AuditTableWatcher implements Watcher {
             // List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
             List<AuditRecord> auditRecords = db.selectAuditRecords(0);
             for (AuditRecord auditRecord : auditRecords) {
-                String diff = diffService.findDiff(db, auditRecord);
-                System.out.println(diff);
+                Injector injector = Guice.createInjector(new AppModule());
+                AuditFrame frame = injector.getInstance(AuditFrame.class);
+                frame.setAuditRecord(auditRecord);
+                frame.findDiff(db);
+                System.out.println(frame.toString());
             }
             findLastId();
             incrementRunCounter();

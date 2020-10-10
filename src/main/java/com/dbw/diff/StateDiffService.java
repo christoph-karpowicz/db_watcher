@@ -1,5 +1,7 @@
 package com.dbw.diff;
 
+import java.util.List;
+
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.Operation;
@@ -13,9 +15,7 @@ public class StateDiffService implements DiffService {
     @Inject
     private DiffBuilder diffBuilder;
 
-    public String findDiff(Database db, AuditRecord auditRecord) {
-        diffBuilder.init();
-        Operation dbOperation = Operation.valueOfSymbol(auditRecord.getOperation());
+    public Diff createDiff(Database db, AuditRecord auditRecord) {
         Diff diff;
         if (db instanceof Postgres) {
             diff = new JsonDiff();
@@ -24,8 +24,13 @@ public class StateDiffService implements DiffService {
         }
         diff.parseOldData(auditRecord.getOldData());
         diff.parseNewData(auditRecord.getNewData());
-        diff.createStatePairs();
-        diffBuilder.build(diff.getStatePairs(), dbOperation);
+        return diff;
+    }
+
+    public String findDiff(List<StateColumn> stateColumns, AuditRecord auditRecord) {
+        Operation dbOperation = Operation.valueOfSymbol(auditRecord.getOperation());
+        diffBuilder.init();
+        diffBuilder.build(stateColumns, dbOperation);
         return diffBuilder.toString();
     }
     

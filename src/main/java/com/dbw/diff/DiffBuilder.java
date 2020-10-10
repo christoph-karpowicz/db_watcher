@@ -21,61 +21,62 @@ public class DiffBuilder implements Builder {
         builder = new StringBuilder();
     }
 
-    public void build(List<StateColumn> statePairs, Operation dbOperation) {
-        addHorizontalBorders(statePairs);
-        addColumnHeaders(statePairs);
+    public void build(List<StateColumn> stateColumns, Operation dbOperation) {
+        addHorizontalBorders(stateColumns);
+        addColumnHeaders(stateColumns);
         switch (dbOperation) {
             case UPDATE:
-                buildUpdate(statePairs);
+                buildUpdate(stateColumns);
                 break;
         }
-        addHorizontalBorders(statePairs);
+        addHorizontalBorders(stateColumns);
     }
 
-    private void addHorizontalBorders(List<StateColumn> statePairs) {
-        statePairs.forEach(pair -> {
+    private void addHorizontalBorders(List<StateColumn> stateColumns) {
+        stateColumns.forEach(stateColumn -> {
             builder.append(PADDING);
-            builder.append(pair.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
+            builder.append(stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
             String border = "";
-            String filler = pair.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING;
-            int maxLength = MAX_COL_LENGTH < pair.getMaxLength() ? MAX_COL_LENGTH : pair.getMaxLength();
+            String filler = stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING;
+            int maxLength = MAX_COL_LENGTH < stateColumn.getMaxLength() ? MAX_COL_LENGTH : stateColumn.getMaxLength();
             for (short i = 0; i < maxLength; i++) {
                 border += filler;
             }
             builder.append(border);
-            builder.append(pair.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
+            builder.append(stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
             builder.append(PADDING);
         });
         appendNewLine();
     }
 
-    private void addColumnHeaders(List<StateColumn> statePairs) {
-        statePairs.forEach(pair -> {
-            append(pair.getColumnName(), pair.getMaxLength(), pair.hasDiff(), HEADER_UNDERLINE_PADDING);
+    private void addColumnHeaders(List<StateColumn> stateColumns) {
+        stateColumns.forEach(stateColumn -> {
+            append(stateColumn, stateColumn.getColumnName(), HEADER_UNDERLINE_PADDING);
         });
         appendNewLine();
     }
 
-    private void buildUpdate(List<StateColumn> statePairs) {
-        statePairs.forEach(pair -> {
-            append(pair.getOldState(), pair.getMaxLength(), pair.hasDiff(), PADDING);
+    private void buildUpdate(List<StateColumn> stateColumns) {
+        stateColumns.forEach(stateColumn -> {
+            append(stateColumn, stateColumn.getOldState(), PADDING);
         });
         appendNewLine();
-        statePairs.forEach(pair -> {
-            append(pair.getNewState(), pair.getMaxLength(), pair.hasDiff(), PADDING);
+        stateColumns.forEach(stateColumn -> {
+            append(stateColumn, stateColumn.getNewState(), PADDING);
         });
         appendNewLine();
     }
 
-    private void append(String value, int columnLength, boolean hasDiff, String padding) {
+    private void append(StateColumn stateColumn, String value, String padding) {
         builder.append(PADDING);
-        builder.append(hasDiff ? DIFF_VERTICAL_BORDER : PADDING);
-        int maxLength = MAX_COL_LENGTH < columnLength ? MAX_COL_LENGTH : columnLength;
+        builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
+        int maxLength = MAX_COL_LENGTH < stateColumn.getMaxLength() ? MAX_COL_LENGTH : stateColumn.getMaxLength();
         int substringLength = maxLength - ELLIPSIS.length();
         int valueLength = value.length();
         String finalValue = value;
         if (valueLength > maxLength) {
             finalValue = value.substring(0, substringLength) + ELLIPSIS;
+            stateColumn.setCut(true);
         } else if (valueLength < maxLength) {
             int lengthDiff = substringLength + ELLIPSIS.length() - valueLength;
             for (short i = 0; i < lengthDiff; i++) {
@@ -83,7 +84,7 @@ public class DiffBuilder implements Builder {
             }
         }
         builder.append(finalValue);
-        builder.append(hasDiff ? DIFF_VERTICAL_BORDER : PADDING);
+        builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
         builder.append(PADDING);
     }
 

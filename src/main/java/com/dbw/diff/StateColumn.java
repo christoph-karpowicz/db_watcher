@@ -6,6 +6,7 @@ public class StateColumn {
     private String oldState;
     private String newState;
     private int maxLength;
+    private boolean isCut;
 
     public StateColumn(String columnName, String oldState, String newState) {
         this.columnName = columnName;
@@ -49,6 +50,14 @@ public class StateColumn {
     
     public String getNewState() {
         return newState;
+    }
+
+    public boolean isCut() {
+        return isCut;
+    }
+
+    public void setCut(boolean isCut) {
+        this.isCut = isCut;
     }
 
     public void compare() {
