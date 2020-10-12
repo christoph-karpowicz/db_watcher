@@ -2,41 +2,41 @@ package com.dbw.frame;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.dbw.db.AuditRecord;
-import com.dbw.db.Database;
-import com.dbw.db.Operation;
 import com.dbw.diff.Diff;
+import com.dbw.diff.DiffService;
 import com.dbw.diff.StateColumn;
-import com.dbw.diff.StateDiffService;
 import com.google.inject.Inject;
 
 public class AuditFrame {
     private AuditRecord auditRecord;
-    private String diff;
+    private Diff diff;
+    private Class<?> dbClass;
     private List<StateColumn> stateColumns;
 
     @Inject
-    private StateDiffService diffService;
+    private DiffService diffService;
 
     public void setAuditRecord(AuditRecord auditRecord) {
         this.auditRecord = auditRecord;
     }
 
-    public void findDiff(Database db) {
-        Diff diffObject = diffService.createDiff(db, auditRecord);
-        createStateColumns(diffObject.getOldState(), diffObject.getNewState());
-        diff = diffService.findDiff(stateColumns, auditRecord);
+    public void setDbClass(Class<?> dbClass) {
+        this.dbClass = dbClass;
     }
 
-    private void createStateColumns(Map<String, Object> oldState, Map<String, Object> newState) {
+    public void createDiff() {
+        diff = diffService.createDiff(dbClass, auditRecord);
+    }
+
+    public void createStateColumns() {
         stateColumns = new ArrayList<StateColumn>();
-        Set<String> columnNames = oldState.keySet();
+        Set<String> columnNames = diff.getOldState().keySet();
         for (String columnName : columnNames) {
-            String oldStateValue = (String)oldState.get(columnName);
-            String newStateValue = (String)newState.get(columnName);
+            String oldStateValue = (String)diff.getOldState().get(columnName);
+            String newStateValue = (String)diff.getNewState().get(columnName);
             StateColumn statePair = new StateColumn(columnName, oldStateValue, newStateValue);
             statePair.compare();
             stateColumns.add(statePair);
@@ -50,14 +50,9 @@ public class AuditFrame {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("--------------------------");
-        builder.append("\nID: " + auditRecord.getId());
-        builder.append("\nTable: " + auditRecord.getTableName());
-        builder.append("\nOperation: " + Operation.valueOfSymbol(auditRecord.getOperation()));
-        builder.append("\nTimestamp: " + auditRecord.getTimestamp());
-        builder.append("\n");
-        builder.append(diff);
+        AuditFrameBuilder builder = new AuditFrameBuilder(diffService, auditRecord, stateColumns);
+        builder.build();
         return builder.toString();
     }
+
 }

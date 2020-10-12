@@ -3,17 +3,12 @@ package com.dbw.diff;
 import java.util.List;
 
 import com.dbw.db.Operation;
+import com.dbw.output.OutputBuilder;
 import com.google.inject.Singleton;
 
 @Singleton
-public class DiffBuilder implements Builder {
+public class TableDiffBuilder implements OutputBuilder {
     private final short MAX_COL_LENGTH = 17;
-    private final String ELLIPSIS = "...";
-    private final String PADDING = " ";
-    private final String HEADER_UNDERLINE_PADDING = "_";
-    private final String DIFF_VERTICAL_BORDER = "|";
-    private final String DIFF_HORIZONTAL_BORDER = "-";
-    private final String NEW_LINE = "\n";
 
     private StringBuilder builder;
 

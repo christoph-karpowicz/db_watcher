@@ -50,7 +50,9 @@ public class AuditTableWatcher implements Watcher {
                 Injector injector = Guice.createInjector(new AppModule());
                 AuditFrame frame = injector.getInstance(AuditFrame.class);
                 frame.setAuditRecord(auditRecord);
-                frame.findDiff(db);
+                frame.setDbClass(db.getClass());
+                frame.createDiff();
+                frame.createStateColumns();
                 System.out.println(frame.toString());
             }
             findLastId();

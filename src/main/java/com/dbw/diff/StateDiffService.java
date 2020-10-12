@@ -3,7 +3,6 @@ package com.dbw.diff;
 import java.util.List;
 
 import com.dbw.db.AuditRecord;
-import com.dbw.db.Database;
 import com.dbw.db.Operation;
 import com.dbw.db.Postgres;
 import com.google.inject.Inject;
@@ -13,11 +12,11 @@ import com.google.inject.Singleton;
 public class StateDiffService implements DiffService {
 
     @Inject
-    private DiffBuilder diffBuilder;
+    private TableDiffBuilder diffBuilder;
 
-    public Diff createDiff(Database db, AuditRecord auditRecord) {
+    public Diff createDiff(Class<?> dbClass, AuditRecord auditRecord) {
         Diff diff;
-        if (db instanceof Postgres) {
+        if (dbClass.equals(Postgres.class)) {
             diff = new JsonDiff();
         } else {
             diff = new XmlDiff();
