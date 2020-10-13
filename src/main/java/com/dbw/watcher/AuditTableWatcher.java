@@ -3,6 +3,7 @@ package com.dbw.watcher;
 import java.util.List;
 
 import com.dbw.app.AppModule;
+import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.frame.AuditFrame;
@@ -12,7 +13,6 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class AuditTableWatcher implements Watcher {
-
     private final short RUN_INTERVAL = 2000;
     
     private List<String> watchedTables;
@@ -47,8 +47,7 @@ public class AuditTableWatcher implements Watcher {
             // List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
             List<AuditRecord> auditRecords = db.selectAuditRecords(0);
             for (AuditRecord auditRecord : auditRecords) {
-                Injector injector = Guice.createInjector(new AppModule());
-                AuditFrame frame = injector.getInstance(AuditFrame.class);
+                AuditFrame frame = ObjectCreator.create(AuditFrame.class);
                 frame.setAuditRecord(auditRecord);
                 frame.setDbClass(db.getClass());
                 frame.createDiff();

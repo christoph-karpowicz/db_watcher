@@ -12,7 +12,9 @@ import com.google.inject.Singleton;
 public class StateDiffService implements DiffService {
 
     @Inject
-    private TableDiffBuilder diffBuilder;
+    private TableDiffBuilder tableDiffBuilder;
+    @Inject
+    private ColumnDiffBuilder columnDiffBuilder;
 
     public Diff createDiff(Class<?> dbClass, AuditRecord auditRecord) {
         Diff diff;
@@ -26,11 +28,16 @@ public class StateDiffService implements DiffService {
         return diff;
     }
 
-    public String findDiff(List<StateColumn> stateColumns, AuditRecord auditRecord) {
-        Operation dbOperation = Operation.valueOfSymbol(auditRecord.getOperation());
-        diffBuilder.init();
-        diffBuilder.build(stateColumns, dbOperation);
-        return diffBuilder.toString();
+    public String findTableDiff(List<StateColumn> stateColumns, Operation dbOperation) {
+        tableDiffBuilder.init();
+        tableDiffBuilder.build(stateColumns, dbOperation);
+        return tableDiffBuilder.toString();
+    }
+
+    public String findColumnDiff(StateColumn stateColumn, short count) {
+        columnDiffBuilder.init();
+        columnDiffBuilder.build(stateColumn, count);
+        return columnDiffBuilder.toString();
     }
     
 }

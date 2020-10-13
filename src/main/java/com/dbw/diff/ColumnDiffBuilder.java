@@ -1,8 +1,5 @@
 package com.dbw.diff;
 
-import java.util.List;
-
-import com.dbw.db.Operation;
 import com.dbw.output.OutputBuilder;
 import com.google.inject.Singleton;
 
@@ -14,8 +11,17 @@ public class ColumnDiffBuilder implements OutputBuilder {
         builder = new StringBuilder();
     }
 
-    public void build(List<StateColumn> stateColumns, Operation dbOperation) {
-        
+    public void build(StateColumn stateColumn, short count) {
+        builder.append("Diff " + count + ": ");
+        builder.append(NEW_LINE);
+        builder.append("Before: ");
+        builder.append(NEW_LINE);
+        builder.append(stateColumn.getOldState());
+        builder.append(NEW_LINE);
+        builder.append("After: ");
+        builder.append(NEW_LINE);
+        builder.append(stateColumn.getNewState());
+        builder.append(NEW_LINE);
     }
 
     @Override

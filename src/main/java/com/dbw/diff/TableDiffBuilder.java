@@ -41,25 +41,25 @@ public class TableDiffBuilder implements OutputBuilder {
             builder.append(stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
             builder.append(PADDING);
         });
-        appendNewLine();
+        builder.append(NEW_LINE);
     }
 
     private void addColumnHeaders(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
             append(stateColumn, stateColumn.getColumnName(), HEADER_UNDERLINE_PADDING);
         });
-        appendNewLine();
+        builder.append(NEW_LINE);
     }
 
     private void buildUpdate(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
             append(stateColumn, stateColumn.getOldState(), PADDING);
         });
-        appendNewLine();
+        builder.append(NEW_LINE);
         stateColumns.forEach(stateColumn -> {
             append(stateColumn, stateColumn.getNewState(), PADDING);
         });
-        appendNewLine();
+        builder.append(NEW_LINE);
     }
 
     private void append(StateColumn stateColumn, String value, String padding) {
@@ -81,10 +81,6 @@ public class TableDiffBuilder implements OutputBuilder {
         builder.append(finalValue);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
         builder.append(PADDING);
-    }
-
-    private void appendNewLine() {
-        builder.append(NEW_LINE);
     }
 
     @Override

@@ -4,23 +4,33 @@ import java.util.List;
 
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Operation;
-import com.dbw.diff.DiffService;
 import com.dbw.diff.StateColumn;
+import com.dbw.diff.StateDiffService;
 import com.dbw.output.OutputBuilder;
+import com.google.inject.Inject;
 
 public class AuditFrameBuilder implements OutputBuilder {
     private AuditRecord auditRecord;
     private List<StateColumn> stateColumns;
-    private DiffService diffService;
     private StringBuilder builder;
+    private Operation dbOperation;
 
-    public AuditFrameBuilder(DiffService diffService, AuditRecord auditRecord, List<StateColumn> stateColumns) {
-        this.diffService = diffService;
+    @Inject
+    private StateDiffService diffService;
+
+    public void setAuditRecord(AuditRecord auditRecord) {
         this.auditRecord = auditRecord;
-        this.stateColumns = stateColumns;
-        builder = new StringBuilder();
     }
 
+    public void setStateColumns(List<StateColumn> stateColumns) {
+        this.stateColumns = stateColumns;
+    }
+
+    public void init() {
+        builder = new StringBuilder();
+        dbOperation = Operation.valueOfSymbol(auditRecord.getOperation());
+    }
+    
     public void build() {
         builder.append(HR);
         builder.append(NEW_LINE);
@@ -28,33 +38,31 @@ public class AuditFrameBuilder implements OutputBuilder {
         builder.append(NEW_LINE);
         builder.append("Table: " + auditRecord.getTableName());
         builder.append(NEW_LINE);
-        builder.append("Operation: " + Operation.valueOfSymbol(auditRecord.getOperation()));
+        builder.append("Operation: " + dbOperation);
         builder.append(NEW_LINE);
         builder.append("Timestamp: " + auditRecord.getTimestamp());
         builder.append(NEW_LINE);
-        builder.append(findDiff());
+        builder.append(findTableDiff());
+        if (dbOperation.equals(Operation.UPDATE)) {
+            builder.append(findColumnDiffs());
+        }
     }
 
-    public String findDiff() {
-        return diffService.findDiff(stateColumns, auditRecord);
+    public String findTableDiff() {
+        return diffService.findTableDiff(stateColumns, dbOperation);
     }
 
-    public String findVerboseDiffs() {
-        StringBuilder builder = new StringBuilder();
+    public String findColumnDiffs() {
+        StringBuilder columnDiffBuilder = new StringBuilder();
 
-        stateColumns.forEach(stateColumn -> {
-            if (stateColumn.isCut()) {
-                builder.append(findVerboseDiff(stateColumn));
+        short diffCount = 0;
+        for (StateColumn stateColumn : stateColumns) {
+            if (stateColumn.hasDiff() && stateColumn.isCut()) {
+                columnDiffBuilder.append(diffService.findColumnDiff(stateColumn, ++diffCount));
             }
-        });
+        }
         
-        return builder.toString();
-    }
-
-    public String findVerboseDiff(StateColumn stateColumn) {
-
-        StringBuilder builder = new StringBuilder();
-        return builder.toString();
+        return columnDiffBuilder.toString();
     }
 
     @Override

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.diff.Diff;
-import com.dbw.diff.DiffService;
+import com.dbw.diff.StateDiffService;
 import com.dbw.diff.StateColumn;
 import com.google.inject.Inject;
 
@@ -17,7 +18,7 @@ public class AuditFrame {
     private List<StateColumn> stateColumns;
 
     @Inject
-    private DiffService diffService;
+    private StateDiffService diffService;
 
     public void setAuditRecord(AuditRecord auditRecord) {
         this.auditRecord = auditRecord;
@@ -50,7 +51,10 @@ public class AuditFrame {
 
     @Override
     public String toString() {
-        AuditFrameBuilder builder = new AuditFrameBuilder(diffService, auditRecord, stateColumns);
+        AuditFrameBuilder builder = ObjectCreator.create(AuditFrameBuilder.class);
+        builder.setAuditRecord(auditRecord);
+        builder.setStateColumns(stateColumns);
+        builder.init();
         builder.build();
         return builder.toString();
     }
