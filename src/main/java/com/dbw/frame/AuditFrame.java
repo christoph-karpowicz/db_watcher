@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
+import com.dbw.db.Operation;
 import com.dbw.diff.Diff;
 import com.dbw.diff.StateDiffService;
 import com.dbw.diff.StateColumn;
@@ -34,7 +35,7 @@ public class AuditFrame {
 
     public void createStateColumns() {
         stateColumns = new ArrayList<StateColumn>();
-        Set<String> columnNames = diff.getOldState().keySet();
+        Set<String> columnNames = diff.getStateColumnNames(Operation.valueOfSymbol(auditRecord.getOperation()));
         for (String columnName : columnNames) {
             String oldStateValue = (String)diff.getOldState().get(columnName);
             String newStateValue = (String)diff.getNewState().get(columnName);

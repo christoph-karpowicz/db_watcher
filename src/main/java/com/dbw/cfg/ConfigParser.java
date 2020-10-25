@@ -14,6 +14,7 @@ public class ConfigParser {
             config = mapper.readValue(new File(path), Config.class);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
         }
         return config;
     }

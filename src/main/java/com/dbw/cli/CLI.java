@@ -35,6 +35,7 @@ public class CLI {
             cmd = parser.parse(options, args);
         } catch(ParseException exp) {
             System.out.println("Unexpected exception:" + exp.getMessage());
+            System.err.println(exp.getStackTrace());
         }
     }
 

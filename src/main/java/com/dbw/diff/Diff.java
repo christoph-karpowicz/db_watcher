@@ -2,7 +2,9 @@ package com.dbw.diff;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.dbw.db.Operation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -31,6 +33,14 @@ public abstract class Diff {
 
     public List<StateColumn> getStateColumns() {
         return ImmutableList.copyOf(stateColumns);
+    }
+
+    public Set<String> getStateColumnNames(Operation operation) {
+        if (operation.equals(Operation.INSERT)) {
+            return getNewState().keySet();
+        } else {
+            return getOldState().keySet();
+        }
     }
 
 }

@@ -134,6 +134,7 @@ public abstract class Database {
             pstmt.close();
         } catch (Exception e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
+            e.printStackTrace();
         }
         return result;
     }

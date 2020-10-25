@@ -1,5 +1,6 @@
 package com.dbw.diff;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.db.Operation;
@@ -8,7 +9,8 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class TableDiffBuilder implements OutputBuilder {
-    private final short MAX_COL_LENGTH = 17;
+    public static final short MAX_ROW_LENGTH = 120;
+    public static final short MAX_COL_LENGTH = 17;
 
     private StringBuilder builder;
 
@@ -16,15 +18,23 @@ public class TableDiffBuilder implements OutputBuilder {
         builder = new StringBuilder();
     }
 
-    public void build(List<StateColumn> stateColumns, Operation dbOperation) {
-        addHorizontalBorders(stateColumns);
-        addColumnHeaders(stateColumns);
-        switch (dbOperation) {
-            case UPDATE:
-                buildUpdate(stateColumns);
-                break;
+    public void build(List<List<StateColumn>> stateRows, Operation dbOperation) {
+        for (List<StateColumn> stateColumns : stateRows) {
+            addHorizontalBorders(stateColumns);
+            addColumnHeaders(stateColumns);
+            switch (dbOperation) {
+                case UPDATE:
+                    buildUpdate(stateColumns);
+                    break;
+                case INSERT:
+                    buildInsert(stateColumns);
+                    break;
+                case DELETE:
+                    buildDelete(stateColumns);
+                    break;
+            }
+            addHorizontalBorders(stateColumns);
         }
-        addHorizontalBorders(stateColumns);
     }
 
     private void addHorizontalBorders(List<StateColumn> stateColumns) {
@@ -62,6 +72,20 @@ public class TableDiffBuilder implements OutputBuilder {
         builder.append(NEW_LINE);
     }
 
+    private void buildInsert(List<StateColumn> stateColumns) {
+        stateColumns.forEach(stateColumn -> {
+            append(stateColumn, stateColumn.getNewState(), PADDING);
+        });
+        builder.append(NEW_LINE);
+    }
+
+    private void buildDelete(List<StateColumn> stateColumns) {
+        stateColumns.forEach(stateColumn -> {
+            append(stateColumn, stateColumn.getOldState(), PADDING);
+        });
+        builder.append(NEW_LINE);
+    }
+    
     private void append(StateColumn stateColumn, String value, String padding) {
         builder.append(PADDING);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);

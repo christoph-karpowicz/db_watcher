@@ -22,6 +22,7 @@ public class JsonDiff extends Diff {
             }
         } catch (Exception e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
+            e.printStackTrace();
         }
         return ImmutableMap.copyOf(parsedData);
     }

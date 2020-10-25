@@ -1,5 +1,7 @@
 package com.dbw.diff;
 
+import java.util.Objects;
+
 public class StateColumn {
     private boolean diff;
     private String columnName;
@@ -17,8 +19,8 @@ public class StateColumn {
 
     private int calculateMaxLength() {
         int maxLength = columnName.length();
-        int oldStateLength = oldState.length();
-        int newStateLength = newState.length();
+        int oldStateLength = Objects.isNull(oldState) ? 0 : oldState.length();
+        int newStateLength = Objects.isNull(newState) ? 0 : newState.length();
         if (oldStateLength > maxLength) {
             maxLength = oldStateLength;
         }
@@ -61,7 +63,8 @@ public class StateColumn {
     }
 
     public void compare() {
-        if (!oldState.equals(newState)) {
+        boolean isInsertOrDeleteOperation = Objects.isNull(oldState) || Objects.isNull(newState);
+        if (!isInsertOrDeleteOperation && !oldState.equals(newState)) {
             setHasDiff();
         }
     }

@@ -58,6 +58,7 @@ public class AuditTableWatcher implements Watcher {
             incrementRunCounter();
         } catch (InterruptedException e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
+            e.printStackTrace();
         }
     }
 

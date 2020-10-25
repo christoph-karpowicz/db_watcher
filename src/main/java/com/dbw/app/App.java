@@ -40,6 +40,7 @@ public class App {
             db = DatabaseFactory.getDatabase(dbConfig);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
         }
     }
 
