@@ -12,8 +12,12 @@ public class XmlStateBuilder {
     private final String XML_ROOT_TAG = "XmlColumnStates";
     private final String XML_COLUMN_STATE_TAG = "columnState";
     private final String XML_COLUMN_STATE_NAME_ATTRIBUTE = "name";
-    private final String PLSQL_TO_CHAR_FUNCTION_START = "TO_CHAR(:";
-    private final String PLSQL_TO_CHAR_FUNCTION_END = ")";
+    private final String PLSQL_TO_CHAR_FUNCTION_START = "TO_CHAR(";
+    private final String RIGHT_PARENTHESIS = ")";
+    private final String PLSQL_LOB_TO_VARCHAR_FUNCTION_START = "DBMS_LOB.substr(";
+    private final String PLSQL_LOB_TO_VARCHAR_FUNCTION_END = ", 4000)";
+    private final String PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START = "UTL_RAW.CAST_TO_VARCHAR2(UTL_ENCODE.BASE64_ENCODE(UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(DBMS_LOB.SUBSTR(";
+    private final String PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END = ")))))";
     private final String PLSQL_STRING_CONCAT_OPERATOR = " || ";
 
     XmlStateTag xmlRootTag;
@@ -46,14 +50,12 @@ public class XmlStateBuilder {
     private String buildForColumn(String statePrefix, Column tableColumn) {
         addNameAttributeToColumnStateTag(tableColumn.getName());
 
+        String columnNameWithStatePrefix = statePrefix + tableColumn.getName();
         StringBuilder columnValueToStringInvocation = new StringBuilder();
         columnValueToStringInvocation
             .append(columnStateTag.start())
             .append(PLSQL_STRING_CONCAT_OPERATOR)
-            .append(PLSQL_TO_CHAR_FUNCTION_START)
-            .append(statePrefix)
-            .append(tableColumn.getName())
-            .append(PLSQL_TO_CHAR_FUNCTION_END)
+            .append(generateToVarcharFunctionCall(columnNameWithStatePrefix, tableColumn.getDataType()))
             .append(PLSQL_STRING_CONCAT_OPERATOR)
             .append(columnStateTag.end());
 
@@ -64,6 +66,28 @@ public class XmlStateBuilder {
         XmlStateTagAttribute columnStateNameAttribute = new XmlStateTagAttribute(XML_COLUMN_STATE_NAME_ATTRIBUTE, value);
         columnStateTag.resetAttributes();
         columnStateTag.addAttribute(columnStateNameAttribute);
+    }
+
+    private String generateToVarcharFunctionCall(String columnNameWithStatePrefix, String dataType) {
+        StringBuilder toVarcharFunctionCall = new StringBuilder();
+
+        switch (dataType) {
+            case "CLOB":
+                toVarcharFunctionCall.append(PLSQL_LOB_TO_VARCHAR_FUNCTION_START)
+                    .append(columnNameWithStatePrefix)
+                    .append(PLSQL_LOB_TO_VARCHAR_FUNCTION_END);
+                break;
+            case "BLOB":
+                toVarcharFunctionCall.append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START)
+                    .append(columnNameWithStatePrefix)
+                    .append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END);
+                break;
+            default:
+                toVarcharFunctionCall.append(PLSQL_TO_CHAR_FUNCTION_START)
+                    .append(columnNameWithStatePrefix)
+                    .append(RIGHT_PARENTHESIS);
+        }
+        return toVarcharFunctionCall.toString();
     }
     
 }

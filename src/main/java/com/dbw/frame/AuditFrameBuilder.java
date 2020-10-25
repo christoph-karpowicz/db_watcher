@@ -32,7 +32,7 @@ public class AuditFrameBuilder implements OutputBuilder {
     }
     
     public void build() {
-        builder.append(HR);
+        builder.append(LG_HR);
         builder.append(NEW_LINE);
         builder.append("ID: " + auditRecord.getId());
         builder.append(NEW_LINE);

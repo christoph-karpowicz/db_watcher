@@ -5,18 +5,16 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
 
 public class Orcl extends Database {
-    public final static short STATE_COLUMN_MAX_LENGTH = 2000;
+    public final static short STATE_COLUMN_MAX_LENGTH = 4000;
     public final String DRIVER = "oracle.jdbc.driver.OracleDriver";
     public final String COL_NAME_ALIAS = "COLUMN_NAME";
     public final String DATA_TYPE_ALIAS = "DATA_TYPE";
@@ -77,7 +75,9 @@ public class Orcl extends Database {
         List<String> auditTriggers = selectStringArray(OrclQueries.SELECT_AUDIT_TRIGGERS, stringArgs);
         String[] auditTriggerNames = new String[auditTriggers.size()];
         for (short i = 0; i < auditTriggers.size(); i++) {
-            String auditTriggerName = auditTriggers.get(i).split("_")[1];
+            String auditTriggerName = auditTriggers.get(i)
+                .replace(Common.DBW_PREFIX, "")
+                .replace(Common.AUDIT_POSTFIX, "");
             auditTriggerNames[i] = auditTriggerName;
         }
         return auditTriggerNames;

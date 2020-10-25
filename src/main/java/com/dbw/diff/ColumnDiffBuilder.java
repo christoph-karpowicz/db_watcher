@@ -12,7 +12,9 @@ public class ColumnDiffBuilder implements OutputBuilder {
     }
 
     public void build(StateColumn stateColumn, short count) {
-        builder.append("Diff " + count + ": ");
+        builder.append(SM_HR);
+        builder.append(NEW_LINE);
+        builder.append(stateColumn.getColumnName() + " diff: ");
         builder.append(NEW_LINE);
         builder.append("Before: ");
         builder.append(NEW_LINE);
@@ -28,5 +30,5 @@ public class ColumnDiffBuilder implements OutputBuilder {
     public String toString() {
         return builder.toString();
     }
-    
+
 }

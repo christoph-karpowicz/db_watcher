@@ -5,8 +5,8 @@ import java.util.List;
 import com.dbw.state.XmlStateBuilder;
 
 public class OrclPrepareService {
-    private final String NEW_STATE_PREFIX = "NEW.";
-    private final String OLD_STATE_PREFIX = "OLD.";
+    private final String NEW_STATE_PREFIX = ":NEW.";
+    private final String OLD_STATE_PREFIX = ":OLD.";
     
     private XmlStateBuilder xmlStateBuilder;
     private Orcl db;

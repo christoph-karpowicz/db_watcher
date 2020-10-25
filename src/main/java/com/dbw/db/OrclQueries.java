@@ -2,7 +2,7 @@ package com.dbw.db;
 
 public class OrclQueries {
 
-    public static final String SELECT_TABLE_COLUMNS = "SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLS WHERE TABLE_NAME = ? ORDER BY COLUMN_NAME";
+    public static final String SELECT_TABLE_COLUMNS = "SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLS WHERE TABLE_NAME = ? ORDER BY COLUMN_ID";
 
     public static final String SELECT_TABLE_NAMES = "SELECT * FROM all_tables WHERE OWNER = ?";
 
@@ -52,8 +52,8 @@ public class OrclQueries {
         "        when deleting then 'D' " +
         "        else 'I' end; " +
         "next_id " + Common.DBW_AUDIT_TABLE_NAME + ".ID%%TYPE;" +
-        "v_old_state VARCHAR2(2000);" +
-        "v_new_state VARCHAR2(2000);" +
+        "v_old_state VARCHAR2(4000);" +
+        "v_new_state VARCHAR2(4000);" +
         "BEGIN " +
         "    SELECT COALESCE(MAX(ID), 0)+1 INTO next_id from " + Common.DBW_AUDIT_TABLE_NAME + ";" +
         "    IF updating THEN" +
@@ -62,8 +62,8 @@ public class OrclQueries {
         "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + UPDATE_COL_LIST + ")" +
         "            VALUES(next_id, '%s', v_old_state, v_new_state, v_operation);" +
         "    ELSIF inserting THEN" +
-        "       v_new_state := %s;" +
-        "       INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + INSERT_COL_LIST + ")" +
+        "        v_new_state := %s;" +
+        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + INSERT_COL_LIST + ")" +
         "            VALUES(next_id, '%s', v_new_state, v_operation);" +
         "    ELSE " +
         "        v_old_state := %s;" +
