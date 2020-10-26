@@ -1,14 +1,12 @@
 package com.dbw.watcher;
 
+import java.sql.SQLException;
 import java.util.List;
 
-import com.dbw.app.AppModule;
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.frame.AuditFrame;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -29,11 +27,11 @@ public class AuditTableWatcher implements Watcher {
         this.db = db;
     }
 
-    public void init() {
+    public void init() throws SQLException {
         db.prepare(watchedTables);
     }
 
-    public void start() {
+    public void start() throws SQLException {
         findLastId();
         setIsRunning(true);
         while (getIsRunning()) {
@@ -41,7 +39,7 @@ public class AuditTableWatcher implements Watcher {
         }
     }
 
-    private void run() {
+    private void run() throws SQLException {
         try {
             Thread.sleep(RUN_INTERVAL);
             // List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
@@ -62,7 +60,7 @@ public class AuditTableWatcher implements Watcher {
         }
     }
 
-    private void findLastId() {
+    private void findLastId() throws SQLException {
         setLastId(db.selectMaxId());
     }
 

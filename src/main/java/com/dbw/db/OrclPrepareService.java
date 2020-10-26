@@ -1,5 +1,6 @@
 package com.dbw.db;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import com.dbw.state.XmlStateBuilder;
@@ -18,23 +19,23 @@ public class OrclPrepareService {
         this.xmlStateBuilder = new XmlStateBuilder();
     }
 
-    public void prepare() {
+    public void prepare() throws SQLException {
         prepareAuditTable();
         prepareAuditTriggers();
     }
 
-    private void prepareAuditTable() {
+    private void prepareAuditTable() throws SQLException {
         if (!db.auditTableExists()) {
             db.createAuditTable();
         }
     }
 
-    private void prepareAuditTriggers() {
+    private void prepareAuditTriggers() throws SQLException {
         dropUnusedAuditTriggers();
         createAuditTriggers();
     }
 
-    private void dropUnusedAuditTriggers() {
+    private void dropUnusedAuditTriggers() throws SQLException {
         String[] auditTriggers = db.selectAuditTriggers();
         for (String auditTriggerName : auditTriggers) {
             if (!watchedTables.contains(auditTriggerName)) {
@@ -43,7 +44,7 @@ public class OrclPrepareService {
         }
     }
 
-    private void createAuditTriggers() {
+    private void createAuditTriggers() throws SQLException {
         for (String tableName : watchedTables) {
             Column[] tableColumns = db.selectTableColumns(tableName);
             String newStateConcat = xmlStateBuilder.build(NEW_STATE_PREFIX, tableColumns);

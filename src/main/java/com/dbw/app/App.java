@@ -1,5 +1,7 @@
 package com.dbw.app;
 
+import java.sql.SQLException;
+
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cfg.DatabaseConfig;
@@ -20,7 +22,7 @@ public class App {
     private Config config;
     private Database db;
     
-    public void init(String[] args) {
+    public void init(String[] args) throws Exception {
         options = handleArgs(args);
         config = ConfigParser.fromYMLFile(options.configPath);
         setDb();
@@ -44,11 +46,11 @@ public class App {
         }
     }
 
-    private void connectToDb() {
+    private void connectToDb() throws Exception {
         db.connect();
     }
 
-    public void start() {
+    public void start() throws SQLException {
         if (options.clean) {
             clean();
         } else {
@@ -57,11 +59,11 @@ public class App {
         }
     }
 
-    private void clean() {
+    private void clean() throws SQLException {
         db.clean(config.getTables());
     }
 
-    private void startWatcher() {
+    private void startWatcher() throws SQLException {
         watcher.setWatchedTables(config.getTables());
         watcher.setDb(db);
         watcher.init();
@@ -72,12 +74,16 @@ public class App {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 Logger.log(Level.INFO, "Shutting down ...");
-                shutdown();
+                try {
+                    shutdown();
+                } catch (Exception e) {
+                    System.err.println(e.getClass().getName()+": "+e.getMessage());
+                }
             }
         });
     }
 
-    private void shutdown() {
+    private void shutdown() throws SQLException {
         db.close();
     }
 }

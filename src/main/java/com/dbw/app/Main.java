@@ -14,7 +14,12 @@ public class Main {
     public static void main(String[] args) {
         Injector injector = Guice.createInjector(new AppModule());
         app = injector.getInstance(App.class);
-        app.init(args);
-        app.start();
+        try {
+            app.init(args);
+            app.start();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

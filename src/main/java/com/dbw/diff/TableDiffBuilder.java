@@ -1,6 +1,5 @@
 package com.dbw.diff;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.db.Operation;
