@@ -1,5 +1,7 @@
 package com.dbw.watcher;
 
+import static org.junit.Assert.fail;
+
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cfg.ConfigParserTest;
@@ -16,7 +18,11 @@ public class WatcherTest
     @BeforeClass
     public static void setup() {
         watcher = new AuditTableWatcher();
-        config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
+        try {
+            config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
         watcher.setWatchedTables(config.getTables());
     }
     

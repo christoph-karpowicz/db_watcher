@@ -3,6 +3,8 @@ package com.dbw.db;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.dbw.err.PreparationException;
+
 public class PostgresPrepareService {
     private Postgres db;
     private List<String> watchedTables;
@@ -12,10 +14,14 @@ public class PostgresPrepareService {
         this.watchedTables = watchedTables;
     }
 
-    public void prepare() throws SQLException {
-        prepareAuditTable();
-        prepareAuditFunction();
-        prepareAuditTriggers();
+    public void prepare() throws PreparationException {
+        try {
+            prepareAuditTable();
+            prepareAuditFunction();
+            prepareAuditTriggers();
+        } catch (SQLException e) {
+            throw new PreparationException(e.getMessage());
+        }
     }
 
     private void prepareAuditTable() throws SQLException {

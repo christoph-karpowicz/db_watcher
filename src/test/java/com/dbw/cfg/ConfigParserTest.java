@@ -2,6 +2,7 @@ package com.dbw.cfg;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -13,7 +14,12 @@ public class ConfigParserTest
     @Test
     public void shouldParseConfigFile()
     {
-        Config config = ConfigParser.fromYMLFile(TEST_CONFIG_PATH);
+        Config config = null;
+        try {
+            config = ConfigParser.fromYMLFile(TEST_CONFIG_PATH);
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
 
         DatabaseConfig dbConfig = config.getDatabase();
         assertEquals(dbConfig.getName(), "dvdrental");

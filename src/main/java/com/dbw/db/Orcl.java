@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.err.PreparationException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
@@ -23,7 +24,7 @@ public class Orcl extends Database {
         super(config);
     }
 
-    public void connect() throws Exception {
+    public void connect() throws SQLException, ClassNotFoundException {
         Class.forName(DRIVER);
         Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
         setConn(conn);
@@ -34,7 +35,7 @@ public class Orcl extends Database {
         return config.getConnectionString();
     }
 
-    public void prepare(List<String> watchedTables) throws SQLException {
+    public void prepare(List<String> watchedTables) throws PreparationException {
         OrclPrepareService orclPrepareService = new OrclPrepareService(this, watchedTables);
         orclPrepareService.prepare();
     }

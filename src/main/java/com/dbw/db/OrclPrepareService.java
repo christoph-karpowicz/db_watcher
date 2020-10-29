@@ -3,6 +3,7 @@ package com.dbw.db;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.dbw.err.PreparationException;
 import com.dbw.state.XmlStateBuilder;
 
 public class OrclPrepareService {
@@ -19,9 +20,13 @@ public class OrclPrepareService {
         this.xmlStateBuilder = new XmlStateBuilder();
     }
 
-    public void prepare() throws SQLException {
-        prepareAuditTable();
-        prepareAuditTriggers();
+    public void prepare() throws PreparationException {
+        try {
+            prepareAuditTable();
+            prepareAuditTriggers();
+        } catch (SQLException e) {
+            throw new PreparationException(e.getMessage(), e.getClass());
+        }
     }
 
     private void prepareAuditTable() throws SQLException {

@@ -6,6 +6,7 @@ import java.util.List;
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
+import com.dbw.err.PreparationException;
 import com.dbw.frame.AuditFrame;
 import com.google.inject.Singleton;
 
@@ -27,8 +28,12 @@ public class AuditTableWatcher implements Watcher {
         this.db = db;
     }
 
-    public void init() throws SQLException {
-        db.prepare(watchedTables);
+    public void init() {
+        try {
+            db.prepare(watchedTables);
+        } catch (PreparationException e) {
+            e.handle();
+        }
     }
 
     public void start() throws SQLException {

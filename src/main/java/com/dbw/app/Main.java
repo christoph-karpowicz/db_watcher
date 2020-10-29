@@ -1,5 +1,6 @@
 package com.dbw.app;
 
+import com.dbw.err.DbwException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -17,6 +18,8 @@ public class Main {
         try {
             app.init(args);
             app.start();
+        } catch (DbwException e) {
+            e.handle();
         } catch (Exception e) {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             e.printStackTrace();

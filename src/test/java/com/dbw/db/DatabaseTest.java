@@ -22,7 +22,11 @@ public class DatabaseTest
     
     @BeforeClass
     public static void setup() {
-        config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
+        try {
+            config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
+        } catch(Exception e) {
+            fail(e.getMessage());
+        }
     }
     
     @Test

@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.err.PreparationException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
@@ -27,7 +28,7 @@ public class Postgres extends Database {
         super(config);
     }
 
-    public void connect() throws Exception {
+    public void connect() throws SQLException, ClassNotFoundException {
         Class.forName(DRIVER);
         Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
         setConn(conn);
@@ -47,7 +48,7 @@ public class Postgres extends Database {
             .toString();
     }
 
-    public void prepare(List<String> watchedTables) throws SQLException {
+    public void prepare(List<String> watchedTables) throws PreparationException {
         PostgresPrepareService postgresPrepareService = new PostgresPrepareService(this, watchedTables);
         postgresPrepareService.prepare();
     }

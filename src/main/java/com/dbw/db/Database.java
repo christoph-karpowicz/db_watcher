@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
@@ -131,7 +132,7 @@ public abstract class Database {
 
     public abstract void connect() throws Exception;
 
-    public abstract void prepare(List<String> watchedTables) throws SQLException;
+    public abstract void prepare(List<String> watchedTables) throws PreparationException;
 
     public abstract void clean(List<String> watchedTables) throws SQLException;
 
