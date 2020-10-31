@@ -20,9 +20,6 @@ public class Main {
             app.start();
         } catch (DbwException e) {
             e.handle();
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            e.printStackTrace();
         }
     }
 }

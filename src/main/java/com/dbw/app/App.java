@@ -10,6 +10,7 @@ import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.err.AppInitException;
 import com.dbw.err.CleanupException;
+import com.dbw.err.WatcherStartException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.watcher.AuditTableWatcher;
@@ -56,7 +57,7 @@ public class App {
         db.connect();
     }
 
-    public void start() throws Exception {
+    public void start() throws CleanupException, WatcherStartException {
         if (options.clean) {
             clean();
         } else {
@@ -73,11 +74,15 @@ public class App {
         }
     }
 
-    private void startWatcher() throws Exception {
-        watcher.setWatchedTables(config.getTables());
-        watcher.setDb(db);
-        watcher.init();
-        watcher.start();
+    private void startWatcher() throws WatcherStartException {
+        try {
+            watcher.setWatchedTables(config.getTables());
+            watcher.setDb(db);
+            watcher.init();
+            watcher.start();
+        } catch (Exception e) {
+            throw new WatcherStartException(e.getMessage(), e.getClass());
+        }
     }
 
     private void addShutdownHook() {

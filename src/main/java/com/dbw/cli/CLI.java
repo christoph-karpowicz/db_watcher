@@ -26,7 +26,8 @@ public class CLI {
     }
 
     private void setOptions() {
-        options.addOption("c", OPTIONS_CONFIG, true, "point to a configuration file");
+        options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
+        options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
         options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
     }
 

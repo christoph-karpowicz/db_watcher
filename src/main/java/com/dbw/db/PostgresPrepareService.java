@@ -20,7 +20,7 @@ public class PostgresPrepareService {
             prepareAuditFunction();
             prepareAuditTriggers();
         } catch (SQLException e) {
-            throw new PreparationException(e.getMessage());
+            throw new PreparationException(e.getMessage(), e.getClass());
         }
     }
 

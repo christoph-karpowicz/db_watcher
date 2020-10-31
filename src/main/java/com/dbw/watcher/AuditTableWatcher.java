@@ -7,6 +7,7 @@ import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.err.PreparationException;
+import com.dbw.err.WatcherRunException;
 import com.dbw.frame.AuditFrame;
 import com.google.inject.Singleton;
 
@@ -28,15 +29,11 @@ public class AuditTableWatcher implements Watcher {
         this.db = db;
     }
 
-    public void init() {
-        try {
-            db.prepare(watchedTables);
-        } catch (PreparationException e) {
-            e.handle();
-        }
+    public void init() throws PreparationException {
+        db.prepare(watchedTables);
     }
 
-    public void start() throws SQLException {
+    public void start() throws SQLException, WatcherRunException {
         findLastId();
         setIsRunning(true);
         while (getIsRunning()) {
@@ -44,7 +41,7 @@ public class AuditTableWatcher implements Watcher {
         }
     }
 
-    private void run() throws SQLException {
+    private void run() throws WatcherRunException {
         try {
             Thread.sleep(RUN_INTERVAL);
             // List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
@@ -59,9 +56,8 @@ public class AuditTableWatcher implements Watcher {
             }
             findLastId();
             incrementRunCounter();
-        } catch (InterruptedException e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new WatcherRunException(e.getMessage(), e.getClass());
         }
     }
 
