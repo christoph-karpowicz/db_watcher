@@ -2,6 +2,7 @@ package com.dbw.cli;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,14 +20,18 @@ public class CLITest
     public static void setup() {
         cli = new CLI();
         cli.setArgs(TEST_ARGS);
-        cli.init();
+        try {
+            cli.init();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
     
     @Test
     public void shouldParseConfigOptions() {
         CLI.ParsedOptions options = cli.parseArgs();
-        assertEquals(TEST_CONFIG_ARG, options.configPath);
-        assertTrue(options.clean);
+        assertEquals(TEST_CONFIG_ARG, options.getConfigPath());
+        assertTrue(options.getClean());
     }
 
 }

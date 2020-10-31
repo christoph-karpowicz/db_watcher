@@ -51,7 +51,7 @@ public class Orcl extends Database {
     }
 
     public boolean auditTriggerExists(String tableName) throws SQLException {
-        String[] stringArgs = {"DBW_" + tableName + "_AUDIT"};
+        String[] stringArgs = {Common.DBW_PREFIX + tableName + Common.AUDIT_POSTFIX};
         return objectExists(OrclQueries.FIND_AUDIT_TRIGGER, stringArgs);
     }
 

@@ -3,6 +3,7 @@ package com.dbw.watcher;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
@@ -13,7 +14,7 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class AuditTableWatcher implements Watcher {
-    private final short RUN_INTERVAL = 2000;
+    private final short RUN_INTERVAL = 1000;
     
     private List<String> watchedTables;
     private Database db;
@@ -44,8 +45,7 @@ public class AuditTableWatcher implements Watcher {
     private void run() throws WatcherRunException {
         try {
             Thread.sleep(RUN_INTERVAL);
-            // List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
-            List<AuditRecord> auditRecords = db.selectAuditRecords(0);
+            List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
             for (AuditRecord auditRecord : auditRecords) {
                 AuditFrame frame = ObjectCreator.create(AuditFrame.class);
                 frame.setAuditRecord(auditRecord);
@@ -66,6 +66,10 @@ public class AuditTableWatcher implements Watcher {
     }
 
     private int getLastId() {
+        if (getRunCounter() == 0 && App.options.getLastNChanges() > 0) {
+            int diff = lastId - (int)App.options.getLastNChanges();
+            return diff > 0 ? diff : 0; 
+        }
         return lastId;
     }
 
@@ -85,7 +89,7 @@ public class AuditTableWatcher implements Watcher {
         return runCounter;
     }
 
-    private void incrementRunCounter() {
+    private synchronized void incrementRunCounter() {
         runCounter++;
     }
     

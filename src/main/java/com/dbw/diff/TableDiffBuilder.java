@@ -2,17 +2,27 @@ package com.dbw.diff;
 
 import java.util.List;
 
+import com.dbw.app.App;
 import com.dbw.db.Operation;
 import com.dbw.output.OutputBuilder;
+import com.google.common.base.Strings;
 import com.google.inject.Singleton;
 
 @Singleton
 public class TableDiffBuilder implements OutputBuilder {
-    public static final short MAX_ROW_LENGTH = 120;
-    public static final short MAX_COL_LENGTH = 17;
+    public static final short DEFAULT_MAX_COL_LENGTH = 17;
+    public static final short DEFAULT_MAX_ROW_LENGTH = 120;
 
     private StringBuilder builder;
 
+    public static short getMaxColumnLength() {
+        return Strings.isNullOrEmpty(App.options.getMaxColumnLength()) ? DEFAULT_MAX_COL_LENGTH : Short.parseShort(App.options.getMaxColumnLength());
+    }
+
+    public static short getMaxRowLength() {
+        return Strings.isNullOrEmpty(App.options.getMaxRowLength()) ? DEFAULT_MAX_ROW_LENGTH : Short.parseShort(App.options.getMaxRowLength());
+    }
+    
     public void init() {
         builder = new StringBuilder();
     }
@@ -42,7 +52,7 @@ public class TableDiffBuilder implements OutputBuilder {
             builder.append(stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
             String border = "";
             String filler = stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING;
-            int maxLength = MAX_COL_LENGTH < stateColumn.getMaxLength() ? MAX_COL_LENGTH : stateColumn.getMaxLength();
+            int maxLength = DEFAULT_MAX_COL_LENGTH < stateColumn.getMaxLength() ? DEFAULT_MAX_COL_LENGTH : stateColumn.getMaxLength();
             for (short i = 0; i < maxLength; i++) {
                 border += filler;
             }
@@ -88,7 +98,7 @@ public class TableDiffBuilder implements OutputBuilder {
     private void append(StateColumn stateColumn, String value, String padding) {
         builder.append(PADDING);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
-        int maxLength = MAX_COL_LENGTH < stateColumn.getMaxLength() ? MAX_COL_LENGTH : stateColumn.getMaxLength();
+        int maxLength = DEFAULT_MAX_COL_LENGTH < stateColumn.getMaxLength() ? DEFAULT_MAX_COL_LENGTH : stateColumn.getMaxLength();
         int substringLength = maxLength - ELLIPSIS.length();
         int valueLength = value.length();
         String finalValue = value;

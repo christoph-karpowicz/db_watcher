@@ -1,6 +1,8 @@
 package com.dbw.cli;
 
 import com.dbw.cfg.Config;
+import com.dbw.diff.TableDiffBuilder;
+import com.google.common.base.Strings;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,6 +13,9 @@ import org.apache.commons.cli.ParseException;
 public class CLI {
     private final String OPTIONS_CONFIG = "config";
     private final String OPTIONS_CLEAN = "clean";
+    private final String OPTIONS_MAX_COL_LENGTH = "maxColumnLength";
+    private final String OPTIONS_MAX_ROW_LENGTH = "maxRowLength";
+    private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
     
     private CommandLineParser parser;
     private Options options;
@@ -18,7 +23,7 @@ public class CLI {
     private String[] args;
     private ParsedOptions parsedOptions;
 
-    public void init() {
+    public void init() throws ParseException {
         parser = new DefaultParser();
         options = new Options();
         setOptions();
@@ -28,16 +33,13 @@ public class CLI {
     private void setOptions() {
         options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
         options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
-        options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
+        options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
+        options.addOption("L", OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
+        options.addOption("n", OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the watcher starts");
     }
 
-    private void setCmd() {
-        try {
-            cmd = parser.parse(options, args);
-        } catch(ParseException exp) {
-            System.out.println("Unexpected exception:" + exp.getMessage());
-            System.err.println(exp.getStackTrace());
-        }
+    private void setCmd() throws ParseException {
+        cmd = parser.parse(options, args);
     }
 
     public void setArgs(String[] args) {
@@ -48,6 +50,9 @@ public class CLI {
         parsedOptions = new ParsedOptions();
         parsedOptions.configPath = getConfigOption();
         parsedOptions.clean = getCleanOption();
+        parsedOptions.maxColumnLength = getMaxColumnLengthOption();
+        parsedOptions.maxRowLength = getMaxRowLengthOption();
+        parsedOptions.lastNChanges = getLastNChangesOption();
         return parsedOptions;
     }
 
@@ -65,8 +70,52 @@ public class CLI {
         return cmd.hasOption(OPTIONS_CLEAN);
     }
 
+    private String getMaxColumnLengthOption() {
+        if(cmd.hasOption(OPTIONS_MAX_COL_LENGTH)) {
+            return cmd.getOptionValue(OPTIONS_MAX_COL_LENGTH);
+        }
+        return null;
+    }
+
+    private String getMaxRowLengthOption() {
+        if(cmd.hasOption(OPTIONS_MAX_ROW_LENGTH)) {
+            return cmd.getOptionValue(OPTIONS_MAX_ROW_LENGTH);
+        }
+        return null;
+    }
+
+    private String getLastNChangesOption() {
+        if(cmd.hasOption(OPTIONS_SHOW_LAST_N_CHANGES)) {
+            return cmd.getOptionValue(OPTIONS_SHOW_LAST_N_CHANGES);
+        }
+        return null;
+    }
+    
     public class ParsedOptions {
-        public String configPath;
-        public boolean clean;
+        private String configPath;
+        private boolean clean;
+        private String maxColumnLength;
+        private String maxRowLength;
+        private String lastNChanges;
+
+        public String getConfigPath() {
+            return configPath;
+        }
+
+        public boolean getClean() {
+            return clean;
+        }
+
+        public String getMaxColumnLength() {
+            return maxColumnLength;
+        }
+
+        public String getMaxRowLength() {
+            return maxRowLength;
+        }
+
+        public short getLastNChanges() {
+            return Strings.isNullOrEmpty(lastNChanges) ? 0 : Short.parseShort(lastNChanges);
+        }
     }
 }

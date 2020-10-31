@@ -42,9 +42,9 @@ public class StateDiffService implements DiffService {
         short rowNumber = -1;
         for (StateColumn stateColumn : stateColumns) {
             int stateColumnLength = 
-                (stateColumn.getMaxLength() > TableDiffBuilder.MAX_COL_LENGTH ? TableDiffBuilder.MAX_COL_LENGTH : stateColumn.getMaxLength());
+                (stateColumn.getMaxLength() > TableDiffBuilder.getMaxColumnLength() ? TableDiffBuilder.getMaxColumnLength() : stateColumn.getMaxLength());
             stateColumnLength += paddingLength;
-            if (rowNumber < 0 || characterCount + stateColumnLength > TableDiffBuilder.MAX_ROW_LENGTH) {
+            if (rowNumber < 0 || characterCount + stateColumnLength > TableDiffBuilder.getMaxRowLength()) {
                 List<StateColumn> newRow = new ArrayList<StateColumn>();
                 rows.add(newRow);
                 rowNumber++;

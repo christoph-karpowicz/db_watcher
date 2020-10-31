@@ -15,20 +15,20 @@ import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.watcher.AuditTableWatcher;
 import com.google.inject.Inject;
+import org.apache.commons.cli.ParseException;
 
 public class App {
-
     @Inject
     private AuditTableWatcher watcher;
     
-    private CLI.ParsedOptions options;
+    public static CLI.ParsedOptions options;
     private Config config;
     private Database db;
     
     public void init(String[] args) throws AppInitException {
         try {
             options = handleArgs(args);
-            config = ConfigParser.fromYMLFile(options.configPath);
+            config = ConfigParser.fromYMLFile(options.getConfigPath());
             setDb();
             connectToDb();
         } catch (Exception e) {
@@ -36,21 +36,16 @@ public class App {
         }
     }
     
-    private CLI.ParsedOptions handleArgs(String[] args) {
+    private CLI.ParsedOptions handleArgs(String[] args) throws ParseException {
         CLI cli = new CLI();
         cli.setArgs(args);
         cli.init();
         return cli.parseArgs();
     }
 
-    private void setDb() {
+    private void setDb() throws Exception {
         DatabaseConfig dbConfig = config.getDatabase();
-        try {
-            db = DatabaseFactory.getDatabase(dbConfig);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
-        }
+        db = DatabaseFactory.getDatabase(dbConfig);
     }
 
     private void connectToDb() throws Exception {
@@ -58,7 +53,7 @@ public class App {
     }
 
     public void start() throws CleanupException, WatcherStartException {
-        if (options.clean) {
+        if (options.getClean()) {
             clean();
         } else {
             addShutdownHook();
