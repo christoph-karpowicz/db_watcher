@@ -17,7 +17,7 @@ public class StateDiffService implements DiffService {
     @Inject
     private ColumnDiffBuilder columnDiffBuilder;
 
-    public Diff createDiff(Class<?> dbClass, AuditRecord auditRecord) {
+    public Diff createDiff(Class<?> dbClass, AuditRecord auditRecord) throws Exception {
         Diff diff;
         if (dbClass.equals(Postgres.class)) {
             diff = new JsonDiff();

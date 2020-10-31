@@ -7,22 +7,20 @@ import java.util.Map;
 
 import com.dbw.db.Postgres;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 public class JsonDiff extends Diff {
     
-    protected Map<String, Object> parseData(String data) {
-        Map<String, Object> parsedJson;
+    protected Map<String, Object> parseData(String data) throws Exception {
         Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
-        try {
-            parsedJson = new ObjectMapper().readValue(data, LinkedHashMap.class);
-            List<Object> parsedJsonValues = new ArrayList<Object>(parsedJson.values());
-            for (short i = 0; i < Postgres.COLUMN_NAMES.length; i++) {
-                parsedData.put(Postgres.COLUMN_NAMES[i], parsedJsonValues.get(i));
-            }
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            e.printStackTrace();
+        if (Strings.isNullOrEmpty(data)) {
+            throw new Exception("Could not parse JSON diff data. Provided JSON string is null or empty.");
+        }
+        Map<String, Object> parsedJson = new ObjectMapper().readValue(data, LinkedHashMap.class);
+        List<Object> parsedJsonValues = new ArrayList<Object>(parsedJson.values());
+        for (short i = 0; i < Postgres.COLUMN_NAMES.length; i++) {
+            parsedData.put(Postgres.COLUMN_NAMES[i], parsedJsonValues.get(i));
         }
         return ImmutableMap.copyOf(parsedData);
     }

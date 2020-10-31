@@ -11,6 +11,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CLI {
+    private final String OPTIONS_DEBUG = "debug";
     private final String OPTIONS_CONFIG = "config";
     private final String OPTIONS_CLEAN = "clean";
     private final String OPTIONS_MAX_COL_LENGTH = "maxColumnLength";
@@ -31,6 +32,7 @@ public class CLI {
     }
 
     private void setOptions() {
+        options.addOption("d", OPTIONS_DEBUG, false, "show exception classes and stack traces");
         options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
         options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
         options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
@@ -48,12 +50,17 @@ public class CLI {
 
     public ParsedOptions parseArgs() {
         parsedOptions = new ParsedOptions();
+        parsedOptions.debug = getDebugOption();
         parsedOptions.configPath = getConfigOption();
         parsedOptions.clean = getCleanOption();
         parsedOptions.maxColumnLength = getMaxColumnLengthOption();
         parsedOptions.maxRowLength = getMaxRowLengthOption();
         parsedOptions.lastNChanges = getLastNChangesOption();
         return parsedOptions;
+    }
+
+    private boolean getDebugOption() {
+        return cmd.hasOption(OPTIONS_DEBUG);
     }
 
     private String getConfigOption() {
@@ -92,11 +99,16 @@ public class CLI {
     }
     
     public class ParsedOptions {
+        private boolean debug;
         private String configPath;
         private boolean clean;
         private String maxColumnLength;
         private String maxRowLength;
         private String lastNChanges;
+
+        public boolean getDebug() {
+            return debug;
+        }
 
         public String getConfigPath() {
             return configPath;

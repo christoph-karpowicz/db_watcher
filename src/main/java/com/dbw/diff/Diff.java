@@ -13,15 +13,15 @@ public abstract class Diff {
     private Map<String, Object> newState;
     private List<StateColumn> stateColumns;
     
-    public void parseOldData(String oldData) {
+    public void parseOldData(String oldData) throws Exception {
         oldState = parseData(oldData);
     }
 
-    public void parseNewData(String newData) {
+    public void parseNewData(String newData) throws Exception {
         newState = parseData(newData);
     }
 
-    protected abstract Map<String, Object> parseData(String data);
+    protected abstract Map<String, Object> parseData(String data) throws Exception;
     
     public Map<String, Object> getOldState() {
         return ImmutableMap.copyOf(oldState);

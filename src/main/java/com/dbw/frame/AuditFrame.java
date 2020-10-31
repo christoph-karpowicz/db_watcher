@@ -29,7 +29,7 @@ public class AuditFrame {
         this.dbClass = dbClass;
     }
 
-    public void createDiff() {
+    public void createDiff() throws Exception {
         diff = diffService.createDiff(dbClass, auditRecord);
     }
 

@@ -34,7 +34,7 @@ public class AuditTableWatcher implements Watcher {
         db.prepare(watchedTables);
     }
 
-    public void start() throws SQLException, WatcherRunException {
+    public void start() throws SQLException {
         findLastId();
         setIsRunning(true);
         while (getIsRunning()) {
@@ -42,7 +42,7 @@ public class AuditTableWatcher implements Watcher {
         }
     }
 
-    private void run() throws WatcherRunException {
+    private void run() {
         try {
             Thread.sleep(RUN_INTERVAL);
             List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
@@ -57,7 +57,7 @@ public class AuditTableWatcher implements Watcher {
             findLastId();
             incrementRunCounter();
         } catch (Exception e) {
-            throw new WatcherRunException(e.getMessage(), e.getClass());
+            new WatcherRunException(e.getMessage(), e.getClass()).handle();
         }
     }
 

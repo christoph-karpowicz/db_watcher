@@ -78,22 +78,18 @@ public class Orcl extends Database {
         return auditTriggerNames;
     }
 
-    public Column[] selectTableColumns(String tableName) {
+    public Column[] selectTableColumns(String tableName) throws SQLException {
         List<Column> result = new ArrayList<Column>();
-        try {
-            PreparedStatement pstmt = getConn().prepareStatement(OrclQueries.SELECT_TABLE_COLUMNS);
-            pstmt.setString(1, tableName);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Column column = new Column();
-                column.setName(rs.getString(COL_NAME_ALIAS));
-                column.setDataType(rs.getString(DATA_TYPE_ALIAS));
-                result.add(column);
-            }
-            pstmt.close();
-        } catch (SQLException e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
+        PreparedStatement pstmt = getConn().prepareStatement(OrclQueries.SELECT_TABLE_COLUMNS);
+        pstmt.setString(1, tableName);
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            Column column = new Column();
+            column.setName(rs.getString(COL_NAME_ALIAS));
+            column.setDataType(rs.getString(DATA_TYPE_ALIAS));
+            result.add(column);
         }
+        pstmt.close();
         Column[] columns = new Column[result.size()];
         return result.toArray(columns);
     }

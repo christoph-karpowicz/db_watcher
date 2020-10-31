@@ -11,8 +11,8 @@ public class PostgresQueries {
     
     public static final String CREATE_AUDIT_TABLE = 
         "CREATE TABLE %s (" +
-            Postgres.COLUMN_NAMES[0] + "            SERIAL PRIMARY KEY NOT NULL," +
-            Postgres.COLUMN_NAMES[1] + "    VARCHAR(100), " +
+            Postgres.COLUMN_NAMES[0] + "     SERIAL PRIMARY KEY NOT NULL," +
+            Postgres.COLUMN_NAMES[1] + "     VARCHAR(100), " +
             Postgres.COLUMN_NAMES[2] + "     TEXT, " +
             Postgres.COLUMN_NAMES[3] + "     TEXT, " +
             Postgres.COLUMN_NAMES[4] + "     CHAR(1) NOT NULL, " +

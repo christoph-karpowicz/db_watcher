@@ -11,21 +11,15 @@ import com.dbw.state.XmlColumnStates;
 
 public class XmlDiff extends Diff {
     
-    protected Map<String, Object> parseData(String data) {
+    protected Map<String, Object> parseData(String data) throws Exception {
         Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
         if (Strings.isNullOrEmpty(data)) {
-            return ImmutableMap.copyOf(parsedData);
+            throw new Exception("Could not parse XML diff data. Provided XML string is null or empty.");
         }
-
-        try {
-            XmlMapper xmlMapper = new XmlMapper();
-            XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
-            for (XmlColumnState columnState : state.getColumnStates()) {
-                parsedData.put(columnState.getName(), columnState.getValue());
-            }
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            e.printStackTrace();
+        XmlMapper xmlMapper = new XmlMapper();
+        XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
+        for (XmlColumnState columnState : state.getColumnStates()) {
+            parsedData.put(columnState.getName(), columnState.getValue());
         }
         return ImmutableMap.copyOf(parsedData);
     }
