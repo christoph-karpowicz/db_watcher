@@ -7,6 +7,7 @@ import com.dbw.db.AuditRecord;
 import com.dbw.db.Operation;
 import com.dbw.db.Postgres;
 import com.dbw.output.OutputBuilder;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -24,9 +25,23 @@ public class StateDiffService implements DiffService {
         } else {
             diff = new XmlDiff();
         }
+        validateStateData(auditRecord);
         diff.parseOldData(auditRecord.getOldData());
         diff.parseNewData(auditRecord.getNewData());
         return diff;
+    }
+
+    private void validateStateData(AuditRecord auditRecord) throws Exception {
+        String exceptionFmt = "Audit record ID: %d. Could not parse state data. Provided %s state string is null or empty.";
+        boolean isUpdate = auditRecord.getOperation().equals(Operation.UPDATE);
+        boolean isInsert = auditRecord.getOperation().equals(Operation.INSERT);
+        boolean isDelete = auditRecord.getOperation().equals(Operation.DELETE);
+        if ((isDelete || isUpdate) && Strings.isNullOrEmpty(auditRecord.getOldData())) {
+            throw new Exception(String.format(exceptionFmt, auditRecord.getId(), "old"));
+        }
+        if ((isInsert || isUpdate) && Strings.isNullOrEmpty(auditRecord.getNewData())) {
+            throw new Exception(String.format(exceptionFmt, auditRecord.getId(), "new"));
+        }
     }
 
     public String findTableDiff(List<StateColumn> stateColumns, Operation dbOperation) {

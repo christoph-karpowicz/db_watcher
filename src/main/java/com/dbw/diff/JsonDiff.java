@@ -15,7 +15,7 @@ public class JsonDiff extends Diff {
     protected Map<String, Object> parseData(String data) throws Exception {
         Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
         if (Strings.isNullOrEmpty(data)) {
-            throw new Exception("Could not parse JSON diff data. Provided JSON string is null or empty.");
+            return ImmutableMap.copyOf(parsedData);
         }
         Map<String, Object> parsedJson = new ObjectMapper().readValue(data, LinkedHashMap.class);
         List<Object> parsedJsonValues = new ArrayList<Object>(parsedJson.values());

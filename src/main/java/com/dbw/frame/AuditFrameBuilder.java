@@ -13,7 +13,6 @@ public class AuditFrameBuilder implements OutputBuilder {
     private AuditRecord auditRecord;
     private List<StateColumn> stateColumns;
     private StringBuilder builder;
-    private Operation dbOperation;
 
     @Inject
     private StateDiffService diffService;
@@ -28,7 +27,6 @@ public class AuditFrameBuilder implements OutputBuilder {
 
     public void init() {
         builder = new StringBuilder();
-        dbOperation = Operation.valueOfSymbol(auditRecord.getOperation());
     }
     
     public void build() {
@@ -38,18 +36,18 @@ public class AuditFrameBuilder implements OutputBuilder {
         builder.append(NEW_LINE);
         builder.append("Table: " + auditRecord.getTableName());
         builder.append(NEW_LINE);
-        builder.append("Operation: " + dbOperation);
+        builder.append("Operation: " + auditRecord.getOperation());
         builder.append(NEW_LINE);
         builder.append("Timestamp: " + auditRecord.getTimestamp());
         builder.append(NEW_LINE);
         builder.append(findTableDiff());
-        if (dbOperation.equals(Operation.UPDATE)) {
+        if (auditRecord.getOperation().equals(Operation.UPDATE)) {
             builder.append(findColumnDiffs());
         }
     }
 
     public String findTableDiff() {
-        return diffService.findTableDiff(stateColumns, dbOperation);
+        return diffService.findTableDiff(stateColumns, auditRecord.getOperation());
     }
 
     public String findColumnDiffs() {

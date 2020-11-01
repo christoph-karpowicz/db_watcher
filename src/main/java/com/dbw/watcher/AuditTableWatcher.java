@@ -45,20 +45,30 @@ public class AuditTableWatcher implements Watcher {
     private void run() {
         try {
             Thread.sleep(RUN_INTERVAL);
-            List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
-            for (AuditRecord auditRecord : auditRecords) {
-                AuditFrame frame = ObjectCreator.create(AuditFrame.class);
-                frame.setAuditRecord(auditRecord);
-                frame.setDbClass(db.getClass());
-                frame.createDiff();
-                frame.createStateColumns();
-                System.out.println(frame.toString());
-            }
+            selectAndProcessAuditRecords();
             findLastId();
-            incrementRunCounter();
+        } catch (SQLException e) {
+            new WatcherRunException(e.getMessage(), e).handle();
         } catch (Exception e) {
-            new WatcherRunException(e.getMessage(), e.getClass()).handle();
+            new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
         }
+        incrementRunCounter();
+    }
+
+    private void selectAndProcessAuditRecords() throws Exception {
+        List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
+        for (AuditRecord auditRecord : auditRecords) {
+            createAuditFrameAndFindDiff(auditRecord);
+        }
+    }
+
+    private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws Exception {
+        AuditFrame frame = ObjectCreator.create(AuditFrame.class);
+        frame.setAuditRecord(auditRecord);
+        frame.setDbClass(db.getClass());
+        frame.createDiff();
+        frame.createStateColumns();
+        System.out.println(frame.toString());
     }
 
     private void findLastId() throws SQLException {

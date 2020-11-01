@@ -25,7 +25,7 @@ public class OrclPrepareService {
             prepareAuditTable();
             prepareAuditTriggers();
         } catch (SQLException e) {
-            throw new PreparationException(e.getMessage(), e.getClass());
+            throw new PreparationException(e.getMessage(), e);
         }
     }
 
@@ -58,8 +58,8 @@ public class OrclPrepareService {
                 OrclQueries.CREATE_AUDIT_TRIGGER, 
                 QueryBuilder.buildAuditTriggerName(tableName),
                 tableName,
-                newStateConcat,
                 oldStateConcat,
+                newStateConcat,
                 tableName,
                 newStateConcat,
                 tableName,

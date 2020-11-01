@@ -7,7 +7,7 @@ public class AuditRecord {
     private String tableName;
     private String oldData;
     private String newData;
-    private String operation;
+    private Operation operation;
     private String query;
     private Date timestamp;
 
@@ -43,11 +43,11 @@ public class AuditRecord {
         this.newData = newData;
     }
 
-    public String getOperation() {
+    public Operation getOperation() {
         return operation;
     }
 
-    public void setOperation(String operation) {
+    public void setOperation(Operation operation) {
         this.operation = operation;
     }
 

@@ -5,18 +5,19 @@ import java.util.Objects;
 import com.dbw.app.App;
 
 public class DbwException extends Exception {
-    private Class childException;
-    private boolean exit;
+    private Exception childException;
+    private boolean isRecoverable = false;
 
     public DbwException(String errorMessage) {
         super(errorMessage);
     }
 
-    public void setExit() {
-        this.exit = true;
+    public DbwException setRecoverable() {
+        this.isRecoverable = true;
+        return this;
     }
 
-    protected void setChildException(Class childException) {
+    protected void setChildException(Exception childException) {
         this.childException = childException;
     }
 
@@ -27,7 +28,7 @@ public class DbwException extends Exception {
             printProductionMessage();
         }
 
-        if (exit) {
+        if (!isRecoverable) {
             System.exit(0);
         }
     }
@@ -35,10 +36,11 @@ public class DbwException extends Exception {
     private void printDebugMessage() {
         if (Objects.isNull(childException)) {
             System.out.printf("%s: %s\n", this.getClass().getName(), this.getMessage());
+            this.printStackTrace();
         } else {
-            System.out.printf("%s\nCaused by %s: %s\n", this.getClass().getName(), childException.getName(), this.getMessage());
+            System.out.printf("%s\nCaused by %s: %s\n", this.getClass().getName(), childException.getClass().getName(), this.getMessage());
+            childException.printStackTrace();
         }
-        this.printStackTrace();
     }
     
     private void printProductionMessage() {

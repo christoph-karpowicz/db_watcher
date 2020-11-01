@@ -32,7 +32,7 @@ public class App {
             setDb();
             connectToDb();
         } catch (Exception e) {
-            throw new AppInitException(e.getMessage(), e.getClass());
+            throw new AppInitException(e.getMessage(), e);
         }
     }
     
@@ -65,7 +65,7 @@ public class App {
         try {
             db.clean(config.getTables());
         } catch (SQLException e) {
-            throw new CleanupException(e.getMessage(), e.getClass());
+            throw new CleanupException(e.getMessage(), e);
         }
     }
 
@@ -76,7 +76,7 @@ public class App {
             watcher.init();
             watcher.start();
         } catch (Exception e) {
-            throw new WatcherStartException(e.getMessage(), e.getClass());
+            throw new WatcherStartException(e.getMessage(), e);
         }
     }
 

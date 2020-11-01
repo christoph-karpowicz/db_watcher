@@ -108,7 +108,7 @@ public class Postgres extends Database {
         return selectMaxId(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID);
     }
 
-    public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException {
+    public List<AuditRecord> selectAuditRecords(int fromId) throws Exception {
         return selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, fromId);
     }
 

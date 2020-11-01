@@ -56,9 +56,9 @@ public abstract class Database {
         return exists;
     }
 
-    public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException;
+    public abstract List<AuditRecord> selectAuditRecords(int fromId) throws Exception;
     
-    protected List<AuditRecord> selectAuditRecords(String query, int fromId) throws SQLException {
+    protected List<AuditRecord> selectAuditRecords(String query, int fromId) throws Exception {
         List<AuditRecord> result = new ArrayList<AuditRecord>();
         PreparedStatement pstmt = conn.prepareStatement(query);
         pstmt.setInt(1, fromId);
@@ -69,7 +69,8 @@ public abstract class Database {
             auditRecord.setTableName(rs.getString(Common.COLNAME_TABLE_NAME));
             auditRecord.setOldData(rs.getString(Common.COLNAME_OLD_STATE));
             auditRecord.setNewData(rs.getString(Common.COLNAME_NEW_STATE));
-            auditRecord.setOperation(rs.getString(Common.COLNAME_OPERATION));
+            Operation dbOperation = Operation.valueOfSymbol(rs.getString(Common.COLNAME_OPERATION));
+            auditRecord.setOperation(dbOperation);
             if (columnExists(rs, Common.COLNAME_QUERY)) {
                 auditRecord.setQuery(rs.getString(Common.COLNAME_QUERY));
             }
