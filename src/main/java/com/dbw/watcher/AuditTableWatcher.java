@@ -65,7 +65,7 @@ public class AuditTableWatcher implements Watcher {
     private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws Exception {
         AuditFrame frame = ObjectCreator.create(AuditFrame.class);
         frame.setAuditRecord(auditRecord);
-        frame.setDbClass(db.getClass());
+        frame.setDb(db);
         frame.createDiff();
         frame.createStateColumns();
         System.out.println(frame.toString());

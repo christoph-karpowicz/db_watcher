@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
+import com.dbw.db.Database;
 import com.dbw.diff.Diff;
 import com.dbw.diff.StateDiffService;
 import com.dbw.diff.StateColumn;
@@ -14,7 +15,7 @@ import com.google.inject.Inject;
 public class AuditFrame {
     private AuditRecord auditRecord;
     private Diff diff;
-    private Class<?> dbClass;
+    private Database db;
     private List<StateColumn> stateColumns;
 
     @Inject
@@ -24,20 +25,20 @@ public class AuditFrame {
         this.auditRecord = auditRecord;
     }
 
-    public void setDbClass(Class<?> dbClass) {
-        this.dbClass = dbClass;
+    public void setDb(Database db) {
+        this.db = db;
     }
 
     public void createDiff() throws Exception {
-        diff = diffService.createDiff(dbClass, auditRecord);
+        diff = diffService.createDiff(db, auditRecord);
     }
 
     public void createStateColumns() {
         stateColumns = new ArrayList<StateColumn>();
         Set<String> columnNames = diff.getStateColumnNames(auditRecord.getOperation());
         for (String columnName : columnNames) {
-            String oldStateValue = (String)diff.getOldState().get(columnName);
-            String newStateValue = (String)diff.getNewState().get(columnName);
+            String oldStateValue = diffService.stateValueToString(diff.getOldState().get(columnName));
+            String newStateValue = diffService.stateValueToString(diff.getNewState().get(columnName));
             StateColumn statePair = new StateColumn(columnName, oldStateValue, newStateValue);
             statePair.compare();
             stateColumns.add(statePair);

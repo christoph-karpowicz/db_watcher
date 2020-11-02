@@ -11,6 +11,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 public class JsonDiff extends Diff {
+    private Postgres db;
+    private String tableName;
+
+    public JsonDiff(Postgres db, String tableName) {
+        this.db = db;
+        this.tableName = tableName;
+    }
     
     protected Map<String, Object> parseData(String data) throws Exception {
         Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
@@ -19,8 +26,9 @@ public class JsonDiff extends Diff {
         }
         Map<String, Object> parsedJson = new ObjectMapper().readValue(data, LinkedHashMap.class);
         List<Object> parsedJsonValues = new ArrayList<Object>(parsedJson.values());
-        for (short i = 0; i < Postgres.COLUMN_NAMES.length; i++) {
-            parsedData.put(Postgres.COLUMN_NAMES[i], parsedJsonValues.get(i));
+        String[] tableColumnNames = db.getWatchedTablesColumnNames().get(tableName);
+        for (short i = 0; i < tableColumnNames.length; i++) {
+            parsedData.put(tableColumnNames[i], parsedJsonValues.get(i));
         }
         return ImmutableMap.copyOf(parsedData);
     }

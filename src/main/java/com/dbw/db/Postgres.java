@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
@@ -13,6 +14,7 @@ import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
 
 public class Postgres extends Database {
+    private Map<String, String[]> watchedTablesColumnNames;
     public final static String[] COLUMN_NAMES = new String[]{
         Common.COLNAME_ID, 
         Common.COLNAME_TABLE_NAME, 
@@ -26,6 +28,10 @@ public class Postgres extends Database {
     
     public Postgres(DatabaseConfig config) {
         super(config);
+    }
+
+    public Map<String, String[]> getWatchedTablesColumnNames() {
+        return watchedTablesColumnNames;
     }
 
     public void connect() throws SQLException, ClassNotFoundException {
@@ -51,15 +57,16 @@ public class Postgres extends Database {
     public void prepare(List<String> watchedTables) throws PreparationException {
         PostgresPrepareService postgresPrepareService = new PostgresPrepareService(this, watchedTables);
         postgresPrepareService.prepare();
+        watchedTablesColumnNames = postgresPrepareService.getWatchedTablesColumnNames();
     }
 
     public boolean auditTableExists() throws SQLException {
-        String[] stringArgs = {Config.DEFAULT_SCHEMA, Common.DBW_AUDIT_TABLE_NAME};
+        String[] stringArgs = {Config.DEFAULT_SCHEMA, Common.DBW_AUDIT_TABLE_NAME.toLowerCase()};
         return objectExists(PostgresQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 
     public void createAuditTable() throws SQLException {
-        executeUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME);
+        executeUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME.toLowerCase());
         Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_CREATED);
     }
 
@@ -102,6 +109,12 @@ public class Postgres extends Database {
             auditTriggerNames[i] = auditTriggerName;
         }
         return auditTriggerNames;
+    }
+
+    public String[] selectTableColumnNames(String tableName) throws SQLException {
+        String[] stringArgs = {Config.DEFAULT_SCHEMA, tableName};
+        List<String> tableColumnNames = selectStringArray(PostgresQueries.FIND_TABLE_COLUMNS, stringArgs);
+        return (String[])tableColumnNames.toArray(new String[tableColumnNames.size()]);
     }
 
     public int selectMaxId() throws SQLException {

@@ -8,6 +8,12 @@ public class PostgresQueries {
         "    WHERE  table_schema = ?" +
         "    AND    table_name   = ?" +
         ");";
+
+    public static final String FIND_TABLE_COLUMNS = 
+        "SELECT column_name as \"item\" FROM information_schema.columns" +
+        "    WHERE  table_schema = ?" +
+        "    AND    table_name   = ?" +
+        "    ORDER BY ordinal_position;";
     
     public static final String CREATE_AUDIT_TABLE = 
         "CREATE TABLE %s (" +
@@ -16,14 +22,14 @@ public class PostgresQueries {
             Postgres.COLUMN_NAMES[2] + "     TEXT, " +
             Postgres.COLUMN_NAMES[3] + "     TEXT, " +
             Postgres.COLUMN_NAMES[4] + "     CHAR(1) NOT NULL, " +
-            Postgres.COLUMN_NAMES[5] + "         TEXT, " +
+            Postgres.COLUMN_NAMES[5] + "     TEXT, " +
             Postgres.COLUMN_NAMES[6] + "     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
         ")";
 
     public static final String FIND_AUDIT_FUNCTION = 
         "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM pg_proc " +
-        "    WHERE  proname = '" + Common.DBW_AUDIT_FUNC_NAME + "'" +
+        "    WHERE  proname = '" + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "'" +
         ");";
 
     private static final String UPDATE_COL_LIST = QueryBuilder.buildColumNameList(
@@ -49,7 +55,7 @@ public class PostgresQueries {
     );
 
     public static final String CREATE_AUDIT_FUNCTION = 
-        "CREATE FUNCTION " + Common.DBW_AUDIT_FUNC_NAME + "() RETURNS trigger AS " +
+        "CREATE FUNCTION " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "() RETURNS trigger AS " +
         "$$" +
         "DECLARE" +
         "    v_old TEXT;" +
@@ -77,7 +83,7 @@ public class PostgresQueries {
         "$$" +
         "LANGUAGE plpgsql;";
 
-    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION IF EXISTS " + Common.DBW_AUDIT_FUNC_NAME + ";";
+    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION IF EXISTS " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + ";";
 
     public static final String FIND_AUDIT_TRIGGER = 
         "SELECT " + Common.EXISTS + " (" +
@@ -89,7 +95,7 @@ public class PostgresQueries {
     public static final String CREATE_AUDIT_TRIGGER = 
         "CREATE TRIGGER %s" +
         " AFTER INSERT OR UPDATE OR DELETE ON %s" +
-        " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME + "();";
+        " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "();";
 
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER IF EXISTS %s ON %s;";
 

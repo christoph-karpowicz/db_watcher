@@ -1,17 +1,25 @@
 package com.dbw.db;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.dbw.err.PreparationException;
+import com.google.common.collect.ImmutableMap;
 
 public class PostgresPrepareService {
     private Postgres db;
     private List<String> watchedTables;
+    private Map<String, String[]> watchedTablesColumnNames;
     
     public PostgresPrepareService(Postgres db, List<String> watchedTables) {
         this.db = db;
         this.watchedTables = watchedTables;
+    }
+
+    public Map<String, String[]> getWatchedTablesColumnNames() {
+        return watchedTablesColumnNames;
     }
 
     public void prepare() throws PreparationException {
@@ -19,6 +27,7 @@ public class PostgresPrepareService {
             prepareAuditTable();
             prepareAuditFunction();
             prepareAuditTriggers();
+            watchedTablesColumnNames = prepareWatchedTablesColumnNames();
         } catch (SQLException e) {
             throw new PreparationException(e.getMessage(), e);
         }
@@ -56,5 +65,13 @@ public class PostgresPrepareService {
                 db.createAuditTrigger(tableName);
             }
         }
+    }
+
+    private Map<String, String[]> prepareWatchedTablesColumnNames() throws SQLException {
+        Map<String, String[]> tableColumnNames = new HashMap<String, String[]>();
+        for (String tableName : watchedTables) {
+            tableColumnNames.put(tableName, db.selectTableColumnNames(tableName));
+        }
+        return ImmutableMap.copyOf(tableColumnNames);
     }
 }

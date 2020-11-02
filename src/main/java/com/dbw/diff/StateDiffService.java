@@ -1,9 +1,13 @@
 package com.dbw.diff;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.dbw.db.AuditRecord;
+import com.dbw.db.Database;
 import com.dbw.db.Operation;
 import com.dbw.db.Postgres;
 import com.dbw.output.OutputBuilder;
@@ -18,10 +22,10 @@ public class StateDiffService implements DiffService {
     @Inject
     private ColumnDiffBuilder columnDiffBuilder;
 
-    public Diff createDiff(Class<?> dbClass, AuditRecord auditRecord) throws Exception {
+    public Diff createDiff(Database db, AuditRecord auditRecord) throws Exception {
         Diff diff;
-        if (dbClass.equals(Postgres.class)) {
-            diff = new JsonDiff();
+        if (db instanceof Postgres) {
+            diff = new JsonDiff((Postgres)db, auditRecord.getTableName());
         } else {
             diff = new XmlDiff();
         }
@@ -76,6 +80,26 @@ public class StateDiffService implements DiffService {
         columnDiffBuilder.init();
         columnDiffBuilder.build(stateColumn, count);
         return columnDiffBuilder.toString();
+    }
+
+    public String stateValueToString(Object value) {
+        if (value instanceof Integer) {
+            return Integer.toString((Integer)value);
+        } else if (value instanceof Double) {
+            return Double.toString((Double)value);
+        } else if (value instanceof Short) {
+            return Short.toString((Short)value);
+        } else if (value instanceof Long) {
+            return Long.toString((Long)value);
+        } else if (value instanceof Character) {
+            return Character.toString((Character)value);
+        } else if (value instanceof Date) {
+            DateFormat df = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+            return df.format((Date)value);
+        } else if (value instanceof ArrayList) {
+            return String.join(", ", (ArrayList)value);
+        }
+        return (String)value;
     }
     
 }
