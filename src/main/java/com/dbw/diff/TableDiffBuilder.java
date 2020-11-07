@@ -1,11 +1,11 @@
 package com.dbw.diff;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.dbw.app.App;
 import com.dbw.db.Operation;
 import com.dbw.output.OutputBuilder;
-import com.google.common.base.Strings;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -16,11 +16,11 @@ public class TableDiffBuilder implements OutputBuilder {
     private StringBuilder builder;
 
     public static short getMaxColumnLength() {
-        return Strings.isNullOrEmpty(App.options.getMaxColumnLength()) ? DEFAULT_MAX_COL_LENGTH : Short.parseShort(App.options.getMaxColumnLength());
+        return Objects.isNull(App.options.getMaxColumnLength()) ? DEFAULT_MAX_COL_LENGTH : App.options.getMaxColumnLength();
     }
 
     public static short getMaxRowLength() {
-        return Strings.isNullOrEmpty(App.options.getMaxRowLength()) ? DEFAULT_MAX_ROW_LENGTH : Short.parseShort(App.options.getMaxRowLength());
+        return Objects.isNull(App.options.getMaxRowLength()) ? DEFAULT_MAX_ROW_LENGTH : App.options.getMaxRowLength();
     }
     
     public void init() {

@@ -29,7 +29,12 @@ public class CLITest
     
     @Test
     public void shouldParseConfigOptions() {
-        CLI.ParsedOptions options = cli.parseArgs();
+        CLI.ParsedOptions options = null;
+        try {
+            options = cli.parseArgs();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
         assertEquals(TEST_CONFIG_ARG, options.getConfigPath());
         assertTrue(options.getClean());
     }

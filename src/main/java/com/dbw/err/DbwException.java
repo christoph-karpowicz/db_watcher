@@ -7,6 +7,7 @@ import com.dbw.app.App;
 public class DbwException extends Exception {
     private Exception childException;
     private boolean isRecoverable = false;
+    private boolean debug = false;
 
     public DbwException(String errorMessage) {
         super(errorMessage);
@@ -21,8 +22,16 @@ public class DbwException extends Exception {
         this.childException = childException;
     }
 
+    public boolean getDebug() {
+        return debug;
+    }
+    
+    protected void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
     public void handle() {
-        if (App.options.getDebug()) {
+        if (debug || (!Objects.isNull(App.options) && App.options.getDebug())) {
             printDebugMessage();
         } else {
             printProductionMessage();

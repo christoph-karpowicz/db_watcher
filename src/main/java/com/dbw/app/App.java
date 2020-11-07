@@ -1,6 +1,7 @@
 package com.dbw.app;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
@@ -10,6 +11,7 @@ import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.err.AppInitException;
 import com.dbw.err.CleanupException;
+import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.WatcherStartException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
@@ -36,7 +38,7 @@ public class App {
         }
     }
     
-    private CLI.ParsedOptions handleArgs(String[] args) throws ParseException {
+    private CLI.ParsedOptions handleArgs(String[] args) throws ParseException, InvalidCLIOptionInputException {
         CLI cli = new CLI();
         cli.setArgs(args);
         cli.init();
@@ -53,6 +55,10 @@ public class App {
     }
 
     public void start() throws CleanupException, WatcherStartException {
+        if (!Objects.isNull(options.getDeleteFirstNRows())) {
+
+        }
+        
         if (options.getClean()) {
             clean();
         } else {
