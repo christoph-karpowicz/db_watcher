@@ -47,11 +47,15 @@ public class AuditTableWatcher implements Watcher {
         try {
             Thread.sleep(RUN_INTERVAL);
             selectAndProcessAuditRecords();
-            findLastId();
         } catch (SQLException e) {
             new WatcherRunException(e.getMessage(), e).handle();
         } catch (Exception e) {
             new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
+        }
+        try {
+            findLastId();
+        } catch (SQLException e) {
+            new WatcherRunException(e.getMessage(), e).handle();
         }
         incrementRunCounter();
     }

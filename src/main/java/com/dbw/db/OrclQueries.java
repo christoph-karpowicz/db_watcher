@@ -55,21 +55,27 @@ public class OrclQueries {
         "v_old_state CLOB;" +
         "v_new_state CLOB;" +
         "BEGIN " +
+        "    IF updating OR deleting THEN" +
+        "       v_old_state := %s;" +
+        "    END IF;" +
+        "    IF updating OR inserting THEN" +
+        "       v_new_state := %s;" +
+        "    END IF;" +
         "    SELECT COALESCE(MAX(ID), 0)+1 INTO next_id from " + Common.DBW_AUDIT_TABLE_NAME + ";" +
         "    IF updating THEN" +
-        "        v_old_state := %s;" +
-        "        v_new_state := %s;" +
         "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + UPDATE_COL_LIST + ")" +
         "            VALUES(next_id, '%s', v_old_state, v_new_state, v_operation);" +
         "    ELSIF inserting THEN" +
-        "        v_new_state := %s;" +
         "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + INSERT_COL_LIST + ")" +
         "            VALUES(next_id, '%s', v_new_state, v_operation);" +
         "    ELSE " +
-        "        v_old_state := %s;" +
         "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + DELETE_COL_LIST + ")" +
         "            VALUES(next_id, '%s', v_old_state, v_operation);" +
         "    END IF;" +
+        "    EXCEPTION" +
+        "        WHEN OTHERS THEN" +
+        "           DBMS_OUTPUT.PUT_LINE(SQLCODE);" +
+        "           DBMS_OUTPUT.PUT_LINE(SQLERRM);" +
         "END;";
 
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s";
