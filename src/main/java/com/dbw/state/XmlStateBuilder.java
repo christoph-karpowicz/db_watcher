@@ -7,10 +7,10 @@ import com.dbw.db.Column;
 
 public class XmlStateBuilder {
 
-    public final static String XML_DECLARATION = "'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'";
-    public final static String XML_ROOT_TAG = "XmlColumnStates";
     public final static String XML_COLUMN_STATES_TAG = "columnStates";
     public final static String XML_COLUMN_STATE_TAG = "columnState";
+    private final String XML_DECLARATION = "'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'";
+    private final String XML_ROOT_TAG = "XmlColumnStates";
     private final String XML_COLUMN_STATE_NAME_ATTRIBUTE = "name";
     private final String PLSQL_TO_CHAR_FUNCTION_START = "TO_CHAR(";
     private final String RIGHT_PARENTHESIS = ")";

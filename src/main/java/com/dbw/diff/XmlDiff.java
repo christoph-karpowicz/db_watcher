@@ -1,8 +1,6 @@
 package com.dbw.diff;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -48,13 +46,20 @@ public class XmlDiff extends Diff {
             Matcher columnStateEndTagMatcher = xmlColumnStateEndTagPattern.matcher(content);
             content = columnStateEndTagMatcher.replaceAll("");
 
-            String escapedContent = content
-                .replaceAll("&", "&amp;")
-                .replaceAll(">", "&gt;")
-                .replaceAll("<", "&lt;")
-                .replaceAll("\"", "&quot;")
-                .replaceAll("'", "&apos;");
-            escapedData = escapedData.replaceAll(content, escapedContent);
+            String[][] htmlCharsWithReplacements = new String[][]{
+                {"&", "&amp;"},
+                {">", "&gt;"},
+                {"<", "&lt;"},
+                {"\"", "&quot;"},
+                {"'", "&apos;"},
+                {"/", "&#47;"},
+                {"\\", "&#92;"}
+            };
+            String escapedContent = content;
+            for (String[] htmlCharWithReplacement : htmlCharsWithReplacements) {
+                escapedContent = escapedContent.replace(htmlCharWithReplacement[0], htmlCharWithReplacement[1]);
+            }
+            escapedData = escapedData.replace(content, escapedContent);
         }
         return escapedData;
     }

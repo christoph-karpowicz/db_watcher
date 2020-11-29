@@ -47,23 +47,27 @@ public class AuditTableWatcher implements Watcher {
         try {
             Thread.sleep(RUN_INTERVAL);
             selectAndProcessAuditRecords();
-        } catch (SQLException e) {
-            new WatcherRunException(e.getMessage(), e).handle();
-        } catch (Exception e) {
-            new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
-        }
-        try {
             findLastId();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             new WatcherRunException(e.getMessage(), e).handle();
         }
         incrementRunCounter();
     }
 
-    private void selectAndProcessAuditRecords() throws Exception {
-        List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
-        for (AuditRecord auditRecord : auditRecords) {
-            createAuditFrameAndFindDiff(auditRecord);
+    private void selectAndProcessAuditRecords() {
+        try {
+            List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
+            for (AuditRecord auditRecord : auditRecords) {
+                try {
+                    createAuditFrameAndFindDiff(auditRecord);
+                } catch (SQLException e) {
+                    new WatcherRunException(e.getMessage(), e).handle();
+                } catch (Exception e) {
+                    new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
+                }
+            }
+        } catch (Exception e) {
+            new WatcherRunException(e.getMessage(), e).handle();
         }
     }
 

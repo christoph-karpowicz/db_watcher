@@ -61,9 +61,7 @@ public class OrclPrepareService {
                 oldStateConcat,
                 newStateConcat,
                 tableName,
-                newStateConcat,
                 tableName,
-                oldStateConcat,
                 tableName
             );
             if (!db.auditTriggerExists(tableName)) {
