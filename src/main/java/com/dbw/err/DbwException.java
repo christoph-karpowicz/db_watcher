@@ -3,6 +3,8 @@ package com.dbw.err;
 import java.util.Objects;
 
 import com.dbw.app.App;
+import com.dbw.log.Level;
+import com.dbw.log.Logger;
 
 public class DbwException extends Exception {
     private Exception childException;
@@ -53,7 +55,7 @@ public class DbwException extends Exception {
     }
     
     private void printProductionMessage() {
-        System.out.printf("ERROR: %s\n", this.getMessage());
+        Logger.log(Level.ERROR, this.getMessage());
     }
     
 }

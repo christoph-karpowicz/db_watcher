@@ -74,7 +74,7 @@ public abstract class Database {
             if (columnExists(rs, Common.COLNAME_QUERY)) {
                 auditRecord.setQuery(rs.getString(Common.COLNAME_QUERY));
             }
-            auditRecord.setTimestamp(rs.getDate(Common.COLNAME_TIMESTAMP));
+            auditRecord.setTimestamp(rs.getTimestamp(Common.COLNAME_TIMESTAMP));
             result.add(auditRecord);
         }
         pstmt.close();
@@ -135,7 +135,7 @@ public abstract class Database {
 
     public abstract void prepare(List<String> watchedTables) throws PreparationException;
 
-    public abstract void clean(List<String> watchedTables) throws SQLException;
+    public abstract void clean(List<String> watchedTables);
 
     public abstract void close() throws SQLException;
     

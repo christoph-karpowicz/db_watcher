@@ -10,10 +10,10 @@ import com.dbw.cli.CLI;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.err.AppInitException;
-import com.dbw.err.CleanupException;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.WatcherStartException;
 import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.watcher.AuditTableWatcher;
 import com.google.inject.Inject;
@@ -54,7 +54,7 @@ public class App {
         db.connect();
     }
 
-    public void start() throws CleanupException, WatcherStartException {
+    public void start() throws WatcherStartException {
         if (!Objects.isNull(options.getDeleteFirstNRows())) {
 
         }
@@ -67,12 +67,8 @@ public class App {
         }
     }
 
-    private void clean() throws CleanupException {
-        try {
-            db.clean(config.getTables());
-        } catch (SQLException e) {
-            throw new CleanupException(e.getMessage(), e);
-        }
+    private void clean() {
+        db.clean(config.getTables());
     }
 
     private void startWatcher() throws WatcherStartException {
@@ -89,7 +85,7 @@ public class App {
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                Logger.log(Level.INFO, "Shutting down ...");
+                Logger.log(Level.INFO, LogMessages.SHUTDOWN);
                 try {
                     shutdown();
                 } catch (SQLException e) {

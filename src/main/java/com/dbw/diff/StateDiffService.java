@@ -1,5 +1,6 @@
 package com.dbw.diff;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.Operation;
 import com.dbw.db.Postgres;
+import com.dbw.log.ErrorMessages;
 import com.dbw.output.OutputBuilder;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
@@ -17,6 +19,8 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class StateDiffService implements DiffService {
+    private final String DATE_FMT = "MM-dd-yyyy HH:mm:ss";
+    
     @Inject
     private TableDiffBuilder tableDiffBuilder;
     @Inject
@@ -36,15 +40,14 @@ public class StateDiffService implements DiffService {
     }
 
     private void validateStateData(AuditRecord auditRecord) throws Exception {
-        String exceptionFmt = "Audit record ID: %d. Could not parse state data. Provided %s state string is null or empty.";
         boolean isUpdate = auditRecord.getOperation().equals(Operation.UPDATE);
         boolean isInsert = auditRecord.getOperation().equals(Operation.INSERT);
         boolean isDelete = auditRecord.getOperation().equals(Operation.DELETE);
         if ((isDelete || isUpdate) && Strings.isNullOrEmpty(auditRecord.getOldData())) {
-            throw new Exception(String.format(exceptionFmt, auditRecord.getId(), "old"));
+            throw new Exception(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "old"));
         }
         if ((isInsert || isUpdate) && Strings.isNullOrEmpty(auditRecord.getNewData())) {
-            throw new Exception(String.format(exceptionFmt, auditRecord.getId(), "new"));
+            throw new Exception(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "new"));
         }
     }
 
@@ -93,8 +96,8 @@ public class StateDiffService implements DiffService {
             return Long.toString((Long)value);
         } else if (value instanceof Character) {
             return Character.toString((Character)value);
-        } else if (value instanceof Date) {
-            DateFormat df = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        } else if (value instanceof Date || value instanceof Timestamp) {
+            DateFormat df = new SimpleDateFormat(DATE_FMT);
             return df.format((Date)value);
         } else if (value instanceof ArrayList) {
             return String.join(", ", (ArrayList)value);

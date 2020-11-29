@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.err.CleanupException;
 import com.dbw.err.PreparationException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
 
 public class Orcl extends Database {
-    public final static short STATE_COLUMN_MAX_LENGTH = 4000;
     public final String DRIVER = "oracle.jdbc.driver.OracleDriver";
     public final String COL_NAME_ALIAS = "COLUMN_NAME";
     public final String DATA_TYPE_ALIAS = "DATA_TYPE";
@@ -102,11 +102,19 @@ public class Orcl extends Database {
         return selectAuditRecords(OrclQueries.SELECT_AUDIT_RECORDS, fromId);
     }
  
-    public void clean(List<String> watchedTables) throws SQLException {
+    public void clean(List<String> watchedTables) {
         for (String tableName : watchedTables) {
-            dropAuditTrigger(tableName);
+            try {
+                dropAuditTrigger(tableName);
+            } catch (SQLException e) {
+                new CleanupException(e.getMessage(), e).setRecoverable().handle();
+            }
         }
-        dropAuditTable();
+        try {
+            dropAuditTable();
+        } catch (SQLException e) {
+            new CleanupException(e.getMessage(), e).setRecoverable().handle();
+        }
     }
 
     public void close() throws SQLException {

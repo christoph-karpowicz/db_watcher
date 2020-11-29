@@ -65,43 +65,43 @@ public class TableDiffBuilder implements OutputBuilder {
 
     private void addColumnHeaders(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
-            append(stateColumn, stateColumn.getColumnName(), HEADER_UNDERLINE_PADDING);
+            append(stateColumn, stateColumn.getColumnName(), HEADER_UNDERLINE_PADDING, false);
         });
         builder.append(NEW_LINE);
     }
 
     private void buildUpdate(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
-            append(stateColumn, stateColumn.getOldState(), PADDING);
+            append(stateColumn, stateColumn.getOldState(), PADDING, false);
         });
         builder.append(NEW_LINE);
         stateColumns.forEach(stateColumn -> {
-            append(stateColumn, stateColumn.getNewState(), PADDING);
+            append(stateColumn, stateColumn.getNewState(), PADDING, true);
         });
         builder.append(NEW_LINE);
     }
 
     private void buildInsert(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
-            append(stateColumn, stateColumn.getNewState(), PADDING);
+            append(stateColumn, stateColumn.getNewState(), PADDING, false);
         });
         builder.append(NEW_LINE);
     }
 
     private void buildDelete(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
-            append(stateColumn, stateColumn.getOldState(), PADDING);
+            append(stateColumn, stateColumn.getOldState(), PADDING, false);
         });
         builder.append(NEW_LINE);
     }
     
-    private void append(StateColumn stateColumn, String value, String padding) {
+    private void append(StateColumn stateColumn, String value, String padding, boolean onlyIfDiff) {
         builder.append(PADDING);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
         int maxLength = DEFAULT_MAX_COL_LENGTH < stateColumn.getMaxLength() ? DEFAULT_MAX_COL_LENGTH : stateColumn.getMaxLength();
         int substringLength = maxLength - ELLIPSIS.length();
-        int valueLength = value.length();
-        String finalValue = value;
+        String finalValue = (onlyIfDiff && !stateColumn.hasDiff()) ? "" : value;
+        int valueLength = finalValue.length();
         if (valueLength > maxLength) {
             finalValue = value.substring(0, substringLength) + ELLIPSIS;
             stateColumn.setCut(true);

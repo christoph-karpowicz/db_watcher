@@ -1,6 +1,6 @@
 package com.dbw.db;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class AuditRecord {
     private int id;
@@ -9,7 +9,7 @@ public class AuditRecord {
     private String newData;
     private Operation operation;
     private String query;
-    private Date timestamp;
+    private Timestamp timestamp;
 
     public int getId() {
         return id;
@@ -59,11 +59,11 @@ public class AuditRecord {
         this.query = query;
     }
 
-    public Date getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 }

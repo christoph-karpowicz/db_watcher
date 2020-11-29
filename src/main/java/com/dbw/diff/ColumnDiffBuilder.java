@@ -14,13 +14,13 @@ public class ColumnDiffBuilder implements OutputBuilder {
     public void build(StateColumn stateColumn, short count) {
         builder.append(SM_HR);
         builder.append(NEW_LINE);
-        builder.append(stateColumn.getColumnName() + " diff: ");
+        builder.append(stateColumn.getColumnName() + VERBOSE_DIFF_DIFF);
         builder.append(NEW_LINE);
-        builder.append("Before: ");
+        builder.append(VERBOSE_DIFF_BEFORE);
         builder.append(NEW_LINE);
         builder.append(stateColumn.getOldState());
         builder.append(NEW_LINE);
-        builder.append("After: ");
+        builder.append(VERBOSE_DIFF_AFTER);
         builder.append(NEW_LINE);
         builder.append(stateColumn.getNewState());
         builder.append(NEW_LINE);

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.err.CleanupException;
 import com.dbw.err.PreparationException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
@@ -125,12 +126,20 @@ public class Postgres extends Database {
         return selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, fromId);
     }
 
-    public void clean(List<String> watchedTables) throws SQLException {
+    public void clean(List<String> watchedTables) {
         for (String tableName : watchedTables) {
-            dropAuditTrigger(tableName);
+            try {
+                dropAuditTrigger(tableName);
+            } catch (SQLException e) {
+                new CleanupException(e.getMessage(), e).setRecoverable().handle();
+            }
         }
-        dropAuditFunction();
-        dropAuditTable();
+        try {
+            dropAuditFunction();
+            dropAuditTable();
+        } catch (SQLException e) {
+            new CleanupException(e.getMessage(), e).setRecoverable().handle();
+        }
     }
 
     public void close() throws SQLException {

@@ -1,5 +1,7 @@
 package com.dbw.db;
 
+import com.dbw.log.ErrorMessages;
+
 public enum Operation {
     INSERT("I"),
     UPDATE("U"),
@@ -17,6 +19,6 @@ public enum Operation {
                 return e;
             }
         }
-        throw new Exception("Uknown database operation.");
+        throw new Exception(ErrorMessages.UNKNOWN_DB_OPERATION);
     }
 }

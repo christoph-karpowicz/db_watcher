@@ -32,13 +32,13 @@ public class AuditFrameBuilder implements OutputBuilder {
     public void build() {
         builder.append(LG_HR);
         builder.append(NEW_LINE);
-        builder.append("ID: " + auditRecord.getId());
+        builder.append(FRAME_HEADER_ID + auditRecord.getId());
         builder.append(NEW_LINE);
-        builder.append("Table: " + auditRecord.getTableName());
+        builder.append(FRAME_HEADER_TABLE + auditRecord.getTableName());
         builder.append(NEW_LINE);
-        builder.append("Operation: " + auditRecord.getOperation());
+        builder.append(FRAME_HEADER_OPERATION + auditRecord.getOperation());
         builder.append(NEW_LINE);
-        builder.append("Timestamp: " + auditRecord.getTimestamp());
+        builder.append(FRAME_HEADER_TIMESTAMP + auditRecord.getTimestamp());
         builder.append(NEW_LINE);
         builder.append(findTableDiff());
         if (auditRecord.getOperation().equals(Operation.UPDATE)) {

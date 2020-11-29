@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.dbw.db.Common;
 import com.dbw.state.XmlColumnState;
 import com.dbw.state.XmlColumnStates;
 
@@ -20,7 +21,7 @@ public class XmlDiff extends Diff {
         XmlMapper xmlMapper = new XmlMapper();
         XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
         for (XmlColumnState columnState : state.getColumnStates()) {
-            String columnStateValue = Objects.isNull(columnState.getValue()) ? "null" : columnState.getValue();
+            String columnStateValue = Objects.isNull(columnState.getValue()) ? Common.NULL_AS_STRING : columnState.getValue();
             parsedData.put(columnState.getName(), columnStateValue);
         }
         return ImmutableMap.copyOf(parsedData);

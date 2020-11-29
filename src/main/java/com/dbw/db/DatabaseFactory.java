@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.log.ErrorMessages;
 
 public class DatabaseFactory {
 
@@ -10,7 +11,7 @@ public class DatabaseFactory {
         } else if (config.getType().equals(DatabaseType.ORCL.type)) {
             return new Orcl(config);
         }
-        throw new Exception("Unknown / not supported database type.");
+        throw new Exception(ErrorMessages.UNKNOWN_DB_TYPE);
     }
     
 }

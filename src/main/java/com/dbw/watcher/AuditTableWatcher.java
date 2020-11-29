@@ -2,6 +2,7 @@ package com.dbw.watcher;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
@@ -76,8 +77,10 @@ public class AuditTableWatcher implements Watcher {
     }
 
     private int getLastId() {
-        if (getRunCounter() == 0 && App.options.getLastNChanges() > 0) {
-            int diff = lastId - (int)App.options.getLastNChanges();
+        Short lastNChanges = App.options.getLastNChanges();
+        boolean lastNChangesGtZero = Objects.nonNull(lastNChanges) && lastNChanges > 0;
+        if (getRunCounter() == 0 && lastNChangesGtZero) {
+            int diff = lastId - (int)lastNChanges;
             return diff > 0 ? diff : 0; 
         }
         return lastId;
