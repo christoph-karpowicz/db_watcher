@@ -9,19 +9,31 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.dbw.db.Common;
 import com.dbw.state.XmlColumnState;
 import com.dbw.state.XmlColumnStates;
 import com.dbw.state.XmlStateBuilder;
+import com.dbw.state.XmlStateTag;
+import com.dbw.state.XmlStateTagAttribute;
+import com.dbw.util.HtmlInXmlEscaper;
 
+@Singleton
 public class XmlDiff extends Diff {
+    
+    @Inject
+    private HtmlInXmlEscaper htmlInXmlEscaper;
     
     protected Map<String, Object> parseData(String data) throws Exception {
         Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
         if (Strings.isNullOrEmpty(data)) {
             return ImmutableMap.copyOf(parsedData);
         }
-        String escapedData = escapeHtml(data);
+        XmlStateTag xmlStateTag = new XmlStateTag(XmlStateBuilder.XML_COLUMN_STATE_TAG, true);
+        XmlStateTagAttribute xmlStateTagAttribute = new XmlStateTagAttribute("name", ".+?", true);
+        xmlStateTag.addAttribute(xmlStateTagAttribute);
+        String escapedData = htmlInXmlEscaper.escapeHtmlBetweenXmlTags(data, xmlStateTag);
         XmlMapper xmlMapper = new XmlMapper();
         XmlColumnStates state = xmlMapper.readValue(escapedData, XmlColumnStates.class);
         for (XmlColumnState columnState : state.getColumnStates()) {
@@ -29,39 +41,6 @@ public class XmlDiff extends Diff {
             parsedData.put(columnState.getName(), columnStateValue);
         }
         return ImmutableMap.copyOf(parsedData);
-    }
-
-    private String escapeHtml(String data) {
-        String escapedData = data;
-        String xmlColumnStateStartTag = "<" + XmlStateBuilder.XML_COLUMN_STATE_TAG + "\sname=\".+?\">";
-        Pattern xmlColumnStateStartTagPattern = Pattern.compile(xmlColumnStateStartTag);
-        String xmlColumnStateEndTag = "<\\/" + XmlStateBuilder.XML_COLUMN_STATE_TAG + ">";
-        Pattern xmlColumnStateEndTagPattern = Pattern.compile(xmlColumnStateEndTag);
-        Pattern xmlColumnStateTagWithContentPattern = Pattern.compile(xmlColumnStateStartTag + ".+?" + xmlColumnStateEndTag);
-        Matcher columnStateTagsContentsMatcher = xmlColumnStateTagWithContentPattern.matcher(escapedData);
-
-        while (columnStateTagsContentsMatcher.find()) {
-            Matcher columnStateStartTagMatcher = xmlColumnStateStartTagPattern.matcher(columnStateTagsContentsMatcher.group());
-            String content = columnStateStartTagMatcher.replaceAll("");
-            Matcher columnStateEndTagMatcher = xmlColumnStateEndTagPattern.matcher(content);
-            content = columnStateEndTagMatcher.replaceAll("");
-
-            String[][] htmlCharsWithReplacements = new String[][]{
-                {"&", "&amp;"},
-                {">", "&gt;"},
-                {"<", "&lt;"},
-                {"\"", "&quot;"},
-                {"'", "&apos;"},
-                {"/", "&#47;"},
-                {"\\", "&#92;"}
-            };
-            String escapedContent = content;
-            for (String[] htmlCharWithReplacement : htmlCharsWithReplacements) {
-                escapedContent = escapedContent.replace(htmlCharWithReplacement[0], htmlCharWithReplacement[1]);
-            }
-            escapedData = escapedData.replace(content, escapedContent);
-        }
-        return escapedData;
     }
 
 }

@@ -37,13 +37,13 @@ public class XmlStateBuilder {
     public String build(String statePrefix, Column[] tableColumns) {
         List<String> stateConcat = new ArrayList<String>();
         stateConcat.add(XML_DECLARATION);
-        stateConcat.add(xmlRootTag.start());
-        stateConcat.add(columnStatesTag.start());
+        stateConcat.add(xmlRootTag.startTag());
+        stateConcat.add(columnStatesTag.startTag());
         for (Column tableColumn : tableColumns) {
             stateConcat.add(buildForColumn(statePrefix, tableColumn));
         }
-        stateConcat.add(columnStatesTag.end());
-        stateConcat.add(xmlRootTag.end());
+        stateConcat.add(columnStatesTag.endTag());
+        stateConcat.add(xmlRootTag.endTag());
         return String.join(PLSQL_STRING_CONCAT_OPERATOR, stateConcat);
     }
 
@@ -53,11 +53,11 @@ public class XmlStateBuilder {
         String columnNameWithStatePrefix = statePrefix + tableColumn.getName();
         StringBuilder columnValueToStringInvocation = new StringBuilder();
         columnValueToStringInvocation
-            .append(columnStateTag.start())
+            .append(columnStateTag.startTag())
             .append(PLSQL_STRING_CONCAT_OPERATOR)
             .append(generateToVarcharFunctionCall(columnNameWithStatePrefix, tableColumn.getDataType()))
             .append(PLSQL_STRING_CONCAT_OPERATOR)
-            .append(columnStateTag.end());
+            .append(columnStateTag.endTag());
 
         return columnValueToStringInvocation.toString();
     }

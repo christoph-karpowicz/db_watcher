@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.Operation;
@@ -31,7 +32,7 @@ public class StateDiffService implements DiffService {
         if (db instanceof Postgres) {
             diff = new JsonDiff((Postgres)db, auditRecord.getTableName());
         } else {
-            diff = new XmlDiff();
+            diff = ObjectCreator.create(XmlDiff.class);
         }
         validateStateData(auditRecord);
         diff.parseOldData(auditRecord.getOldData());
