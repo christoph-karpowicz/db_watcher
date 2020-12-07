@@ -23,10 +23,10 @@ public class OrclPrepareService {
     public void prepare() throws PreparationException {
         try {
             prepareAuditTable();
-            prepareAuditTriggers();
         } catch (SQLException e) {
             throw new PreparationException(e.getMessage(), e);
         }
+        prepareAuditTriggers();
     }
 
     private void prepareAuditTable() throws SQLException {
@@ -35,40 +35,47 @@ public class OrclPrepareService {
         }
     }
 
-    private void prepareAuditTriggers() throws SQLException {
+    private void prepareAuditTriggers() {
         dropUnusedAuditTriggers();
         createAuditTriggers();
     }
 
-    private void dropUnusedAuditTriggers() throws SQLException {
-        String[] auditTriggers = db.selectAuditTriggers();
-        for (String auditTriggerName : auditTriggers) {
-            if (!watchedTables.contains(auditTriggerName)) {
-                db.dropAuditTrigger(auditTriggerName);
+    private void dropUnusedAuditTriggers() {
+        try {
+            String[] auditTriggers = db.selectAuditTriggers();
+            for (String auditTriggerName : auditTriggers) {
+                if (!watchedTables.contains(auditTriggerName)) {
+                    db.dropAuditTrigger(auditTriggerName);
+                }
             }
+        } catch (SQLException e) {
+            new PreparationException(e.getMessage(), e).setRecoverable().handle();
         }
     }
 
-    private void createAuditTriggers() throws SQLException {
+    private void createAuditTriggers() {
         for (String tableName : watchedTables) {
-            Column[] tableColumns = db.selectTableColumns(tableName);
-            String newStateConcat = xmlStateBuilder.build(NEW_STATE_PREFIX, tableColumns);
-            String oldStateConcat = xmlStateBuilder.build(OLD_STATE_PREFIX, tableColumns);
-            String auditTriggerQuery = db.prepareQuery(
-                OrclQueries.CREATE_AUDIT_TRIGGER, 
-                QueryBuilder.buildAuditTriggerName(tableName),
-                tableName,
-                oldStateConcat,
-                newStateConcat,
-                tableName,
-                tableName,
-                tableName
-            );
-            if (!db.auditTriggerExists(tableName)) {
-                db.createAuditTrigger(tableName, auditTriggerQuery);
+            try {
+                Column[] tableColumns = db.selectTableColumns(tableName);
+                String newStateConcat = xmlStateBuilder.build(NEW_STATE_PREFIX, tableColumns);
+                String oldStateConcat = xmlStateBuilder.build(OLD_STATE_PREFIX, tableColumns);
+                String auditTriggerQuery = db.prepareQuery(
+                    OrclQueries.CREATE_AUDIT_TRIGGER, 
+                    QueryBuilder.buildAuditTriggerName(tableName),
+                    tableName,
+                    oldStateConcat,
+                    newStateConcat,
+                    tableName,
+                    tableName,
+                    tableName
+                );
+                if (!db.auditTriggerExists(tableName)) {
+                    db.createAuditTrigger(tableName, auditTriggerQuery);
+                }
+            } catch (SQLException e) {
+                new PreparationException(e.getMessage(), e).setRecoverable().handle();
             }
         }
     }
-
     
 }

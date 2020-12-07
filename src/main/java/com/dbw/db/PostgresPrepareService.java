@@ -54,15 +54,23 @@ public class PostgresPrepareService {
         String[] auditTriggers = db.selectAuditTriggers();
         for (String auditTriggerName : auditTriggers) {
             if (!watchedTables.contains(auditTriggerName)) {
-                db.dropAuditTrigger(auditTriggerName);
+                try {
+                    db.dropAuditTrigger(auditTriggerName);
+                } catch (SQLException e) {
+                    new PreparationException(e.getMessage(), e).setRecoverable().handle();
+                }
             }
         }
     }
 
-    private void createAuditTriggers() throws SQLException {
+    private void createAuditTriggers() {
         for (String tableName : watchedTables) {
-            if (!db.auditTriggerExists(tableName)) {
-                db.createAuditTrigger(tableName);
+            try {
+                if (!db.auditTriggerExists(tableName)) {
+                    db.createAuditTrigger(tableName);
+                }
+            } catch (SQLException e) {
+                new PreparationException(e.getMessage(), e).setRecoverable().handle();
             }
         }
     }
