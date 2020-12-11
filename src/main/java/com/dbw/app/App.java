@@ -10,6 +10,7 @@ import com.dbw.cli.CLI;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.err.AppInitException;
+import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.WatcherStartException;
 import com.dbw.log.Level;
@@ -54,9 +55,9 @@ public class App {
         db.connect();
     }
 
-    public void start() throws WatcherStartException {
+    public void start() throws WatcherStartException, InitialAuditRecordDeleteException {
         if (!Objects.isNull(options.getDeleteFirstNRows())) {
-
+            deleteFirstNRows();
         }
         
         if (options.getClean()) {
@@ -64,6 +65,14 @@ public class App {
         } else {
             addShutdownHook();
             startWatcher();
+        }
+    }
+
+    private void deleteFirstNRows() throws InitialAuditRecordDeleteException {
+        try {
+            db.deleteFirstNRows(options.getDeleteFirstNRows());
+        } catch (SQLException e) {
+            throw new InitialAuditRecordDeleteException(e.getMessage(), e);
         }
     }
 

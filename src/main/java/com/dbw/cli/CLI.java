@@ -3,7 +3,7 @@ package com.dbw.cli;
 import com.dbw.cfg.Config;
 import com.dbw.diff.TableDiffBuilder;
 import com.dbw.err.InvalidCLIOptionInputException;
-import com.google.common.base.Strings;
+import com.dbw.log.ErrorMessages;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -71,9 +71,14 @@ public class CLI {
         return cmd.hasOption(OPTIONS_DEBUG);
     }
 
-    private String getDeleteFirstNRowsOption() {
+    private String getDeleteFirstNRowsOption() throws NumberFormatException {
         if(cmd.hasOption(OPTIONS_DELETE_FIRST_N_ROWS)) {
-            return cmd.getOptionValue(OPTIONS_DELETE_FIRST_N_ROWS);
+            String value = cmd.getOptionValue(OPTIONS_DELETE_FIRST_N_ROWS);
+            boolean isNumeric = value.chars().allMatch(Character::isDigit);
+            if (!isNumeric && !value.trim().equals("*")) {
+                throw new NumberFormatException(ErrorMessages.CLI_INVALID_DELETE_N_ROWS);
+            }
+            return value;
         }
         return null;
     }

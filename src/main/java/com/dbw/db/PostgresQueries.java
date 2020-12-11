@@ -105,4 +105,12 @@ public class PostgresQueries {
 
     public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?;";
 
+    public static final String SELECT_NTH_AUDIT_RECORD = "SELECT id FROM " + Common.DBW_AUDIT_TABLE_NAME + " LIMIT 1 OFFSET ?;";
+
+    public static final String COUNT_AUDIT_RECORDS = "SELECT COUNT(*) AS \"ROW_COUNT\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
+
+    public static final String DELETE_ALL_AUDIT_RECORDS = "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME;
+
+    public static final String DELETE_AUDIT_RECORDS_WITH_ID_LTE = "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id <= ?";
+
 }

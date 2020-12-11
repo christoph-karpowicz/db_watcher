@@ -23,20 +23,43 @@ public abstract class Database {
         this.config = config;
     }
 
+    public abstract void deleteFirstNRows(String nRows) throws SQLException;
+
+    protected void deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
+        if (nRows.equals("*")) {
+            executeFormattedQueryUpdate(deleteAllQuery);
+            return;
+        }
+        int rowCount = selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
+        int nRowsNum = Integer.parseInt(nRows);
+        if (rowCount <= nRowsNum) {
+            executeFormattedQueryUpdate(deleteAllQuery);
+            return;
+        }
+        executePreparedStatementUpdateWithSingleInt(deleteAllLteQuery, nRowsNum);
+    }
+
     public void dropAuditTable() throws SQLException {
-        executeUpdate("DROP TABLE " + Common.DBW_AUDIT_TABLE_NAME);
+        executeFormattedQueryUpdate("DROP TABLE " + Common.DBW_AUDIT_TABLE_NAME);
         Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_DROPPED);
     }
 
-    protected void executeUpdate(String query, Object... args) throws SQLException {
+    protected void executePreparedStatementUpdateWithSingleInt(String query, int param) throws SQLException {
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, param);
+        pstmt.executeUpdate();
+        pstmt.close();
+    }
+
+    protected void executeFormattedQueryUpdate(String query, Object... params) throws SQLException {
         Statement stmt = conn.createStatement();
-        stmt.executeUpdate(prepareQuery(query, args));
+        stmt.executeUpdate(formatQuery(query, params));
         stmt.close();
     }
 
-    public static String prepareQuery(String query, Object... args) {
-        if (args.length > 0) {
-            return String.format(query, args);
+    public static String formatQuery(String query, Object... params) {
+        if (params.length > 0) {
+            return String.format(query, params);
         }
         return query;
     }
@@ -106,12 +129,12 @@ public abstract class Database {
 
     public abstract int selectMaxId() throws SQLException;
 
-    protected int selectMaxId(String query) throws SQLException {
+    protected int selectSingleIntValue(String query, String columnName) throws SQLException {
         int result = 0;
         Statement pstmt = conn.createStatement();
         ResultSet rs = pstmt.executeQuery(query);
         if (rs.next()) {
-            result = rs.getInt(Common.MAX);
+            result = rs.getInt(columnName);
         } else {
             throw new SQLException(ErrorMessages.COULDNT_SELECT_MAX);
         }

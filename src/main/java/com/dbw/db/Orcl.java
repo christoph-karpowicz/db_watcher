@@ -46,7 +46,7 @@ public class Orcl extends Database {
     }
 
     public void createAuditTable() throws SQLException {
-        executeUpdate(OrclQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME);
+        executeFormattedQueryUpdate(OrclQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME);
         Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_CREATED);
     }
 
@@ -56,12 +56,16 @@ public class Orcl extends Database {
     }
 
     public void createAuditTrigger(String tableName, String query) throws SQLException {
-        executeUpdate(query);
+        executeFormattedQueryUpdate(query);
         Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
+    public void deleteFirstNRows(String nRows) throws SQLException {
+        deleteFirstNRows(nRows, OrclQueries.DELETE_ALL_AUDIT_RECORDS, OrclQueries.DELETE_AUDIT_RECORDS_WITH_ID_LTE);
+    }
+
     public void dropAuditTrigger(String tableName) throws SQLException {
-        executeUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName));
+        executeFormattedQueryUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName));
         Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
@@ -95,7 +99,7 @@ public class Orcl extends Database {
     }
 
     public int selectMaxId() throws SQLException {
-        return selectMaxId(OrclQueries.SELECT_AUDIT_TABLE_MAX_ID);
+        return selectSingleIntValue(OrclQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
     }
 
     public List<AuditRecord> selectAuditRecords(int fromId) throws Exception {

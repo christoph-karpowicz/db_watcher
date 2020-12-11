@@ -67,7 +67,7 @@ public class Postgres extends Database {
     }
 
     public void createAuditTable() throws SQLException {
-        executeUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME.toLowerCase());
+        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME.toLowerCase());
         Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_CREATED);
     }
 
@@ -77,12 +77,12 @@ public class Postgres extends Database {
     }
 
     public void createAuditFunction() throws SQLException {
-        executeUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION);
+        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION);
         Logger.log(Level.INFO, LogMessages.AUDIT_FUNCTION_CREATED);
     }
 
     public void dropAuditFunction() throws SQLException {
-        executeUpdate(PostgresQueries.DROP_AUDIT_FUNCTION);
+        executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_FUNCTION);
         Logger.log(Level.INFO, LogMessages.AUDIT_FUNCTION_DROPPED);
     }
 
@@ -92,12 +92,16 @@ public class Postgres extends Database {
     }
 
     public void createAuditTrigger(String tableName) throws SQLException {
-        executeUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
+        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
         Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
+    public void deleteFirstNRows(String nRows) throws SQLException {
+        deleteFirstNRows(nRows, PostgresQueries.DELETE_ALL_AUDIT_RECORDS, PostgresQueries.DELETE_AUDIT_RECORDS_WITH_ID_LTE);
+    }
+
     public void dropAuditTrigger(String tableName) throws SQLException {
-        executeUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
+        executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
         Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
@@ -119,7 +123,7 @@ public class Postgres extends Database {
     }
 
     public int selectMaxId() throws SQLException {
-        return selectMaxId(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID);
+        return selectSingleIntValue(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
     }
 
     public List<AuditRecord> selectAuditRecords(int fromId) throws Exception {

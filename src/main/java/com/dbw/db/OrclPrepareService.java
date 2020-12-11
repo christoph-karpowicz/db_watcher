@@ -59,7 +59,7 @@ public class OrclPrepareService {
                 Column[] tableColumns = db.selectTableColumns(tableName);
                 String newStateConcat = xmlStateBuilder.build(NEW_STATE_PREFIX, tableColumns);
                 String oldStateConcat = xmlStateBuilder.build(OLD_STATE_PREFIX, tableColumns);
-                String auditTriggerQuery = db.prepareQuery(
+                String auditTriggerQuery = db.formatQuery(
                     OrclQueries.CREATE_AUDIT_TRIGGER, 
                     QueryBuilder.buildAuditTriggerName(tableName),
                     tableName,

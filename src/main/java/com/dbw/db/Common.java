@@ -5,6 +5,7 @@ public class Common {
     public final static String AUDIT_POSTFIX = "_AUDIT";
     public final static String EXISTS = "exists";
     public final static String MAX = "max";
+    public final static String ROW_COUNT = "ROW_COUNT";
     public final static String ITEM = "item";
     public final static String COLNAME_ID = "id";
     public final static String DBW_AUDIT_TABLE_NAME = "DBW_AUDIT";
