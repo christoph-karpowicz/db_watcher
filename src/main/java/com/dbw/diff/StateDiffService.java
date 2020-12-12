@@ -95,6 +95,8 @@ public class StateDiffService implements DiffService {
             return Short.toString((Short)value);
         } else if (value instanceof Long) {
             return Long.toString((Long)value);
+        } else if (value instanceof Boolean) {
+            return Boolean.toString((Boolean)value);
         } else if (value instanceof Character) {
             return Character.toString((Character)value);
         } else if (value instanceof Date || value instanceof Timestamp) {

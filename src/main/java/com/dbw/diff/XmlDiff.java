@@ -37,7 +37,7 @@ public class XmlDiff extends Diff {
         XmlMapper xmlMapper = new XmlMapper();
         XmlColumnStates state = xmlMapper.readValue(escapedData, XmlColumnStates.class);
         for (XmlColumnState columnState : state.getColumnStates()) {
-            String columnStateValue = Objects.isNull(columnState.getValue()) ? Common.NULL_AS_STRING : columnState.getValue();
+            Object columnStateValue = Objects.requireNonNullElse(columnState.getValue(), Common.NULL_AS_STRING);
             parsedData.put(columnState.getName(), columnStateValue);
         }
         return ImmutableMap.copyOf(parsedData);
