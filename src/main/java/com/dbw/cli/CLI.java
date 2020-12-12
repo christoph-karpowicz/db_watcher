@@ -19,6 +19,7 @@ public class CLI {
     private final String OPTIONS_MAX_COL_LENGTH = "maxColumnLength";
     private final String OPTIONS_MAX_ROW_LENGTH = "maxRowLength";
     private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
+    public static final String ALL_SYMBOL = "*";
     
     private CommandLineParser parser;
     private Options options;
@@ -35,7 +36,7 @@ public class CLI {
 
     private void setOptions() {
         options.addOption("d", OPTIONS_DEBUG, false, "show exception classes and stack traces");
-        options.addOption("D", OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (* if all)");
+        options.addOption("D", OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
         options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
         options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
         options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
@@ -75,7 +76,7 @@ public class CLI {
         if(cmd.hasOption(OPTIONS_DELETE_FIRST_N_ROWS)) {
             String value = cmd.getOptionValue(OPTIONS_DELETE_FIRST_N_ROWS);
             boolean isNumeric = value.chars().allMatch(Character::isDigit);
-            if (!isNumeric && !value.trim().equals("*")) {
+            if (!isNumeric && !value.trim().equals(ALL_SYMBOL)) {
                 throw new NumberFormatException(ErrorMessages.CLI_INVALID_DELETE_N_ROWS);
             }
             return value;

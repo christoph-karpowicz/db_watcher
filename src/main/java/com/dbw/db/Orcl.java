@@ -106,19 +106,23 @@ public class Orcl extends Database {
         return selectAuditRecords(OrclQueries.SELECT_AUDIT_RECORDS, fromId);
     }
  
-    public void clean(List<String> watchedTables) {
+    public boolean clean(List<String> watchedTables) {
+        boolean success = true;
         for (String tableName : watchedTables) {
             try {
                 dropAuditTrigger(tableName);
             } catch (SQLException e) {
+                success = false;
                 new CleanupException(e.getMessage(), e).setRecoverable().handle();
             }
         }
         try {
             dropAuditTable();
         } catch (SQLException e) {
+            success = false;
             new CleanupException(e.getMessage(), e).setRecoverable().handle();
         }
+        return success;
     }
 
     public void close() throws SQLException {

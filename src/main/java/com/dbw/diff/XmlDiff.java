@@ -2,9 +2,7 @@ package com.dbw.diff;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Strings;
@@ -37,7 +35,7 @@ public class XmlDiff extends Diff {
         XmlMapper xmlMapper = new XmlMapper();
         XmlColumnStates state = xmlMapper.readValue(escapedData, XmlColumnStates.class);
         for (XmlColumnState columnState : state.getColumnStates()) {
-            Object columnStateValue = Objects.requireNonNullElse(columnState.getValue(), Common.NULL_AS_STRING);
+            Object columnStateValue = Optional.ofNullable(columnState.getValue()).orElse(Common.NULL_AS_STRING);
             parsedData.put(columnState.getName(), columnStateValue);
         }
         return ImmutableMap.copyOf(parsedData);

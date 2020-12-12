@@ -13,9 +13,11 @@ import com.dbw.err.AppInitException;
 import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.WatcherStartException;
+import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
+import com.dbw.log.SuccessMessages;
 import com.dbw.watcher.AuditTableWatcher;
 import com.google.inject.Inject;
 import org.apache.commons.cli.ParseException;
@@ -56,8 +58,9 @@ public class App {
     }
 
     public void start() throws WatcherStartException, InitialAuditRecordDeleteException {
-        if (!Objects.isNull(options.getDeleteFirstNRows())) {
-            deleteFirstNRows();
+        String deleteFirstNRowsOption = options.getDeleteFirstNRows();
+        if (!Objects.isNull(deleteFirstNRowsOption)) {
+            deleteFirstNRows(deleteFirstNRowsOption);
         }
         
         if (options.getClean()) {
@@ -68,16 +71,22 @@ public class App {
         }
     }
 
-    private void deleteFirstNRows() throws InitialAuditRecordDeleteException {
+    private void deleteFirstNRows(String nRows) throws InitialAuditRecordDeleteException {
         try {
-            db.deleteFirstNRows(options.getDeleteFirstNRows());
+            db.deleteFirstNRows(nRows);
         } catch (SQLException e) {
             throw new InitialAuditRecordDeleteException(e.getMessage(), e);
         }
+        String successMessage = nRows.equals(CLI.ALL_SYMBOL) ? SuccessMessages.CLI_ALL_ROWS_DELETED : SuccessMessages.CLI_N_ROWS_DELETED;
+        Logger.log(Level.INFO, SuccessMessages.formatMsg(successMessage, nRows));
     }
 
     private void clean() {
-        db.clean(config.getTables());
+        if (db.clean(config.getTables())) {
+            Logger.log(Level.INFO, SuccessMessages.CLI_CLEANED);
+        } else {
+            Logger.log(Level.ERROR, ErrorMessages.CLI_CLEAN);
+        }
     }
 
     private void startWatcher() throws WatcherStartException {

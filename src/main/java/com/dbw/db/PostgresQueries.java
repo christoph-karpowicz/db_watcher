@@ -83,7 +83,7 @@ public class PostgresQueries {
         "$$" +
         "LANGUAGE plpgsql;";
 
-    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION IF EXISTS " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + ";";
+    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + ";";
 
     public static final String FIND_AUDIT_TRIGGER = 
         "SELECT " + Common.EXISTS + " (" +
@@ -97,7 +97,7 @@ public class PostgresQueries {
         " AFTER INSERT OR UPDATE OR DELETE ON %s" +
         " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "();";
 
-    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER IF EXISTS %s ON %s;";
+    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s ON %s;";
 
     public static final String SELECT_AUDIT_TRIGGERS = "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
 

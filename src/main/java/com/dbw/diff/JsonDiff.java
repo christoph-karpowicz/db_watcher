@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 import com.dbw.db.Common;
 import com.dbw.db.Postgres;
@@ -30,7 +30,7 @@ public class JsonDiff extends Diff {
         List<Object> parsedJsonValues = new ArrayList<Object>(parsedJson.values());
         String[] tableColumnNames = db.getWatchedTablesColumnNames().get(tableName);
         for (short i = 0; i < tableColumnNames.length; i++) {
-            Object columnStateValue = Objects.requireNonNullElse(parsedJsonValues.get(i), Common.NULL_AS_STRING);
+            Object columnStateValue = Optional.ofNullable(parsedJsonValues.get(i)).orElse(Common.NULL_AS_STRING);
             parsedData.put(tableColumnNames[i], columnStateValue);
         }
         return ImmutableMap.copyOf(parsedData);

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.cfg.DatabaseConfig;
+import com.dbw.cli.CLI;
 import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
@@ -26,7 +27,7 @@ public abstract class Database {
     public abstract void deleteFirstNRows(String nRows) throws SQLException;
 
     protected void deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
-        if (nRows.equals("*")) {
+        if (nRows.equals(CLI.ALL_SYMBOL)) {
             executeFormattedQueryUpdate(deleteAllQuery);
             return;
         }
@@ -158,7 +159,7 @@ public abstract class Database {
 
     public abstract void prepare(List<String> watchedTables) throws PreparationException;
 
-    public abstract void clean(List<String> watchedTables);
+    public abstract boolean clean(List<String> watchedTables);
 
     public abstract void close() throws SQLException;
     
