@@ -9,6 +9,7 @@ import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.diff.Diff;
 import com.dbw.diff.StateDiffService;
+import com.dbw.err.StateDataProcessingException;
 import com.dbw.diff.StateColumn;
 import com.google.inject.Inject;
 
@@ -29,7 +30,7 @@ public class AuditFrame {
         this.db = db;
     }
 
-    public void createDiff() throws Exception {
+    public void createDiff() throws StateDataProcessingException {
         diff = diffService.createDiff(db, auditRecord);
     }
 

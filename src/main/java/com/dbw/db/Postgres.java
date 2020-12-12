@@ -8,7 +8,8 @@ import java.util.Map;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
-import com.dbw.err.CleanupException;
+import com.dbw.err.PurgeException;
+import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.PreparationException;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
@@ -96,13 +97,33 @@ public class Postgres extends Database {
         Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
-    public void deleteFirstNRows(String nRows) throws SQLException {
-        deleteFirstNRows(nRows, PostgresQueries.DELETE_ALL_AUDIT_RECORDS, PostgresQueries.DELETE_AUDIT_RECORDS_WITH_ID_LTE);
+    public String deleteFirstNRows(String nRows) throws SQLException {
+        return deleteFirstNRows(nRows, PostgresQueries.DELETE_ALL_AUDIT_RECORDS, PostgresQueries.DELETE_AUDIT_RECORDS_WITH_ID_LTE);
     }
 
     public void dropAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
         Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
+    }
+
+    public boolean purge(List<String> watchedTables) {
+        boolean success = true;
+        for (String tableName : watchedTables) {
+            try {
+                dropAuditTrigger(tableName);
+            } catch (SQLException e) {
+                success = false;
+                new PurgeException(e.getMessage(), e).setRecoverable().handle();
+            }
+        }
+        try {
+            dropAuditFunction();
+            dropAuditTable();
+        } catch (SQLException e) {
+            success = false;
+            new PurgeException(e.getMessage(), e).setRecoverable().handle();
+        }
+        return success;
     }
 
     public String[] selectAuditTriggers() throws SQLException {
@@ -126,28 +147,8 @@ public class Postgres extends Database {
         return selectSingleIntValue(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
     }
 
-    public List<AuditRecord> selectAuditRecords(int fromId) throws Exception {
+    public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException {
         return selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, fromId);
-    }
-
-    public boolean clean(List<String> watchedTables) {
-        boolean success = true;
-        for (String tableName : watchedTables) {
-            try {
-                dropAuditTrigger(tableName);
-            } catch (SQLException e) {
-                success = false;
-                new CleanupException(e.getMessage(), e).setRecoverable().handle();
-            }
-        }
-        try {
-            dropAuditFunction();
-            dropAuditTable();
-        } catch (SQLException e) {
-            success = false;
-            new CleanupException(e.getMessage(), e).setRecoverable().handle();
-        }
-        return success;
     }
 
     public void close() throws SQLException {

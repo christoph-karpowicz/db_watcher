@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.dbw.db.Operation;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -13,15 +15,15 @@ public abstract class Diff {
     private Map<String, Object> newState;
     private List<StateColumn> stateColumns;
     
-    public void parseOldData(String oldData) throws Exception {
+    public void parseOldData(String oldData) throws JsonProcessingException, JsonMappingException {
         oldState = parseData(oldData);
     }
 
-    public void parseNewData(String newData) throws Exception {
+    public void parseNewData(String newData) throws JsonProcessingException, JsonMappingException {
         newState = parseData(newData);
     }
 
-    protected abstract Map<String, Object> parseData(String data) throws Exception;
+    protected abstract Map<String, Object> parseData(String data) throws JsonProcessingException, JsonMappingException;
     
     public Map<String, Object> getOldState() {
         return ImmutableMap.copyOf(oldState);

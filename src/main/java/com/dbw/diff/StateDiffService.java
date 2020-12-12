@@ -12,8 +12,12 @@ import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.Operation;
 import com.dbw.db.Postgres;
+import com.dbw.err.StateDataProcessingException;
+import com.dbw.err.StateDataValidationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.output.OutputBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,28 +31,32 @@ public class StateDiffService implements DiffService {
     @Inject
     private ColumnDiffBuilder columnDiffBuilder;
 
-    public Diff createDiff(Database db, AuditRecord auditRecord) throws Exception {
+    public Diff createDiff(Database db, AuditRecord auditRecord) throws StateDataProcessingException {
         Diff diff;
         if (db instanceof Postgres) {
             diff = new JsonDiff((Postgres)db, auditRecord.getTableName());
         } else {
             diff = ObjectCreator.create(XmlDiff.class);
         }
-        validateStateData(auditRecord);
-        diff.parseOldData(auditRecord.getOldData());
-        diff.parseNewData(auditRecord.getNewData());
+        try {
+            validateStateData(auditRecord);
+            diff.parseOldData(auditRecord.getOldData());
+            diff.parseNewData(auditRecord.getNewData());
+        } catch (StateDataValidationException | JsonProcessingException e) {
+            throw new StateDataProcessingException(e.getMessage(), e);
+        }
         return diff;
     }
 
-    private void validateStateData(AuditRecord auditRecord) throws Exception {
+    private void validateStateData(AuditRecord auditRecord) throws StateDataValidationException {
         boolean isUpdate = auditRecord.getOperation().equals(Operation.UPDATE);
         boolean isInsert = auditRecord.getOperation().equals(Operation.INSERT);
         boolean isDelete = auditRecord.getOperation().equals(Operation.DELETE);
         if ((isDelete || isUpdate) && Strings.isNullOrEmpty(auditRecord.getOldData())) {
-            throw new Exception(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "old"));
+            throw new StateDataValidationException(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "old"));
         }
         if ((isInsert || isUpdate) && Strings.isNullOrEmpty(auditRecord.getNewData())) {
-            throw new Exception(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "new"));
+            throw new StateDataValidationException(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "new"));
         }
     }
 

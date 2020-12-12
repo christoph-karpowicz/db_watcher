@@ -12,12 +12,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CLI {
+    private final String OPTIONS_CONFIG = "config";
     private final String OPTIONS_DEBUG = "debug";
     private final String OPTIONS_DELETE_FIRST_N_ROWS = "deleteFirstNRows";
-    private final String OPTIONS_CONFIG = "config";
-    private final String OPTIONS_CLEAN = "clean";
     private final String OPTIONS_MAX_COL_LENGTH = "maxColumnLength";
     private final String OPTIONS_MAX_ROW_LENGTH = "maxRowLength";
+    private final String OPTIONS_PURGE = "purge";
     private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
     public static final String ALL_SYMBOL = "*";
     
@@ -35,12 +35,12 @@ public class CLI {
     }
 
     private void setOptions() {
+        options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
         options.addOption("d", OPTIONS_DEBUG, false, "show exception classes and stack traces");
         options.addOption("D", OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
-        options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
-        options.addOption("C", OPTIONS_CLEAN, false, "remove database audit table, function and triggers");
         options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
         options.addOption("L", OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
+        options.addOption("p", OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
         options.addOption("n", OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the watcher starts");
     }
 
@@ -54,20 +54,30 @@ public class CLI {
 
     public ParsedOptions parseArgs() throws InvalidCLIOptionInputException {
         parsedOptions = new ParsedOptions();
-        parsedOptions.debug = getDebugOption();
         parsedOptions.configPath = getConfigOption();
-        parsedOptions.clean = getCleanOption();
+        parsedOptions.debug = getDebugOption();
+        parsedOptions.purge = getPurgeOption();
         try {
             parsedOptions.deleteFirstNRows = getDeleteFirstNRowsOption();
             parsedOptions.maxColumnLength = getMaxColumnLengthOption();
             parsedOptions.maxRowLength = getMaxRowLengthOption();
-            parsedOptions.lastNChanges = getLastNChangesOption();
+            parsedOptions.showLastNChanges = getShowLastNChangesOption();
         } catch (NumberFormatException e) {
             throw new InvalidCLIOptionInputException(e.getMessage(), e, parsedOptions.debug);
         }
         return parsedOptions;
     }
 
+    private String getConfigOption() {
+        String configPath;
+        if(cmd.hasOption(OPTIONS_CONFIG)) {
+            configPath = cmd.getOptionValue(OPTIONS_CONFIG);
+        } else {
+            configPath = Config.DEFAULT_PATH;
+        }
+        return configPath;
+    }
+    
     private boolean getDebugOption() {
         return cmd.hasOption(OPTIONS_DEBUG);
     }
@@ -82,20 +92,6 @@ public class CLI {
             return value;
         }
         return null;
-    }
-
-    private String getConfigOption() {
-        String configPath;
-        if(cmd.hasOption(OPTIONS_CONFIG)) {
-            configPath = cmd.getOptionValue(OPTIONS_CONFIG);
-        } else {
-            configPath = Config.DEFAULT_PATH;
-        }
-        return configPath;
-    }
-
-    private boolean getCleanOption() {
-        return cmd.hasOption(OPTIONS_CLEAN);
     }
 
     private Short getMaxColumnLengthOption() throws NumberFormatException {
@@ -114,37 +110,37 @@ public class CLI {
         return null;
     }
 
-    private Short getLastNChangesOption() throws NumberFormatException {
+    private boolean getPurgeOption() {
+        return cmd.hasOption(OPTIONS_PURGE);
+    }
+    
+    private Short getShowLastNChangesOption() throws NumberFormatException {
         if(cmd.hasOption(OPTIONS_SHOW_LAST_N_CHANGES)) {
             String optionValue = cmd.getOptionValue(OPTIONS_SHOW_LAST_N_CHANGES);
             return Short.parseShort(optionValue);
         }
         return null;
     }
-    
+
     public class ParsedOptions {
+        private String configPath;
         private boolean debug;
         private String deleteFirstNRows;
-        private String configPath;
-        private boolean clean;
         private Short maxColumnLength;
         private Short maxRowLength;
-        private Short lastNChanges;
+        private boolean purge;
+        private Short showLastNChanges;
 
+        public String getConfigPath() {
+            return configPath;
+        }
+        
         public boolean getDebug() {
             return debug;
         }
 
         public String getDeleteFirstNRows() {
             return deleteFirstNRows;
-        }
-
-        public String getConfigPath() {
-            return configPath;
-        }
-
-        public boolean getClean() {
-            return clean;
         }
 
         public Short getMaxColumnLength() {
@@ -155,8 +151,12 @@ public class CLI {
             return maxRowLength;
         }
 
-        public Short getLastNChanges() {
-            return lastNChanges;
+        public boolean getPurge() {
+            return purge;
+        }
+
+        public Short getShowLastNChanges() {
+            return showLastNChanges;
         }
     }
 }

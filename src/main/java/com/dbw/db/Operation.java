@@ -1,5 +1,6 @@
 package com.dbw.db;
 
+import com.dbw.err.UnknownDbOperationException;
 import com.dbw.log.ErrorMessages;
 
 public enum Operation {
@@ -13,12 +14,12 @@ public enum Operation {
         this.symbol = symbol;
     }
 
-    public static Operation valueOfSymbol(String symbol) throws Exception {
+    public static Operation valueOfSymbol(String symbol) throws UnknownDbOperationException {
         for (Operation e : values()) {
             if (e.symbol.equals(symbol)) {
                 return e;
             }
         }
-        throw new Exception(ErrorMessages.UNKNOWN_DB_OPERATION);
+        throw new UnknownDbOperationException(ErrorMessages.UNKNOWN_DB_OPERATION);
     }
 }

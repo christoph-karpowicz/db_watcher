@@ -11,10 +11,12 @@ import java.util.List;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cli.CLI;
 import com.dbw.err.PreparationException;
+import com.dbw.err.UnknownDbOperationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
+import com.dbw.log.SuccessMessages;
 
 public abstract class Database {
     protected DatabaseConfig config;
@@ -24,20 +26,24 @@ public abstract class Database {
         this.config = config;
     }
 
-    public abstract void deleteFirstNRows(String nRows) throws SQLException;
+    public abstract String deleteFirstNRows(String nRows) throws SQLException;
 
-    protected void deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
+    protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
+        int rowCount = selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
+        if (rowCount == 0) {
+            return SuccessMessages.CLI_AUDIT_TABLE_EMPTY;
+        }
         if (nRows.equals(CLI.ALL_SYMBOL)) {
             executeFormattedQueryUpdate(deleteAllQuery);
-            return;
+            return SuccessMessages.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
-        int rowCount = selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
         int nRowsNum = Integer.parseInt(nRows);
         if (rowCount <= nRowsNum) {
             executeFormattedQueryUpdate(deleteAllQuery);
-            return;
+            return SuccessMessages.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
         executePreparedStatementUpdateWithSingleInt(deleteAllLteQuery, nRowsNum);
+        return SuccessMessages.format(SuccessMessages.CLI_N_ROWS_DELETED, nRowsNum);
     }
 
     public void dropAuditTable() throws SQLException {
@@ -80,9 +86,9 @@ public abstract class Database {
         return exists;
     }
 
-    public abstract List<AuditRecord> selectAuditRecords(int fromId) throws Exception;
+    public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException;
     
-    protected List<AuditRecord> selectAuditRecords(String query, int fromId) throws Exception {
+    protected List<AuditRecord> selectAuditRecords(String query, int fromId) throws SQLException, UnknownDbOperationException {
         List<AuditRecord> result = new ArrayList<AuditRecord>();
         PreparedStatement pstmt = conn.prepareStatement(query);
         pstmt.setInt(1, fromId);
@@ -155,11 +161,11 @@ public abstract class Database {
         return config;
     }
 
-    public abstract void connect() throws Exception;
+    public abstract void connect() throws SQLException, ClassNotFoundException;
 
     public abstract void prepare(List<String> watchedTables) throws PreparationException;
 
-    public abstract boolean clean(List<String> watchedTables);
+    public abstract boolean purge(List<String> watchedTables);
 
     public abstract void close() throws SQLException;
     

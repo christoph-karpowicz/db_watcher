@@ -12,6 +12,8 @@ import com.dbw.db.DatabaseFactory;
 import com.dbw.err.AppInitException;
 import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.InvalidCLIOptionInputException;
+import com.dbw.err.PreparationException;
+import com.dbw.err.UnknownDbTypeException;
 import com.dbw.err.WatcherStartException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
@@ -48,12 +50,12 @@ public class App {
         return cli.parseArgs();
     }
 
-    private void setDb() throws Exception {
+    private void setDb() throws UnknownDbTypeException {
         DatabaseConfig dbConfig = config.getDatabase();
         db = DatabaseFactory.getDatabase(dbConfig);
     }
 
-    private void connectToDb() throws Exception {
+    private void connectToDb() throws SQLException, ClassNotFoundException {
         db.connect();
     }
 
@@ -63,8 +65,8 @@ public class App {
             deleteFirstNRows(deleteFirstNRowsOption);
         }
         
-        if (options.getClean()) {
-            clean();
+        if (options.getPurge()) {
+            purge();
         } else {
             addShutdownHook();
             startWatcher();
@@ -72,20 +74,20 @@ public class App {
     }
 
     private void deleteFirstNRows(String nRows) throws InitialAuditRecordDeleteException {
+        String successMessage;
         try {
-            db.deleteFirstNRows(nRows);
+            successMessage = db.deleteFirstNRows(nRows);
         } catch (SQLException e) {
             throw new InitialAuditRecordDeleteException(e.getMessage(), e);
         }
-        String successMessage = nRows.equals(CLI.ALL_SYMBOL) ? SuccessMessages.CLI_ALL_ROWS_DELETED : SuccessMessages.CLI_N_ROWS_DELETED;
-        Logger.log(Level.INFO, SuccessMessages.formatMsg(successMessage, nRows));
+        Logger.log(Level.INFO, SuccessMessages.format(successMessage, nRows));
     }
 
-    private void clean() {
-        if (db.clean(config.getTables())) {
-            Logger.log(Level.INFO, SuccessMessages.CLI_CLEANED);
+    private void purge() {
+        if (db.purge(config.getTables())) {
+            Logger.log(Level.INFO, SuccessMessages.CLI_PURGE);
         } else {
-            Logger.log(Level.ERROR, ErrorMessages.CLI_CLEAN);
+            Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
         }
     }
 
@@ -95,7 +97,7 @@ public class App {
             watcher.setDb(db);
             watcher.init();
             watcher.start();
-        } catch (Exception e) {
+        } catch (PreparationException | SQLException e) {
             throw new WatcherStartException(e.getMessage(), e);
         }
     }

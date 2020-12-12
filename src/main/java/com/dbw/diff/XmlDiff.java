@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -23,7 +25,7 @@ public class XmlDiff extends Diff {
     @Inject
     private HtmlInXmlEscaper htmlInXmlEscaper;
     
-    protected Map<String, Object> parseData(String data) throws Exception {
+    protected Map<String, Object> parseData(String data) throws JsonProcessingException, JsonMappingException {
         Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
         if (Strings.isNullOrEmpty(data)) {
             return ImmutableMap.copyOf(parsedData);

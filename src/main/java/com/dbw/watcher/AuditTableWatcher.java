@@ -9,6 +9,8 @@ import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.err.PreparationException;
+import com.dbw.err.StateDataProcessingException;
+import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.WatcherRunException;
 import com.dbw.frame.AuditFrame;
 import com.google.inject.Singleton;
@@ -48,7 +50,7 @@ public class AuditTableWatcher implements Watcher {
             Thread.sleep(RUN_INTERVAL);
             selectAndProcessAuditRecords();
             findLastId();
-        } catch (Exception e) {
+        } catch (InterruptedException | SQLException e) {
             new WatcherRunException(e.getMessage(), e).handle();
         }
         incrementRunCounter();
@@ -60,18 +62,16 @@ public class AuditTableWatcher implements Watcher {
             for (AuditRecord auditRecord : auditRecords) {
                 try {
                     createAuditFrameAndFindDiff(auditRecord);
-                } catch (SQLException e) {
-                    new WatcherRunException(e.getMessage(), e).handle();
-                } catch (Exception e) {
+                } catch (StateDataProcessingException e) {
                     new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException | UnknownDbOperationException e) {
             new WatcherRunException(e.getMessage(), e).handle();
         }
     }
 
-    private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws Exception {
+    private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws StateDataProcessingException {
         AuditFrame frame = ObjectCreator.create(AuditFrame.class);
         frame.setAuditRecord(auditRecord);
         frame.setDb(db);
@@ -85,7 +85,7 @@ public class AuditTableWatcher implements Watcher {
     }
 
     private int getLastId() {
-        Short lastNChanges = App.options.getLastNChanges();
+        Short lastNChanges = App.options.getShowLastNChanges();
         boolean lastNChangesGtZero = Objects.nonNull(lastNChanges) && lastNChanges > 0;
         if (getRunCounter() == 0 && lastNChangesGtZero) {
             int diff = lastId - (int)lastNChanges;
