@@ -87,15 +87,19 @@ After starting the app with any flag except `-p, --purge` the database watcher w
 Because of the variety of terminal window widths, there are options to customize the lengths (in characters) of displayed columns and rows. Specified lengths are maximum values, which means that if the `l` flag is set to 50 and the actual column value's length is 20, the displayed column's length will be 20. Column name is also taken into account so if the column's name is `description` and its value is `2006` the displayed column's length will be 11 (length of the word `description`).
 
 Default 120 row length:
+
 ![DefaultColumnLength](docs/120_row_length.png)
 
 60 row length:
+
 ![40ColumnLength](docs/40_row_length.png)
 
 Default 17 column length:
+
 ![DefaultRowLength](docs/17_column_length.png)
 
 100 column length:
+
 ![100RowLength](docs/100_column_length.png)
 
 Too short or too long lengths can cause the output to be unreadable so some adjustments may be necessary. 
@@ -105,15 +109,20 @@ Too short or too long lengths can cause the output to be unreadable so some adju
 Operation outputs are separated by hyphens. An individual operation output starts with a header with the audit record's ID number, name of the table on which the operation has been carried out, operation type and a timestamp.
 
 Next are the modified table's columns with their values. In case of an update:
+
 ![updatedColumn](docs/updated_column.png)
+
 From top to bottom there's the column name, value before, value after. 
 
 Updated columns are bordered:
+
 ![updatedVsNotUpdatedColumns](docs/updated_vs_not_updated_columns.png)
+
 `release_year` column has been updated, and `description` hasn't.
 
 In many cases the column's value is too long to be displayed in the columns part of the output. If the value exceeds the maximum length of a column, it will get truncated and ended with an ellipsis. 
 Values that got truncated and were updated in the given operation, are displayed below the columns section fully. For example, if the date in `last_update` column was too long:
+
 ![fullColumnDiff](docs/full_column_diff.png)
 
 ## Requirements
@@ -125,6 +134,7 @@ Java 8 or above
 OS:
   - Ubuntu 20.04 LTS, 
   - Windows 10
+
 DBs:
   - PostgreSQL 12.1,
   - Oracle Database 18c Express Edition (XE)
