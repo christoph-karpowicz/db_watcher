@@ -8,6 +8,7 @@ import com.dbw.log.ErrorMessages;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -31,6 +32,7 @@ public class CLI {
         parser = new DefaultParser();
         options = new Options();
         setOptions();
+        setHelpFormatter();
         setCmd();
     }
 
@@ -41,7 +43,12 @@ public class CLI {
         options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
         options.addOption("L", OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
         options.addOption("p", OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
-        options.addOption("n", OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the watcher starts");
+        options.addOption("n", OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
+    }
+
+    private void setHelpFormatter() {
+        HelpFormatter formatter = new HelpFormatter();
+        // formatter.printHelp("help", options);
     }
 
     private void setCmd() throws ParseException {

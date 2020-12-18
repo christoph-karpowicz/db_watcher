@@ -52,7 +52,7 @@ public class TableDiffBuilder implements OutputBuilder {
             builder.append(stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING);
             String border = "";
             String filler = stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING;
-            int maxLength = DEFAULT_MAX_COL_LENGTH < stateColumn.getMaxLength() ? DEFAULT_MAX_COL_LENGTH : stateColumn.getMaxLength();
+            int maxLength = getFinalMaxColumnLength(stateColumn);
             for (short i = 0; i < maxLength; i++) {
                 border += filler;
             }
@@ -98,7 +98,7 @@ public class TableDiffBuilder implements OutputBuilder {
     private void append(StateColumn stateColumn, String value, String padding, boolean onlyIfDiff) {
         builder.append(PADDING);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
-        int maxLength = DEFAULT_MAX_COL_LENGTH < stateColumn.getMaxLength() ? DEFAULT_MAX_COL_LENGTH : stateColumn.getMaxLength();
+        int maxLength = getFinalMaxColumnLength(stateColumn);
         int substringLength = maxLength - ELLIPSIS.length();
         String finalValue = (onlyIfDiff && !stateColumn.hasDiff()) ? "" : value;
         int valueLength = finalValue.length();
@@ -114,6 +114,10 @@ public class TableDiffBuilder implements OutputBuilder {
         builder.append(finalValue);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
         builder.append(PADDING);
+    }
+
+    private int getFinalMaxColumnLength(StateColumn stateColumn) {
+        return TableDiffBuilder.getMaxColumnLength() < stateColumn.getMaxLength() ? TableDiffBuilder.getMaxColumnLength() : stateColumn.getMaxLength();
     }
 
     @Override
