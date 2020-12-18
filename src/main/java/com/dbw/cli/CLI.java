@@ -37,7 +37,7 @@ public class CLI {
     }
 
     private void setOptions() {
-        options.addOption("c", OPTIONS_CONFIG, true, "provice a path to a configuration file");
+        options.addOption("c", OPTIONS_CONFIG, true, "provide a path to the configuration file");
         options.addOption("d", OPTIONS_DEBUG, false, "show exception classes and stack traces");
         options.addOption("D", OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
         options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
