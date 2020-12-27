@@ -6,8 +6,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public class ConfigParserTest 
-{
+public class ConfigParserTest {
 
     public static final String TEST_CONFIG_PATH = "config/test.yml";
     
@@ -22,15 +21,15 @@ public class ConfigParserTest
         }
 
         DatabaseConfig dbConfig = config.getDatabase();
-        assertEquals(dbConfig.getName(), "dvdrental");
+        assertEquals(dbConfig.getName(), "example");
         assertEquals(dbConfig.getType(), "postgresql");
         assertEquals(dbConfig.getHost(), "127.0.0.1");
         assertEquals(dbConfig.getPort(), 5432);
-        assertEquals(dbConfig.getUser(), "chris");
-        assertEquals(dbConfig.getPassword(), "1111");
+        assertEquals(dbConfig.getUser(), "christoph");
+        assertEquals(dbConfig.getPassword(), "pwd1234");
 
         Object[] tables = config.getTables().toArray();
-        Object[] expectedTables = {"film", "actor", "address"};
+        Object[] expectedTables = {"film", "actor", "address", "inventory", "language", "staff"};
         assertArrayEquals(expectedTables, tables);
     }
 }

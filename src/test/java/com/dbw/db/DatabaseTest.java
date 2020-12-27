@@ -15,8 +15,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class DatabaseTest 
-{
+public class DatabaseTest {
     private static Database db;
     private static Config config;
     
@@ -45,7 +44,7 @@ public class DatabaseTest
         try {
             db.connect();
         } catch (Exception e) {
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
+            fail(e.getMessage());
         }
         
         boolean connectionClosed = true;

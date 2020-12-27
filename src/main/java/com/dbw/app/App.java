@@ -109,7 +109,7 @@ public class App {
                 try {
                     shutdown();
                 } catch (SQLException e) {
-                    System.err.println(e.getClass().getName()+": "+e.getMessage());
+                    System.err.println(e.getClass().getName() + ": " + e.getMessage());
                 }
             }
         });

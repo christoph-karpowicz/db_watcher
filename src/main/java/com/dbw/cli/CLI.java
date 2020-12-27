@@ -20,6 +20,13 @@ public class CLI {
     private final String OPTIONS_MAX_ROW_LENGTH = "maxRowLength";
     private final String OPTIONS_PURGE = "purge";
     private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
+    public static final String OPTIONS_CONFIG_FLAG = "c";
+    public static final String OPTIONS_DEBUG_FLAG = "d";
+    public static final String OPTIONS_DELETE_FIRST_N_ROWS_FLAG = "D";
+    public static final String OPTIONS_MAX_COL_LENGTH_FLAG = "l";
+    public static final String OPTIONS_MAX_ROW_LENGTH_FLAG = "L";
+    public static final String OPTIONS_PURGE_FLAG = "p";
+    public static final String OPTIONS_SHOW_LAST_N_CHANGES_FLAG = "n";
     public static final String ALL_SYMBOL = "*";
     
     private CommandLineParser parser;
@@ -37,13 +44,13 @@ public class CLI {
     }
 
     private void setOptions() {
-        options.addOption("c", OPTIONS_CONFIG, true, "provide a path to the configuration file");
-        options.addOption("d", OPTIONS_DEBUG, false, "show exception classes and stack traces");
-        options.addOption("D", OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
-        options.addOption("l", OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
-        options.addOption("L", OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
-        options.addOption("p", OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
-        options.addOption("n", OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
+        options.addOption(OPTIONS_CONFIG_FLAG, OPTIONS_CONFIG, true, "provide a path to the configuration file");
+        options.addOption(OPTIONS_DEBUG_FLAG, OPTIONS_DEBUG, false, "show exception classes and stack traces");
+        options.addOption(OPTIONS_DELETE_FIRST_N_ROWS_FLAG, OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
+        options.addOption(OPTIONS_MAX_COL_LENGTH_FLAG, OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
+        options.addOption(OPTIONS_MAX_ROW_LENGTH_FLAG, OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
+        options.addOption(OPTIONS_PURGE_FLAG, OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
+        options.addOption(OPTIONS_SHOW_LAST_N_CHANGES_FLAG, OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
     }
 
     private void setHelpFormatter() {
