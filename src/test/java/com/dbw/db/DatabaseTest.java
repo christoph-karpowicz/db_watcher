@@ -8,13 +8,13 @@ import java.sql.SQLException;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
-import com.dbw.cfg.ConfigParserTest;
 import com.dbw.cfg.DatabaseConfig;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+// mvn clean test -DtestConfigPath="./config/orcl-example.yml"
 public class DatabaseTest {
     private static Database db;
     private static Config config;
@@ -22,7 +22,8 @@ public class DatabaseTest {
     @BeforeClass
     public static void setup() {
         try {
-            config = ConfigParser.fromYMLFile(ConfigParserTest.TEST_CONFIG_PATH);
+            String testConfigPathFromArgument = System.getProperty("testConfigPath");
+            config = ConfigParser.fromYMLFile(testConfigPathFromArgument);
         } catch(Exception e) {
             fail(e.getMessage());
         }

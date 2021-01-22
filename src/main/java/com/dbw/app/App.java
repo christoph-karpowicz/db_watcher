@@ -2,6 +2,7 @@ package com.dbw.app;
 
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
@@ -35,7 +36,14 @@ public class App {
     public void init(String[] args) throws AppInitException {
         try {
             options = handleArgs(args);
-            config = ConfigParser.fromYMLFile(options.getConfigPath());
+            Optional<String> configPathArg = options.getConfigPath();
+            String configPath;
+            if (configPathArg.isPresent()) {
+                configPath = configPathArg.get();
+            } else {
+                configPath = chooseConfigFile();
+            }
+            config = ConfigParser.fromYMLFile(configPath);
             setDb();
             connectToDb();
         } catch (Exception e) {
@@ -48,6 +56,11 @@ public class App {
         cli.setArgs(args);
         cli.init();
         return cli.parseArgs();
+    }
+
+    private String chooseConfigFile() {
+        ConfigParser.outputConfigFileListFromCurrentDir();
+        return "";
     }
 
     private void setDb() throws UnknownDbTypeException {
@@ -64,7 +77,6 @@ public class App {
         if (!Objects.isNull(deleteFirstNRowsOption)) {
             deleteFirstNRows(deleteFirstNRowsOption);
         }
-        
         if (options.getPurge()) {
             purge();
         } else {

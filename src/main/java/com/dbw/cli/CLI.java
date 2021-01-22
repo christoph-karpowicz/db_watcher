@@ -1,5 +1,7 @@
 package com.dbw.cli;
 
+import java.util.Optional;
+
 import com.dbw.cfg.Config;
 import com.dbw.diff.TableDiffBuilder;
 import com.dbw.err.InvalidCLIOptionInputException;
@@ -82,14 +84,12 @@ public class CLI {
         return parsedOptions;
     }
 
-    private String getConfigOption() {
-        String configPath;
+    private Optional<String> getConfigOption() {
+        String configPath = null;
         if(cmd.hasOption(OPTIONS_CONFIG)) {
             configPath = cmd.getOptionValue(OPTIONS_CONFIG);
-        } else {
-            configPath = Config.DEFAULT_PATH;
         }
-        return configPath;
+        return Optional.ofNullable(configPath);
     }
     
     private boolean getDebugOption() {
@@ -137,7 +137,7 @@ public class CLI {
     }
 
     public class ParsedOptions {
-        private String configPath;
+        private Optional<String> configPath;
         private boolean debug;
         private String deleteFirstNRows;
         private Short maxColumnLength;
@@ -145,7 +145,7 @@ public class CLI {
         private boolean purge;
         private Short showLastNChanges;
 
-        public String getConfigPath() {
+        public Optional<String> getConfigPath() {
             return configPath;
         }
         

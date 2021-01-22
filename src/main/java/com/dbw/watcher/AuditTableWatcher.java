@@ -13,6 +13,9 @@ import com.dbw.err.StateDataProcessingException;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.WatcherRunException;
 import com.dbw.frame.AuditFrame;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -42,6 +45,9 @@ public class AuditTableWatcher implements Watcher {
         setIsRunning(true);
         while (getIsRunning()) {
             run();
+            if (getRunCounter() == 1) {
+                Logger.log(Level.INFO, LogMessages.WATCHER_STARTED);
+            }
         }
     }
 
