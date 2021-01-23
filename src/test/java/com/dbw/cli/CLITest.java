@@ -1,7 +1,6 @@
 package com.dbw.cli;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -55,7 +54,7 @@ public class CLITest {
             fail(e.getMessage());
         }
         assertEquals(OPTIONS_DELETE_FIRST_N_ROWS_VALUE, options.getDeleteFirstNRows());
-        assertEquals(TEST_CONFIG_VALUE, options.getConfigPath());
+        assertEquals(TEST_CONFIG_VALUE, options.getConfigPath().get());
         assertTrue(options.getDebug());
         assertTrue(options.getPurge());
         assertEquals(toShort(TEST_MAX_COLUMN_LENGTH_VALUE), options.getMaxColumnLength());

@@ -1,5 +1,6 @@
 package com.dbw.app;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +26,8 @@ import com.dbw.watcher.AuditTableWatcher;
 import com.google.inject.Inject;
 import org.apache.commons.cli.ParseException;
 
+// mvn package shade:shade -DskipTests=true
+// mvn clean test -DtestConfigPath="./config/orcl-example.yml"
 public class App {
     @Inject
     private AuditTableWatcher watcher;
@@ -58,9 +61,8 @@ public class App {
         return cli.parseArgs();
     }
 
-    private String chooseConfigFile() {
-        ConfigParser.outputConfigFileListFromCurrentDir();
-        return "";
+    private String chooseConfigFile() throws IOException {
+        return ConfigParser.getConfigFileNameFromInput();
     }
 
     private void setDb() throws UnknownDbTypeException {

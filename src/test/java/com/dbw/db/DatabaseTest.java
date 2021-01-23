@@ -14,7 +14,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-// mvn clean test -DtestConfigPath="./config/orcl-example.yml"
 public class DatabaseTest {
     private static Database db;
     private static Config config;

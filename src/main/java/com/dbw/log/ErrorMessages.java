@@ -7,4 +7,6 @@ public class ErrorMessages {
     public final static String UNKNOWN_DB_TYPE = "Unknown or not supported database type.";
     public final static String CLI_INVALID_DELETE_N_ROWS = "Invalid -D flag value. It has to be either a number or an asterisk.";
     public final static String CLI_PURGE = "Errors occured while deleting database entities.";
+    public final static String INPUT_NAN = "Invalid input. Enter a number from the list.";
+    public final static String INPUT_OUT_OF_BOUNDS = "Invalid input. Number out of list bounds.";
 }
