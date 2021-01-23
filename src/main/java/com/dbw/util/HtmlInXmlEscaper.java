@@ -3,6 +3,7 @@ package com.dbw.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.dbw.state.XmlStateBuilder;
 import com.dbw.state.XmlStateTag;
 import com.google.inject.Singleton;
 
@@ -17,6 +18,23 @@ public class HtmlInXmlEscaper {
         {"/", "&#47;"},
         {"\\", "&#92;"}
     };
+
+    public boolean isHtmlBetweenXmlTags(String data) {
+        int expectedGtOrLtSymbols = 5 + countColumnStateTags(data) * 2;
+        long numberOfGtSymbols = data.chars().filter(ch -> ch == '>').count();
+        long numberOfLtSymbols = data.chars().filter(ch -> ch == '<').count();
+        return numberOfGtSymbols > expectedGtOrLtSymbols || numberOfLtSymbols > expectedGtOrLtSymbols;
+    }
+
+    private int countColumnStateTags(String data) {
+        Pattern pattern = Pattern.compile(String.format("<%s\\s.*?>", XmlStateBuilder.XML_COLUMN_STATE_TAG));
+        Matcher matcher = pattern.matcher(data);
+        int count = 0;
+        while (matcher.find()){
+            count +=1;
+        }
+        return count;
+    }
 
     public String escapeHtmlBetweenXmlTags(String xmlData, XmlStateTag xmlColumnStateTag) {
         String escapedData = xmlData;

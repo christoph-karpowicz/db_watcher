@@ -29,7 +29,7 @@ public abstract class Database {
     public abstract String deleteFirstNRows(String nRows) throws SQLException;
 
     protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
-        int rowCount = selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
+        int rowCount = getAuditRecordCount();
         if (rowCount == 0) {
             return SuccessMessages.CLI_AUDIT_TABLE_EMPTY;
         }
@@ -69,6 +69,10 @@ public abstract class Database {
             return String.format(query, params);
         }
         return query;
+    }
+
+    public int getAuditRecordCount() throws SQLException {
+        return selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
     }
 
     protected boolean objectExists(String query, String[] stringArgs) throws SQLException {

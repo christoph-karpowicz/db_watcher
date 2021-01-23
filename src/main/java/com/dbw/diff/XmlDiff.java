@@ -21,7 +21,6 @@ import com.dbw.util.HtmlInXmlEscaper;
 
 @Singleton
 public class XmlDiff extends Diff {
-    
     @Inject
     private HtmlInXmlEscaper htmlInXmlEscaper;
     
@@ -33,9 +32,11 @@ public class XmlDiff extends Diff {
         XmlStateTag xmlStateTag = new XmlStateTag(XmlStateBuilder.XML_COLUMN_STATE_TAG, true);
         XmlStateTagAttribute xmlStateTagAttribute = new XmlStateTagAttribute("name", ".+?", true);
         xmlStateTag.addAttribute(xmlStateTagAttribute);
-        String escapedData = htmlInXmlEscaper.escapeHtmlBetweenXmlTags(data, xmlStateTag);
+        if (htmlInXmlEscaper.isHtmlBetweenXmlTags(data)) {
+            data = htmlInXmlEscaper.escapeHtmlBetweenXmlTags(data, xmlStateTag);
+        }
         XmlMapper xmlMapper = new XmlMapper();
-        XmlColumnStates state = xmlMapper.readValue(escapedData, XmlColumnStates.class);
+        XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
         for (XmlColumnState columnState : state.getColumnStates()) {
             Object columnStateValue = Optional.ofNullable(columnState.getValue()).orElse(Common.NULL_AS_STRING);
             parsedData.put(columnState.getName(), columnStateValue);

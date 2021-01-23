@@ -47,6 +47,7 @@ public class AuditTableWatcher implements Watcher {
             run();
             if (getRunCounter() == 1) {
                 Logger.log(Level.INFO, LogMessages.WATCHER_STARTED);
+                Logger.log(Level.INFO, String.format(LogMessages.AUDIT_RECORDS_COUNT, db.getAuditRecordCount()));
             }
         }
     }
