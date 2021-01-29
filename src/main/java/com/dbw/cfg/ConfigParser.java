@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class ConfigParser {
+    private final static String YML_PATTERN = ".+\\.ya?ml$";
 
     public static Config fromYMLFile(String path) throws JsonMappingException, JsonParseException, IOException {
         Config config = null;
@@ -72,7 +73,7 @@ public class ConfigParser {
     }
 
     private static boolean isYMLFile(Path path) {
-        String ymlFilePatternString = ".+\\.ya?ml$";
+        String ymlFilePatternString = YML_PATTERN;
         Pattern ymlFilePattern = Pattern.compile(ymlFilePatternString);
         Matcher ymlFilePatternMatcher = ymlFilePattern.matcher(path.getFileName().toString());
         return ymlFilePatternMatcher.matches();

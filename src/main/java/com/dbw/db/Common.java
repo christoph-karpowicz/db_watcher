@@ -17,4 +17,5 @@ public class Common {
     public final static String COLNAME_QUERY = "query";
     public final static String COLNAME_TIMESTAMP = "timestamp";
     public final static String NULL_AS_STRING = "null";
+    public final static String COMMA_DELIMITER = ", ";
 }

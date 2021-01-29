@@ -4,12 +4,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.dbw.err.PreparationException;
+import com.dbw.log.ErrorMessages;
 import com.dbw.state.XmlStateBuilder;
 
 public class OrclPrepareService {
-    private final String NEW_STATE_PREFIX = ":NEW.";
-    private final String OLD_STATE_PREFIX = ":OLD.";
-    
     private XmlStateBuilder xmlStateBuilder;
     private Orcl db;
     private List<String> watchedTables;
@@ -24,7 +22,8 @@ public class OrclPrepareService {
         try {
             prepareAuditTable();
         } catch (SQLException e) {
-            throw new PreparationException(e.getMessage(), e);
+            String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TABLE, e.getMessage());
+            new PreparationException(errMsg, e).handle();
         }
         prepareAuditTriggers();
     }
@@ -57,11 +56,12 @@ public class OrclPrepareService {
         for (String tableName : watchedTables) {
             try {
                 Column[] tableColumns = db.selectTableColumns(tableName);
-                String newStateConcat = xmlStateBuilder.build(NEW_STATE_PREFIX, tableColumns);
-                String oldStateConcat = xmlStateBuilder.build(OLD_STATE_PREFIX, tableColumns);
+                String newStateConcat = xmlStateBuilder.build(OrclSpec.NEW_STATE_PREFIX, tableColumns);
+                String oldStateConcat = xmlStateBuilder.build(OrclSpec.OLD_STATE_PREFIX, tableColumns);
+                String auditTriggerName = QueryBuilder.buildAuditTriggerName(tableName);
                 String auditTriggerQuery = db.formatQuery(
-                    OrclQueries.CREATE_AUDIT_TRIGGER, 
-                    QueryBuilder.buildAuditTriggerName(tableName),
+                    OrclQueries.CREATE_AUDIT_TRIGGER,
+                    auditTriggerName,
                     tableName,
                     oldStateConcat,
                     newStateConcat,
@@ -73,7 +73,8 @@ public class OrclPrepareService {
                     db.createAuditTrigger(tableName, auditTriggerQuery);
                 }
             } catch (SQLException e) {
-                new PreparationException(e.getMessage(), e).setRecoverable().handle();
+                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableName, e.getMessage());
+                new PreparationException(errMsg, e).setRecoverable().handle();
             }
         }
     }

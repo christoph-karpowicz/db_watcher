@@ -9,4 +9,6 @@ public class ErrorMessages {
     public final static String CLI_PURGE = "Errors occured while deleting database entities.";
     public final static String INPUT_NAN = "Invalid input. Enter a number from the list.";
     public final static String INPUT_OUT_OF_BOUNDS = "Invalid input. Number out of list bounds.";
+    public final static String CREATE_AUDIT_TABLE = "Failed to create an audit table. (%s)";
+    public final static String CREATE_AUDIT_TRIGGER = "Failed to create an audit trigger for \"%s\" table. (%s)";
 }

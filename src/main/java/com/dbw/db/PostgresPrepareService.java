@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.dbw.err.PreparationException;
+import com.dbw.log.ErrorMessages;
 import com.google.common.collect.ImmutableMap;
 
 public class PostgresPrepareService {
@@ -35,7 +36,12 @@ public class PostgresPrepareService {
 
     private void prepareAuditTable() throws SQLException {
         if (!db.auditTableExists()) {
-            db.createAuditTable();
+            try {
+                db.createAuditTable();
+            } catch (SQLException e) {
+                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TABLE, e.getMessage());
+                new PreparationException(errMsg, e).handle();
+            }
         }
     }
 
@@ -70,7 +76,8 @@ public class PostgresPrepareService {
                     db.createAuditTrigger(tableName);
                 }
             } catch (SQLException e) {
-                new PreparationException(e.getMessage(), e).setRecoverable().handle();
+                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableName, e.getMessage());
+                new PreparationException(errMsg, e).setRecoverable().handle();
             }
         }
     }

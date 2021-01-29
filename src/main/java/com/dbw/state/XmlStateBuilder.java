@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.db.Column;
+import com.dbw.db.OrclSpec;
 
 public class XmlStateBuilder {
 
-    public final static String XML_COLUMN_STATES_TAG = "columnStates";
-    public final static String XML_COLUMN_STATE_TAG = "columnState";
-    private final String XML_DECLARATION = "'<?xml version=\"1.0\" encoding=\"UTF-8\"?>'";
-    private final String XML_ROOT_TAG = "XmlColumnStates";
-    private final String XML_COLUMN_STATE_NAME_ATTRIBUTE = "name";
+    public final static String XML_COLUMN_STATES_TAG = "dbw-css";
+    public final static String XML_COLUMN_STATE_TAG = "dbw-cs";
+    public final static String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    public final static String XML_COLUMN_STATE_NAME_ATTRIBUTE = "name";
+    private final String XML_ROOT_TAG = "dbw-root";
     private final String PLSQL_TO_CHAR_FUNCTION_START = "TO_CHAR(";
     private final String RIGHT_PARENTHESIS = ")";
     private final String PLSQL_LOB_TO_VARCHAR_FUNCTION_START = "DBMS_LOB.substr(";
@@ -36,7 +37,6 @@ public class XmlStateBuilder {
 
     public String build(String statePrefix, Column[] tableColumns) {
         List<String> stateConcat = new ArrayList<String>();
-        stateConcat.add(XML_DECLARATION);
         stateConcat.add(xmlRootTag.startTag());
         stateConcat.add(columnStatesTag.startTag());
         for (Column tableColumn : tableColumns) {
@@ -72,15 +72,15 @@ public class XmlStateBuilder {
         StringBuilder toVarcharFunctionCall = new StringBuilder();
 
         switch (dataType) {
-            case "CLOB":
+            case OrclSpec.TYPE_BLOB:
+            toVarcharFunctionCall.append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START)
+                .append(columnNameWithStatePrefix)
+                .append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END);
+            break;
+            case OrclSpec.TYPE_CLOB:
                 toVarcharFunctionCall.append(PLSQL_LOB_TO_VARCHAR_FUNCTION_START)
                     .append(columnNameWithStatePrefix)
                     .append(PLSQL_LOB_TO_VARCHAR_FUNCTION_END);
-                break;
-            case "BLOB":
-                toVarcharFunctionCall.append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START)
-                    .append(columnNameWithStatePrefix)
-                    .append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END);
                 break;
             default:
                 toVarcharFunctionCall.append(PLSQL_TO_CHAR_FUNCTION_START)

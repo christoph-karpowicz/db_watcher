@@ -30,12 +30,13 @@ public class XmlDiff extends Diff {
             return ImmutableMap.copyOf(parsedData);
         }
         XmlStateTag xmlStateTag = new XmlStateTag(XmlStateBuilder.XML_COLUMN_STATE_TAG, true);
-        XmlStateTagAttribute xmlStateTagAttribute = new XmlStateTagAttribute("name", ".+?", true);
+        XmlStateTagAttribute xmlStateTagAttribute = new XmlStateTagAttribute(XmlStateBuilder.XML_COLUMN_STATE_NAME_ATTRIBUTE, ".+?", true);
         xmlStateTag.addAttribute(xmlStateTagAttribute);
         if (htmlInXmlEscaper.isHtmlBetweenXmlTags(data)) {
             data = htmlInXmlEscaper.escapeHtmlBetweenXmlTags(data, xmlStateTag);
         }
         XmlMapper xmlMapper = new XmlMapper();
+        data = XmlStateBuilder.XML_DECLARATION + data;
         XmlColumnStates state = xmlMapper.readValue(data, XmlColumnStates.class);
         for (XmlColumnState columnState : state.getColumnStates()) {
             Object columnStateValue = Optional.ofNullable(columnState.getValue()).orElse(Common.NULL_AS_STRING);

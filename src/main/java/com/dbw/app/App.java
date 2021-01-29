@@ -94,7 +94,7 @@ public class App {
         } catch (SQLException e) {
             throw new InitialAuditRecordDeleteException(e.getMessage(), e);
         }
-        Logger.log(Level.INFO, SuccessMessages.format(successMessage, nRows));
+        Logger.log(Level.INFO, String.format(successMessage, nRows));
     }
 
     private void purge() {

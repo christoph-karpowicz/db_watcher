@@ -16,7 +16,6 @@ import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
 
 public class Postgres extends Database {
-    private Map<String, String[]> watchedTablesColumnNames;
     public final static String[] COLUMN_NAMES = new String[]{
         Common.COLNAME_ID, 
         Common.COLNAME_TABLE_NAME, 
@@ -26,7 +25,9 @@ public class Postgres extends Database {
         Common.COLNAME_QUERY,
         Common.COLNAME_TIMESTAMP
     };
-    public final String DRIVER = "org.postgresql.Driver";
+    
+    private Map<String, String[]> watchedTablesColumnNames;
+    private final String DRIVER = "org.postgresql.Driver";
     
     public Postgres(DatabaseConfig config) {
         super(config);

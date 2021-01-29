@@ -16,6 +16,7 @@ import com.dbw.frame.AuditFrame;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
+import com.dbw.log.WarningMessages;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -27,6 +28,7 @@ public class AuditTableWatcher implements Watcher {
     private boolean isRunning;
     private int runCounter = 0;
     private int lastId;
+    private int initialAuditRecordCount;
 
     public void setWatchedTables(List<String> watchedTables) {
         this.watchedTables = watchedTables;
@@ -41,13 +43,14 @@ public class AuditTableWatcher implements Watcher {
     }
 
     public void start() throws SQLException {
+        setInitialAuditRecordCount();
         findLastId();
         setIsRunning(true);
         while (getIsRunning()) {
             run();
             if (getRunCounter() == 1) {
                 Logger.log(Level.INFO, LogMessages.WATCHER_STARTED);
-                Logger.log(Level.INFO, String.format(LogMessages.AUDIT_RECORDS_COUNT, db.getAuditRecordCount()));
+                Logger.log(Level.INFO, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
             }
         }
     }
@@ -95,8 +98,16 @@ public class AuditTableWatcher implements Watcher {
         Short lastNChanges = App.options.getShowLastNChanges();
         boolean lastNChangesGtZero = Objects.nonNull(lastNChanges) && lastNChanges > 0;
         if (getRunCounter() == 0 && lastNChangesGtZero) {
-            int diff = lastId - (int)lastNChanges;
-            return diff > 0 ? diff : 0; 
+            if (initialAuditRecordCount == 0) {
+                Logger.log(Level.WARNING, WarningMessages.NO_LAST_N_CHANGES);
+                return 0;
+            }
+            
+            int lastIdMinusN = lastId - (int)lastNChanges;
+            if (lastIdMinusN <= 0) {
+                Logger.log(Level.WARNING, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
+            }
+            return lastIdMinusN > 0 ? lastIdMinusN : 0;
         }
         return lastId;
     }
@@ -121,4 +132,8 @@ public class AuditTableWatcher implements Watcher {
         runCounter++;
     }
     
+    public void setInitialAuditRecordCount() throws SQLException {
+        this.initialAuditRecordCount = db.getAuditRecordCount();
+    }
+
 }

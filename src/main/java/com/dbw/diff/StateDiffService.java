@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
+import com.dbw.db.Common;
 import com.dbw.db.Database;
 import com.dbw.db.Operation;
 import com.dbw.db.Postgres;
@@ -111,7 +112,7 @@ public class StateDiffService implements DiffService {
             DateFormat df = new SimpleDateFormat(DATE_FMT);
             return df.format((Date)value);
         } else if (value instanceof ArrayList) {
-            return String.join(", ", (ArrayList)value);
+            return String.join(Common.COMMA_DELIMITER, (ArrayList)value);
         }
         return (String)value;
     }

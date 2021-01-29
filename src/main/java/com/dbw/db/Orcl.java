@@ -17,9 +17,9 @@ import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
 
 public class Orcl extends Database {
-    public final String DRIVER = "oracle.jdbc.driver.OracleDriver";
-    public final String COL_NAME_ALIAS = "COLUMN_NAME";
-    public final String DATA_TYPE_ALIAS = "DATA_TYPE";
+    private final String DRIVER = "oracle.jdbc.driver.OracleDriver";
+    private final String COL_NAME_ALIAS = "COLUMN_NAME";
+    private final String DATA_TYPE_ALIAS = "DATA_TYPE";
 
     public Orcl(DatabaseConfig config) {
         super(config);

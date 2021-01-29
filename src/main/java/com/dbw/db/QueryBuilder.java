@@ -3,7 +3,7 @@ package com.dbw.db;
 public class QueryBuilder {
 
     public static String buildColumNameList(String... columnNames) {
-        return String.join(", ", columnNames);
+        return String.join(Common.COMMA_DELIMITER, columnNames);
     }
 
     public static String buildAuditTriggerName(String tableName) {

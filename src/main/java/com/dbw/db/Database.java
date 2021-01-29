@@ -35,15 +35,15 @@ public abstract class Database {
         }
         if (nRows.equals(CLI.ALL_SYMBOL)) {
             executeFormattedQueryUpdate(deleteAllQuery);
-            return SuccessMessages.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
+            return String.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
         int nRowsNum = Integer.parseInt(nRows);
         if (rowCount <= nRowsNum) {
             executeFormattedQueryUpdate(deleteAllQuery);
-            return SuccessMessages.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
+            return String.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
         executePreparedStatementUpdateWithSingleInt(deleteAllLteQuery, nRowsNum);
-        return SuccessMessages.format(SuccessMessages.CLI_N_ROWS_DELETED, nRowsNum);
+        return String.format(SuccessMessages.CLI_N_ROWS_DELETED, nRowsNum);
     }
 
     public void dropAuditTable() throws SQLException {

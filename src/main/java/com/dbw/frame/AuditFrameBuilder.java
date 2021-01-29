@@ -41,7 +41,7 @@ public class AuditFrameBuilder implements OutputBuilder {
         builder.append(FRAME_HEADER_TIMESTAMP + auditRecord.getTimestamp());
         builder.append(NEW_LINE);
         builder.append(findTableDiff());
-        if (auditRecord.getOperation().equals(Operation.UPDATE)) {
+        if (Operation.UPDATE.equals(auditRecord.getOperation())) {
             builder.append(findColumnDiffs());
         }
     }
