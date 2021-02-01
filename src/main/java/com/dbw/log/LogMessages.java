@@ -4,6 +4,7 @@ public class LogMessages {
     public final static String DB_OPENED = "Database opened successfully.";
     public final static String DB_CLOSED = "Database connection closed.";
     public final static String CHOOSE_CONFIG = "Choose the config file by entering its number from the list:";
+    public final static String WATCHER_INIT = "Initializing ...";
     public final static String WATCHER_STARTED = "Watcher started.";
     public final static String AUDIT_RECORDS_COUNT = "Audit records count: %d.";
     public final static String SHUTDOWN = "Shutting down ...";

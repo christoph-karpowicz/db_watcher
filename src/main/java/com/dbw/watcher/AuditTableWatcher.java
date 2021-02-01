@@ -39,6 +39,7 @@ public class AuditTableWatcher implements Watcher {
     }
 
     public void init() throws PreparationException {
+        Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
         db.prepare(watchedTables);
     }
 
@@ -49,8 +50,7 @@ public class AuditTableWatcher implements Watcher {
         while (getIsRunning()) {
             run();
             if (getRunCounter() == 1) {
-                Logger.log(Level.INFO, LogMessages.WATCHER_STARTED);
-                Logger.log(Level.INFO, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
+                outputInfo();
             }
         }
     }
@@ -110,6 +110,11 @@ public class AuditTableWatcher implements Watcher {
             return lastIdMinusN > 0 ? lastIdMinusN : 0;
         }
         return lastId;
+    }
+
+    private void outputInfo() {
+        Logger.log(Level.INFO, LogMessages.WATCHER_STARTED);
+        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
     }
 
     private void setLastId(int lastId) {

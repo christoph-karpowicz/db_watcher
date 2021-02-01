@@ -38,7 +38,9 @@ public class App {
     
     public void init(String[] args) throws AppInitException {
         try {
-            options = handleArgs(args);
+            CLI cli = new CLI();
+            cli.init(args);
+            options = cli.handleArgs();
             Optional<String> configPathArg = options.getConfigPath();
             String configPath;
             if (configPathArg.isPresent()) {
@@ -54,13 +56,6 @@ public class App {
         }
     }
     
-    private CLI.ParsedOptions handleArgs(String[] args) throws ParseException, InvalidCLIOptionInputException {
-        CLI cli = new CLI();
-        cli.setArgs(args);
-        cli.init();
-        return cli.parseArgs();
-    }
-
     private String chooseConfigFile() throws IOException {
         return ConfigParser.getConfigFileNameFromInput();
     }
@@ -81,10 +76,10 @@ public class App {
         }
         if (options.getPurge()) {
             purge();
-        } else {
-            addShutdownHook();
-            startWatcher();
+            return;
         }
+        addShutdownHook();
+        startWatcher();
     }
 
     private void deleteFirstNRows(String nRows) throws InitialAuditRecordDeleteException {
