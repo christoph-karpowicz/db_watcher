@@ -12,6 +12,8 @@ import com.dbw.cli.CLI;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.err.AppInitException;
+import com.dbw.err.ConfigException;
+import com.dbw.err.DbConnectionException;
 import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.PreparationException;
@@ -56,7 +58,7 @@ public class App {
         }
     }
     
-    private String chooseConfigFile() throws IOException {
+    private String chooseConfigFile() throws IOException, ConfigException {
         return ConfigParser.getConfigFileNameFromInput();
     }
 
@@ -65,7 +67,7 @@ public class App {
         db = DatabaseFactory.getDatabase(dbConfig);
     }
 
-    private void connectToDb() throws SQLException, ClassNotFoundException {
+    private void connectToDb() throws DbConnectionException {
         db.connect();
     }
 

@@ -11,7 +11,9 @@ import java.util.List;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbOperationException;
+import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
+import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
@@ -25,11 +27,17 @@ public class Orcl extends Database {
         super(config);
     }
 
-    public void connect() throws SQLException, ClassNotFoundException {
-        Class.forName(DRIVER);
-        Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
-        setConn(conn);
-        Logger.log(Level.INFO, LogMessages.DB_OPENED);
+    public void connect() throws DbConnectionException {
+        try {
+            Class.forName(DRIVER);
+            Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
+            setConn(conn);
+            Logger.log(Level.INFO, LogMessages.DB_OPENED);
+        } catch (SQLException e) {
+            throw new DbConnectionException(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new DbConnectionException(String.format(ErrorMessages.DB_CONN_FAILED, e.getMessage()), e);
+        }
     }
 
     private String getConnectionString() {

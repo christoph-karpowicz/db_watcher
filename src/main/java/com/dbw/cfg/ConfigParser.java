@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dbw.err.ConfigException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
@@ -33,9 +34,12 @@ public class ConfigParser {
         return config;
     }
 
-    public static String getConfigFileNameFromInput() throws IOException {
-        System.out.println(LogMessages.CHOOSE_CONFIG);
+    public static String getConfigFileNameFromInput() throws IOException, ConfigException {
         List<String> configFileList = getYMLFileListFromCurrentDir();
+        if (configFileList.size() == 0) {
+            throw new ConfigException(ErrorMessages.CONFIG_NO_YML_FILES);
+        }
+        System.out.println(LogMessages.CHOOSE_CONFIG);
         outputConfigFileListFromCurrentDir(configFileList);
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Integer fileNameIndex = null;
@@ -54,7 +58,7 @@ public class ConfigParser {
         return configFileList.get(fileNameIndex - 1);
     }
     
-    private static void outputConfigFileListFromCurrentDir(List<String> configFileList) throws IOException {
+    private static void outputConfigFileListFromCurrentDir(List<String> configFileList) {
         for (int i = 0; i < configFileList.size(); i++) {
             String outputLine = String.format("[%d] %s", i+1, configFileList.get(i));
             System.out.println(outputLine);

@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cli.CLI;
+import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.log.ErrorMessages;
@@ -165,7 +166,7 @@ public abstract class Database {
         return config;
     }
 
-    public abstract void connect() throws SQLException, ClassNotFoundException;
+    public abstract void connect() throws DbConnectionException;
 
     public abstract void prepare(List<String> watchedTables) throws PreparationException;
 

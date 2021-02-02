@@ -1,7 +1,7 @@
 package com.dbw.log;
 
 public class LogMessages {
-    public final static String DB_OPENED = "Database opened successfully.";
+    public final static String DB_OPENED = "Database connection opened successfully.";
     public final static String DB_CLOSED = "Database connection closed.";
     public final static String CHOOSE_CONFIG = "Choose the config file by entering its number from the list:";
     public final static String WATCHER_INIT = "Initializing ...";
