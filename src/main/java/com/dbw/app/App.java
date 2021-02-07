@@ -1,6 +1,8 @@
 package com.dbw.app;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import com.dbw.err.DbConnectionException;
 import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.PreparationException;
+import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbTypeException;
 import com.dbw.err.WatcherStartException;
 import com.dbw.log.ErrorMessages;
@@ -71,7 +74,7 @@ public class App {
         db.connect();
     }
 
-    public void start() throws WatcherStartException, InitialAuditRecordDeleteException {
+    public void start() throws WatcherStartException, InitialAuditRecordDeleteException, PurgeException {
         String deleteFirstNRowsOption = options.getDeleteFirstNRows();
         if (!Objects.isNull(deleteFirstNRowsOption)) {
             deleteFirstNRows(deleteFirstNRowsOption);
@@ -94,11 +97,30 @@ public class App {
         Logger.log(Level.INFO, String.format(successMessage, nRows));
     }
 
-    private void purge() {
+    private void purge() throws PurgeException {
+        boolean isConfirmed = confirmPurge();
+        if (!isConfirmed) {
+            return;
+        }
         if (db.purge(config.getTables())) {
             Logger.log(Level.INFO, SuccessMessages.CLI_PURGE);
         } else {
             Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
+        }
+    }
+
+    private boolean confirmPurge() throws PurgeException {
+        try {
+            System.out.println(LogMessages.CONFIRM_PURGE);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String input = reader.readLine();
+            if (input.equals("y") || input.equals("Y")) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            throw new PurgeException(e.getMessage(), e);
         }
     }
 
