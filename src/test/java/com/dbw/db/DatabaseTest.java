@@ -17,11 +17,12 @@ import org.junit.Test;
 public class DatabaseTest {
     private static Database db;
     private static Config config;
+    private static String testConfigPathFromArgument;
     
     @BeforeClass
     public static void setup() {
         try {
-            String testConfigPathFromArgument = System.getProperty("testConfigPath");
+            testConfigPathFromArgument = System.getProperty("testConfigPath");
             config = ConfigParser.fromYMLFile(testConfigPathFromArgument);
         } catch(Exception e) {
             fail(e.getMessage());
@@ -29,14 +30,18 @@ public class DatabaseTest {
     }
     
     @Test
-    public void shouldBeAPostgresDatabase() {
+    public void shouldBeTheRightDatabaseType() {
         DatabaseConfig dbConfig = config.getDatabase();
         try {
             db = DatabaseFactory.getDatabase(dbConfig);
         } catch (Exception e) {
             fail(e.getMessage());
         }
-        assertEquals(Postgres.class, db.getClass());
+        if (testConfigPathFromArgument.contains("orcl")) {
+            assertEquals(Orcl.class, db.getClass());
+        } else {
+            assertEquals(Postgres.class, db.getClass());
+        }
     }
 
     @Test

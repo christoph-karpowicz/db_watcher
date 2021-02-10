@@ -84,7 +84,7 @@ public class CLI {
         cmd = parser.parse(options, args);
     }
 
-    public void setArgs(String[] args) {
+    private void setArgs(String[] args) {
         this.args = args;
     }
 

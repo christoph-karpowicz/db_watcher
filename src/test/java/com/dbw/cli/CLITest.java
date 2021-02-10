@@ -37,9 +37,8 @@ public class CLITest {
     @BeforeClass
     public static void setup() {
         cli = new CLI();
-        cli.setArgs(TEST_ARGS);
         try {
-            cli.init();
+            cli.init(TEST_ARGS);
         } catch (Exception e) {
             fail(e.getMessage());
         }

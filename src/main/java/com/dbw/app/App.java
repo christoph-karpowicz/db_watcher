@@ -17,7 +17,6 @@ import com.dbw.err.AppInitException;
 import com.dbw.err.ConfigException;
 import com.dbw.err.DbConnectionException;
 import com.dbw.err.InitialAuditRecordDeleteException;
-import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.err.PreparationException;
 import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbTypeException;
@@ -29,10 +28,7 @@ import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
 import com.dbw.watcher.AuditTableWatcher;
 import com.google.inject.Inject;
-import org.apache.commons.cli.ParseException;
 
-// mvn package shade:shade -DskipTests=true
-// mvn clean test -DtestConfigPath="./config/orcl-example.yml"
 public class App {
     @Inject
     private AuditTableWatcher watcher;
