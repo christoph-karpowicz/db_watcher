@@ -2,6 +2,7 @@ package com.dbw.frame;
 
 import java.util.List;
 
+import com.dbw.app.App;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Operation;
 import com.dbw.diff.StateColumn;
@@ -41,8 +42,8 @@ public class AuditFrameBuilder implements OutputBuilder {
         builder.append(FRAME_HEADER_TIMESTAMP + auditRecord.getTimestamp());
         builder.append(NEW_LINE);
         builder.append(findTableDiff());
-        if (Operation.UPDATE.equals(auditRecord.getOperation())) {
-            builder.append(findColumnDiffs());
+        if (Operation.UPDATE.equals(auditRecord.getOperation()) && App.options.getVerboseDiff()) {
+            builder.append(findVerboseColumnDiffs());
         }
     }
 
@@ -50,7 +51,7 @@ public class AuditFrameBuilder implements OutputBuilder {
         return diffService.findTableDiff(stateColumns, auditRecord.getOperation());
     }
 
-    public String findColumnDiffs() {
+    public String findVerboseColumnDiffs() {
         StringBuilder columnDiffBuilder = new StringBuilder();
 
         short diffCount = 0;

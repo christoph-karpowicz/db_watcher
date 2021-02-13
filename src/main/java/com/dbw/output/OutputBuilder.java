@@ -10,6 +10,7 @@ public interface OutputBuilder {
     public final String HEADER_UNDERLINE_PADDING = "_";
     public final String DIFF_VERTICAL_BORDER = "|";
     public final String DIFF_HORIZONTAL_BORDER = "-";
+    public final String DIFF_EDGE_BORDER = "+";
     public final String NEW_LINE = "\n";
     public final String FRAME_HEADER_ID = "ID: ";
     public final String FRAME_HEADER_TABLE = "Table: ";

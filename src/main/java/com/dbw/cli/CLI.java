@@ -29,6 +29,7 @@ public class CLI {
     private final String OPTIONS_MAX_ROW_LENGTH = "maxRowLength";
     private final String OPTIONS_PURGE = "purge";
     private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
+    private final String OPTIONS_VERBOSE_DIFF = "verboseDiff";
     public static final String OPTIONS_CONFIG_FLAG = "c";
     public static final String OPTIONS_DEBUG_FLAG = "d";
     public static final String OPTIONS_DELETE_FIRST_N_ROWS_FLAG = "D";
@@ -38,6 +39,7 @@ public class CLI {
     public static final String OPTIONS_MAX_ROW_LENGTH_FLAG = "L";
     public static final String OPTIONS_PURGE_FLAG = "p";
     public static final String OPTIONS_SHOW_LAST_N_CHANGES_FLAG = "n";
+    public static final String OPTIONS_VERBOSE_DIFF_FLAG = "v";
     public static final String ALL_SYMBOL = "*";
     
     private CommandLineParser parser;
@@ -73,6 +75,7 @@ public class CLI {
         options.addOption(OPTIONS_MAX_ROW_LENGTH_FLAG, OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
         options.addOption(OPTIONS_PURGE_FLAG, OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
         options.addOption(OPTIONS_SHOW_LAST_N_CHANGES_FLAG, OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
+        options.addOption(OPTIONS_VERBOSE_DIFF_FLAG, OPTIONS_VERBOSE_DIFF, false, "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column length");
     }
 
     public void printHelp() {
@@ -94,6 +97,7 @@ public class CLI {
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
         parsedOptions.purge = getPurgeOption();
+        parsedOptions.verboseDiff = getVerboseDiff();
         try {
             parsedOptions.deleteFirstNRows = getDeleteFirstNRowsOption();
             parsedOptions.maxColumnLength = getMaxColumnLengthOption();
@@ -161,6 +165,10 @@ public class CLI {
         return null;
     }
 
+    private boolean getVerboseDiff() {
+        return cmd.hasOption(OPTIONS_VERBOSE_DIFF);
+    }
+
     public class ParsedOptions {
         private Optional<String> configPath;
         private boolean debug;
@@ -170,6 +178,7 @@ public class CLI {
         private Short maxRowLength;
         private boolean purge;
         private Short showLastNChanges;
+        private boolean verboseDiff;
 
         public Optional<String> getConfigPath() {
             return configPath;
@@ -201,6 +210,10 @@ public class CLI {
 
         public Short getShowLastNChanges() {
             return showLastNChanges;
+        }
+
+        public boolean getVerboseDiff() {
+            return verboseDiff;
         }
     }
 }

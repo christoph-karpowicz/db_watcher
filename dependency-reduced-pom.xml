@@ -25,6 +25,9 @@
           <version>2.22.1</version>
           <configuration>
             <skipTests>${skipTests}</skipTests>
+            <additionalClasspathElements>
+              <additionalClasspathElement>lib/ojdbc7.jar</additionalClasspathElement>
+            </additionalClasspathElements>
           </configuration>
         </plugin>
         <plugin>
