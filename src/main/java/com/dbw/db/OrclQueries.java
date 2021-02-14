@@ -43,39 +43,39 @@ public class OrclQueries {
     );
     
     public static final String CREATE_AUDIT_TRIGGER = 
-        "CREATE TRIGGER %s " +
-        "AFTER INSERT OR UPDATE OR DELETE ON %s " +
-        "FOR EACH ROW " +
-        "DECLARE " +
-        "v_operation VARCHAR2(6) := " +
-        "    case when updating then 'U' " +
-        "        when deleting then 'D' " +
-        "        else 'I' end; " +
-        "next_id " + Common.DBW_AUDIT_TABLE_NAME + ".ID%%TYPE;" +
-        "v_old_state CLOB;" +
-        "v_new_state CLOB;" +
-        "BEGIN " +
-        "    IF updating OR deleting THEN" +
-        "       v_old_state := %s;" +
-        "    END IF;" +
-        "    IF updating OR inserting THEN" +
-        "       v_new_state := %s;" +
-        "    END IF;" +
-        "    SELECT COALESCE(MAX(ID), 0)+1 INTO next_id from " + Common.DBW_AUDIT_TABLE_NAME + ";" +
-        "    IF updating THEN" +
-        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + UPDATE_COL_LIST + ")" +
-        "            VALUES(next_id, '%s', v_old_state, v_new_state, v_operation);" +
-        "    ELSIF inserting THEN" +
-        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + INSERT_COL_LIST + ")" +
-        "            VALUES(next_id, '%s', v_new_state, v_operation);" +
-        "    ELSE " +
-        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + DELETE_COL_LIST + ")" +
-        "            VALUES(next_id, '%s', v_old_state, v_operation);" +
-        "    END IF;" +
-        "    EXCEPTION" +
-        "        WHEN OTHERS THEN" +
-        "           DBMS_OUTPUT.PUT_LINE(SQLCODE);" +
-        "           DBMS_OUTPUT.PUT_LINE(SQLERRM);" +
+        "CREATE TRIGGER %s \n" +
+        "AFTER INSERT OR UPDATE OR DELETE ON %s \n" +
+        "FOR EACH ROW \n" +
+        "DECLARE \n" +
+        "v_operation VARCHAR2(6) := \n" +
+        "    case when updating then 'U' \n" +
+        "        when deleting then 'D' \n" +
+        "        else 'I' end; \n" +
+        "v_next_id " + Common.DBW_AUDIT_TABLE_NAME + ".ID%%TYPE;\n" +
+        "v_old_state CLOB;\n" +
+        "v_new_state CLOB;\n" +
+        "BEGIN \n" +
+        "    IF updating OR deleting THEN\n" +
+        "       v_old_state := %s;\n" +
+        "    END IF;\n" +
+        "    IF updating OR inserting THEN\n" +
+        "       v_new_state := %s;\n" +
+        "    END IF;\n" +
+        "    SELECT COALESCE(MAX(ID), 0)+1 INTO v_next_id from \n" + Common.DBW_AUDIT_TABLE_NAME + ";\n" +
+        "    IF updating THEN\n" +
+        "        INSERT INTO \n" + Common.DBW_AUDIT_TABLE_NAME + "(\n" + UPDATE_COL_LIST + ")\n" +
+        "            VALUES(v_next_id, '%s', v_old_state, v_new_state, v_operation);\n" +
+        "    ELSIF inserting THEN\n" +
+        "        INSERT INTO \n" + Common.DBW_AUDIT_TABLE_NAME + "(\n" + INSERT_COL_LIST + ")\n" +
+        "            VALUES(v_next_id, '%s', v_new_state, v_operation);\n" +
+        "    ELSE \n" +
+        "        INSERT INTO \n" + Common.DBW_AUDIT_TABLE_NAME + "(\n" + DELETE_COL_LIST + ")\n" +
+        "            VALUES(v_next_id, '%s', v_old_state, v_operation);\n" +
+        "    END IF;\n" +
+        "    EXCEPTION\n" +
+        "        WHEN OTHERS THEN\n" +
+        "           DBMS_OUTPUT.PUT_LINE(SQLCODE);\n" +
+        "           DBMS_OUTPUT.PUT_LINE(SQLERRM);\n" +
         "END;";
 
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s";

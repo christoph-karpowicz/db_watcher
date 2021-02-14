@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.sql.SQLException;
 
 import com.dbw.cfg.Config;
@@ -23,7 +24,8 @@ public class DatabaseTest {
     public static void setup() {
         try {
             testConfigPathFromArgument = System.getProperty("testConfigPath");
-            config = ConfigParser.fromYMLFile(testConfigPathFromArgument);
+            File configFile = new File(testConfigPathFromArgument);
+            config = ConfigParser.fromYMLFile(configFile);
         } catch(Exception e) {
             fail(e.getMessage());
         }

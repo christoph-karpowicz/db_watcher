@@ -1,12 +1,15 @@
 package com.dbw.app;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.dbw.cache.Cache;
+import com.dbw.cache.ConfigCache;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cfg.DatabaseConfig;
@@ -33,12 +36,16 @@ public class App {
     @Inject
     private AuditTableWatcher watcher;
     
+    private Cache cache;
     public static CLI.ParsedOptions options;
     private Config config;
+    private boolean configChanged;
     private Database db;
     
     public void init(String[] args) throws AppInitException {
         try {
+            cache = new Cache();
+            cache.load();
             CLI cli = new CLI();
             cli.init(args);
             options = cli.handleArgs();
@@ -49,7 +56,17 @@ public class App {
             } else {
                 configPath = chooseConfigFile();
             }
-            config = ConfigParser.fromYMLFile(configPath);
+            File configFile = new File(configPath);
+            config = ConfigParser.fromYMLFile(configFile);
+            String configFileChecksum = ConfigParser.getFileChecksum(configFile);
+            configChanged = cache.compareConfigFileChecksums(configFileChecksum);
+            if (configChanged) {
+                ConfigCache configCache = new ConfigCache();
+                configCache.setChecksum(configFileChecksum);
+                cache.createPersistentCacheIfDoesntExist();
+                cache.getPersistentCache().get().setConfig(configCache);
+                cache.persist();
+            }
             setDb();
             connectToDb();
         } catch (Exception e) {
@@ -103,6 +120,7 @@ public class App {
         } else {
             Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
         }
+        cache.delete();
     }
 
     private boolean confirmPurge() throws PurgeException {
@@ -124,7 +142,7 @@ public class App {
         try {
             watcher.setWatchedTables(config.getTables());
             watcher.setDb(db);
-            watcher.init();
+            watcher.init(configChanged);
             watcher.start();
         } catch (PreparationException | SQLException e) {
             throw new WatcherStartException(e.getMessage(), e);

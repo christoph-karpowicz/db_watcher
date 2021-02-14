@@ -1,7 +1,5 @@
 #!/bin/bash
 
-arg=$1
-
 if [ $1 = "test-orcl" ]; then
     mvn clean test -DtestConfigPath="./config/orcl-example.yml"
 elif [ $1 = "test-postgres" ]; then

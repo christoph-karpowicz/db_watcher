@@ -48,7 +48,7 @@ In the `database` dictionary, `host` and `port` mappings can be replaced with a 
 
 ## Usage
 
-After starting, Dbw first evaluates the list of tables provided in the configuration file and creates new triggers for new tables in the collection or drops the ones that there is no corresponding table name for. An audit table named `DBW_AUDIT` is created during the initial application start for a given database and can be removed when the user explicitly wants to drop all Dbw related database entities using the `-p` flag. 
+After starting, Dbw first evaluates the list of tables provided in the configuration file and creates new triggers for new tables in the collection or drops the ones that there is no corresponding table name for. An audit table named `DBW_AUDIT` is created during the initial application start for a given database and can be removed when the user explicitly wants to drop all Dbw related database objects using the `-p` flag. 
 
 An example application start for PostgreSQL configuration:
 ```

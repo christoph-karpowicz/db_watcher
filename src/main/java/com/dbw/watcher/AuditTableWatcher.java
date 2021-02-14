@@ -38,9 +38,14 @@ public class AuditTableWatcher implements Watcher {
         this.db = db;
     }
 
-    public void init() throws PreparationException {
+    public void init(boolean configChanged) throws PreparationException {
         Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
-        db.prepare(watchedTables);
+        if (configChanged) {
+            Logger.log(Level.INFO, LogMessages.DB_PREPARATION);
+            db.prepare(watchedTables);
+        } else {
+            Logger.log(Level.INFO, LogMessages.CONFIG_UNCHANGED);
+        }
     }
 
     public void start() throws SQLException {

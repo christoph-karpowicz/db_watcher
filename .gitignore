@@ -9,3 +9,4 @@ lib/
 docker-compose.yml
 data/
 release/
+dbw.cache

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+
 import org.junit.Test;
 
 public class ConfigParserTest {
@@ -15,7 +17,8 @@ public class ConfigParserTest {
     {
         Config config = null;
         try {
-            config = ConfigParser.fromYMLFile(TEST_CONFIG_PATH);
+            File configFile = new File(TEST_CONFIG_PATH);
+            config = ConfigParser.fromYMLFile(configFile);
         } catch(Exception e) {
             fail(e.getMessage());
         }

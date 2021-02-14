@@ -13,6 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.io.FileInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.dbw.err.ConfigException;
 import com.dbw.log.ErrorMessages;
@@ -27,10 +30,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class ConfigParser {
     private final static String YML_PATTERN = ".+\\.ya?ml$";
 
-    public static Config fromYMLFile(String path) throws JsonMappingException, JsonParseException, IOException {
+    public static Config fromYMLFile(File file) throws JsonMappingException, JsonParseException, IOException {
         Config config = null;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        config = mapper.readValue(new File(path), Config.class);
+        config = mapper.readValue(file, Config.class);
         return config;
     }
 
@@ -81,6 +84,23 @@ public class ConfigParser {
         Pattern ymlFilePattern = Pattern.compile(ymlFilePatternString);
         Matcher ymlFilePatternMatcher = ymlFilePattern.matcher(path.getFileName().toString());
         return ymlFilePatternMatcher.matches();
+    }
+
+    public static String getFileChecksum(File file) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        FileInputStream fis = new FileInputStream(file);
+        byte[] byteArray = new byte[1024];
+        int bytesCount = 0; 
+        while ((bytesCount = fis.read(byteArray)) != -1) {
+            digest.update(byteArray, 0, bytesCount);
+        };
+        fis.close();
+        byte[] bytes = digest.digest();
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i< bytes.length; i++) {
+            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
     }
     
 }
