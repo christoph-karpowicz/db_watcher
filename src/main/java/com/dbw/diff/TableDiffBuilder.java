@@ -51,8 +51,8 @@ public class TableDiffBuilder implements OutputBuilder {
             builder.append(PADDING);
             builder.append(stateColumn.hasDiff() ? DIFF_EDGE_BORDER : PADDING);
             String filler = stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING;
-            int maxLength = getFinalMaxColumnLength(stateColumn);
-            for (short i = 0; i < maxLength; i++) {
+            int maxWidth = getFinalMaxColumnWidth(stateColumn);
+            for (short i = 0; i < maxWidth; i++) {
                 builder.append(filler);
             }
             builder.append(stateColumn.hasDiff() ? DIFF_EDGE_BORDER : PADDING);
@@ -96,14 +96,14 @@ public class TableDiffBuilder implements OutputBuilder {
     private void append(StateColumn stateColumn, String value, String padding, boolean onlyIfDiff) {
         builder.append(PADDING);
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
-        int maxLength = getFinalMaxColumnLength(stateColumn);
-        int substringLength = maxLength - ELLIPSIS.length();
+        int maxWidth = getFinalMaxColumnWidth(stateColumn);
+        int substringLength = maxWidth - ELLIPSIS.length();
         String finalValue = (onlyIfDiff && !stateColumn.hasDiff()) ? "" : value;
         int valueLength = finalValue.length();
-        if (valueLength > maxLength) {
+        if (valueLength > maxWidth) {
             finalValue = value.substring(0, substringLength) + ELLIPSIS;
             stateColumn.setCut(true);
-        } else if (valueLength < maxLength) {
+        } else if (valueLength < maxWidth) {
             int lengthDiff = substringLength + ELLIPSIS.length() - valueLength;
             for (short i = 0; i < lengthDiff; i++) {
                 finalValue += padding;
@@ -114,8 +114,8 @@ public class TableDiffBuilder implements OutputBuilder {
         builder.append(PADDING);
     }
 
-    private int getFinalMaxColumnLength(StateColumn stateColumn) {
-        return TableDiffBuilder.getMaxColumnWidth() < stateColumn.getMaxLength() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxLength();
+    private int getFinalMaxColumnWidth(StateColumn stateColumn) {
+        return TableDiffBuilder.getMaxColumnWidth() < stateColumn.getMaxWidth() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxWidth();
     }
 
     @Override

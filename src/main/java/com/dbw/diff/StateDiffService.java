@@ -72,16 +72,16 @@ public class StateDiffService implements DiffService {
         short characterCount = 0;
         short rowNumber = -1;
         for (StateColumn stateColumn : stateColumns) {
-            int stateColumnLength = 
-                (stateColumn.getMaxLength() > TableDiffBuilder.getMaxColumnWidth() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxLength());
-            stateColumnLength += paddingLength;
-            if (rowNumber < 0 || characterCount + stateColumnLength > TableDiffBuilder.getMaxRowWidth()) {
+            int stateColumnWidth = 
+                (stateColumn.getMaxWidth() > TableDiffBuilder.getMaxColumnWidth() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxWidth());
+            stateColumnWidth += paddingLength;
+            if (rowNumber < 0 || characterCount + stateColumnWidth > TableDiffBuilder.getMaxRowWidth()) {
                 List<StateColumn> newRow = new ArrayList<StateColumn>();
                 rows.add(newRow);
                 rowNumber++;
                 characterCount = 0;
             } else {
-                characterCount += stateColumnLength;
+                characterCount += stateColumnWidth;
             }
             rows.get(rowNumber).add(stateColumn);
         }

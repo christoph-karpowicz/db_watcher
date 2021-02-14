@@ -20,7 +20,7 @@ public class HtmlInXmlEscaper {
     };
 
     public boolean isHtmlBetweenXmlTags(String data) {
-        int expectedGtOrLtSymbols = 5 + countColumnStateTags(data) * 2;
+        int expectedGtOrLtSymbols = 4 + countColumnStateTags(data) * 2;
         long numberOfGtSymbols = data.chars().filter(ch -> ch == '>').count();
         long numberOfLtSymbols = data.chars().filter(ch -> ch == '<').count();
         return numberOfGtSymbols > expectedGtOrLtSymbols || numberOfLtSymbols > expectedGtOrLtSymbols;

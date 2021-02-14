@@ -7,17 +7,17 @@ public class StateColumn {
     private String columnName;
     private String oldState;
     private String newState;
-    private int maxLength;
+    private int maxWidth;
     private boolean isCut;
 
     public StateColumn(String columnName, String oldState, String newState) {
         this.columnName = columnName;
         this.oldState = oldState;
         this.newState = newState;
-        this.maxLength = calculateMaxLength();
+        this.maxWidth = calculateMaxWidth();
     }
 
-    private int calculateMaxLength() {
+    private int calculateMaxWidth() {
         int maxLength = columnName.length();
         int oldStateLength = Objects.isNull(oldState) ? 0 : oldState.length();
         int newStateLength = Objects.isNull(newState) ? 0 : newState.length();
@@ -30,8 +30,8 @@ public class StateColumn {
         return maxLength;
     }
 
-    public int getMaxLength() {
-        return maxLength;
+    public int getMaxWidth() {
+        return maxWidth;
     }
     
     private void setHasDiff() {
