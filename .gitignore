@@ -6,7 +6,8 @@ target/
 config/*
 !config/test.yml
 lib/
-docker-compose.yml
 data/
 release/
+docker-compose.yml
+dependency-reduced-pom.xml
 dbw.cache
