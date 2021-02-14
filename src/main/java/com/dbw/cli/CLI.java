@@ -25,8 +25,8 @@ public class CLI {
     private final String OPTIONS_DELETE_FIRST_N_ROWS = "deleteFirstNRows";
     private final String OPTIONS_FILTER = "filter";
     private final String OPTIONS_SHOW_HELP = "help";
-    private final String OPTIONS_MAX_COL_LENGTH = "maxColumnLength";
-    private final String OPTIONS_MAX_ROW_LENGTH = "maxRowLength";
+    private final String OPTIONS_MAX_COL_WIDTH = "maxColumnWidth";
+    private final String OPTIONS_MAX_ROW_WIDTH = "maxRowWidth";
     private final String OPTIONS_PURGE = "purge";
     private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
     private final String OPTIONS_VERBOSE_DIFF = "verboseDiff";
@@ -35,8 +35,8 @@ public class CLI {
     public static final String OPTIONS_DELETE_FIRST_N_ROWS_FLAG = "D";
     public static final String OPTIONS_FILTER_FLAG = "f";
     public static final String OPTIONS_SHOW_HELP_FLAG = "h";
-    public static final String OPTIONS_MAX_COL_LENGTH_FLAG = "l";
-    public static final String OPTIONS_MAX_ROW_LENGTH_FLAG = "L";
+    public static final String OPTIONS_MAX_COL_WIDTH_FLAG = "w";
+    public static final String OPTIONS_MAX_ROW_WIDTH_FLAG = "W";
     public static final String OPTIONS_PURGE_FLAG = "p";
     public static final String OPTIONS_SHOW_LAST_N_CHANGES_FLAG = "n";
     public static final String OPTIONS_VERBOSE_DIFF_FLAG = "v";
@@ -69,13 +69,13 @@ public class CLI {
         options.addOption(OPTIONS_CONFIG_FLAG, OPTIONS_CONFIG, true, "provide a path to the configuration file");
         options.addOption(OPTIONS_DEBUG_FLAG, OPTIONS_DEBUG, false, "show exception classes and stack traces");
         options.addOption(OPTIONS_DELETE_FIRST_N_ROWS_FLAG, OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
-        options.addOption(OPTIONS_FILTER_FLAG, OPTIONS_FILTER, true, "show only the specified operations and filter out the rest (i - inserts, u - updates, d - deletes, for example: \"-f u,d\")");
+        // options.addOption(OPTIONS_FILTER_FLAG, OPTIONS_FILTER, true, "show only the specified operations and filter out the rest (i - inserts, u - updates, d - deletes, for example: \"-f u,d\")");
         options.addOption(OPTIONS_SHOW_HELP_FLAG, OPTIONS_SHOW_HELP, false, "show help");
-        options.addOption(OPTIONS_MAX_COL_LENGTH_FLAG, OPTIONS_MAX_COL_LENGTH, true, "specify the maximum length of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_LENGTH + ")");
-        options.addOption(OPTIONS_MAX_ROW_LENGTH_FLAG, OPTIONS_MAX_ROW_LENGTH, true, "specify the maximum length of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_LENGTH + ")");
+        options.addOption(OPTIONS_MAX_COL_WIDTH_FLAG, OPTIONS_MAX_COL_WIDTH, true, "specify the maximum width of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_WIDTH + ")");
+        options.addOption(OPTIONS_MAX_ROW_WIDTH_FLAG, OPTIONS_MAX_ROW_WIDTH, true, "specify the maximum width of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_WIDTH + ")");
         options.addOption(OPTIONS_PURGE_FLAG, OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
         options.addOption(OPTIONS_SHOW_LAST_N_CHANGES_FLAG, OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
-        options.addOption(OPTIONS_VERBOSE_DIFF_FLAG, OPTIONS_VERBOSE_DIFF, false, "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column length");
+        options.addOption(OPTIONS_VERBOSE_DIFF_FLAG, OPTIONS_VERBOSE_DIFF, false, "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column width");
     }
 
     public void printHelp() {
@@ -100,8 +100,8 @@ public class CLI {
         parsedOptions.verboseDiff = getVerboseDiff();
         try {
             parsedOptions.deleteFirstNRows = getDeleteFirstNRowsOption();
-            parsedOptions.maxColumnLength = getMaxColumnLengthOption();
-            parsedOptions.maxRowLength = getMaxRowLengthOption();
+            parsedOptions.maxColumnWidth = getMaxColumnWidthOption();
+            parsedOptions.maxRowWidth = getMaxRowWidthOption();
             parsedOptions.showLastNChanges = getShowLastNChangesOption();
         } catch (NumberFormatException e) {
             throw new InvalidCLIOptionInputException(e.getMessage(), e, parsedOptions.debug);
@@ -137,17 +137,17 @@ public class CLI {
         return cmd.hasOption(OPTIONS_SHOW_HELP);
     }
 
-    private Short getMaxColumnLengthOption() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_MAX_COL_LENGTH)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_MAX_COL_LENGTH);
+    private Short getMaxColumnWidthOption() throws NumberFormatException {
+        if(cmd.hasOption(OPTIONS_MAX_COL_WIDTH)) {
+            String optionValue = cmd.getOptionValue(OPTIONS_MAX_COL_WIDTH);
             return Short.parseShort(optionValue);
         }
         return null;
     }
 
-    private Short getMaxRowLengthOption() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_MAX_ROW_LENGTH)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_MAX_ROW_LENGTH);
+    private Short getMaxRowWidthOption() throws NumberFormatException {
+        if(cmd.hasOption(OPTIONS_MAX_ROW_WIDTH)) {
+            String optionValue = cmd.getOptionValue(OPTIONS_MAX_ROW_WIDTH);
             return Short.parseShort(optionValue);
         }
         return null;
@@ -174,8 +174,8 @@ public class CLI {
         private boolean debug;
         private String deleteFirstNRows;
         private boolean showHelp;
-        private Short maxColumnLength;
-        private Short maxRowLength;
+        private Short maxColumnWidth;
+        private Short maxRowWidth;
         private boolean purge;
         private Short showLastNChanges;
         private boolean verboseDiff;
@@ -196,12 +196,12 @@ public class CLI {
             return showHelp;
         }
 
-        public Short getMaxColumnLength() {
-            return maxColumnLength;
+        public Short getMaxColumnWidth() {
+            return maxColumnWidth;
         }
 
-        public Short getMaxRowLength() {
-            return maxRowLength;
+        public Short getMaxRowWidth() {
+            return maxRowWidth;
         }
 
         public boolean getPurge() {

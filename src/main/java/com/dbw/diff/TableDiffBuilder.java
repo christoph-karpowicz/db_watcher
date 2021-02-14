@@ -10,17 +10,17 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class TableDiffBuilder implements OutputBuilder {
-    public static final short DEFAULT_MAX_COL_LENGTH = 17;
-    public static final short DEFAULT_MAX_ROW_LENGTH = 120;
+    public static final short DEFAULT_MAX_COL_WIDTH = 17;
+    public static final short DEFAULT_MAX_ROW_WIDTH = 120;
 
     private StringBuilder builder;
 
-    public static short getMaxColumnLength() {
-        return Objects.isNull(App.options.getMaxColumnLength()) ? DEFAULT_MAX_COL_LENGTH : App.options.getMaxColumnLength();
+    public static short getMaxColumnWidth() {
+        return Objects.isNull(App.options.getMaxColumnWidth()) ? DEFAULT_MAX_COL_WIDTH : App.options.getMaxColumnWidth();
     }
 
-    public static short getMaxRowLength() {
-        return Objects.isNull(App.options.getMaxRowLength()) ? DEFAULT_MAX_ROW_LENGTH : App.options.getMaxRowLength();
+    public static short getMaxRowWidth() {
+        return Objects.isNull(App.options.getMaxRowWidth()) ? DEFAULT_MAX_ROW_WIDTH : App.options.getMaxRowWidth();
     }
     
     public void init() {
@@ -115,7 +115,7 @@ public class TableDiffBuilder implements OutputBuilder {
     }
 
     private int getFinalMaxColumnLength(StateColumn stateColumn) {
-        return TableDiffBuilder.getMaxColumnLength() < stateColumn.getMaxLength() ? TableDiffBuilder.getMaxColumnLength() : stateColumn.getMaxLength();
+        return TableDiffBuilder.getMaxColumnWidth() < stateColumn.getMaxLength() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxLength();
     }
 
     @Override

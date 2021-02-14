@@ -2,9 +2,9 @@
 
 ![Example](docs/operation_output.png)
 
-Dbw is a console application that displays changes in a given Oracle or PostgreSQL database. It does that by creating triggers on tables that were specified in a YML config file and an audit table in which every record represents an individual insert, update or delete operation. When it comes to detecting and keeping track of said operations, the database does all the work. The application merely frequently checks if new records were added to the audit table and outputs them in the console in a readable form. 
+Dbw is a console application that displays changes in real time in a given Oracle or PostgreSQL database. It does that by creating triggers on tables that were specified in a YML config file and an audit table in which every record represents an individual insert, update or delete operation. When it comes to detecting and keeping track of said operations, the database does all the work. The application merely frequently checks if new records were added to the audit table and outputs them in the console in a readable form. 
 
-This application has been written to help developers in their daily work on large systems, in which a single action can result in changes to many different tables in the database. Dbw instantly displays before and after states of an updated row and contents of insterted or deleted rows saving the developer the trouble of querying the database with tools that he or she might use or analyzing the applications code to find out what happens after a certain action. 
+This application has been written to help developers in their daily work on large systems, in which a single action can result in changes to many different tables in the database. Dbw instantly displays before and after states of an updated row and contents of insterted or deleted rows saving the developer the trouble of querying the database with tools that he or she might use or analyzing the applications code to find out what happens after a given action. 
 
 ## Configuration
 
@@ -48,7 +48,7 @@ In the `database` dictionary, `host` and `port` mappings can be replaced with a 
 
 ## Usage
 
-After starting, Dbw first evaluates the list of tables provided in the configuration file and creates new triggers for new tables in the collection or drops the ones that there is no corresponding table name for. An audit table named `DBW_AUDIT` is created during the initial application start for a given database and can be removed when the user explicitly wants to drop all Dbw related database objects using the `-p` flag. 
+After launching, Dbw first evaluates the list of tables provided in the configuration file and creates new triggers for new tables in the collection or drops the ones that there is no corresponding table name for. An audit table named `DBW_AUDIT` is created during the initial application start for a given database and can be removed when the user explicitly wants to drop all Dbw related database objects using the `-p` flag. 
 
 An example application start for PostgreSQL configuration:
 ```
@@ -71,34 +71,47 @@ To close the application, use Ctrl+C.
  -d,--debug                    show exception classes and stack traces
  -D,--deleteFirstNRows <arg>   delete the first n rows from the audit
                                table (* if all)
- -l,--maxColumnLength <arg>    specify the maximum length of a column
-                               (default: 17)
- -L,--maxRowLength <arg>       specify the maximum length of a row
-                               (default: 120)
+ -h,--help                     show help
  -n,--lastNChanges <arg>       specify the number of last changes to
                                display after the app starts
  -p,--purge                    remove database audit table, functions and
                                triggers
+ -v,--verboseDiff              show verbose output, i.e. with full before
+                               and after states of column values that
+                               exceeded the maximum column width
+ -w,--maxColumnWidth <arg>     specify the maximum width of a column
+                               (default: 17)
+ -W,--maxRowWidth <arg>        specify the maximum width of a row
+                               (default: 120)
 ```
 
-All flags except `-c, --config` are optional.  
-After starting the app with any flag except `-p, --purge` the database watcher will initiate. 
+#### Config file
 
-Because of the variety of terminal window widths, there are options to customize the lengths (in characters) of displayed columns and rows. Specified lengths are maximum values, which means that if the `l` flag is set to 50 and the actual column value's length is 20, the displayed column's length will be 20. Column name is also taken into account, so if the column's name is `description` and its value is `2006`, the displayed column's length will be 11 (length of the word `description`).
+If a path to a config file hasn't been specified with the `-c,--config` flag, Dbw will list all YML files from the current directory and ask the user to choose one of them. 
+![ConfigChoice](docs/config_choice.png)  
+To use one of the displayed config files, insert its number from the list and press Enter.
 
-Default 120 row length:  
-![DefaultColumnLength](docs/120_row_length.png)
+#### Cleanup
 
-60 row length:  
-![40ColumnLength](docs/40_row_length.png)
+Purge (`-p, --purge` flag) will remove any trace of Dbw from the database by removing all previously created database objects.
 
-Default 17 column length:  
-![DefaultRowLength](docs/17_column_length.png)
+#### Output width
 
-100 column length:  
-![100RowLength](docs/100_column_length.png)
+Because of the variety of terminal window widths, there are options to customize the widths of displayed columns and rows. Specified widths are maximum values, which means that if the `w` flag is set to 50 and the actual column value's character count is 20, the displayed column's width will be 20. Column name is also taken into account, so if the column's name is `description` and its value is `2006`, the displayed column's width will be 11 (length of the word `description`).
 
-Too short or too long lengths can cause the output to be unreadable so some adjustments may be necessary. 
+Default 120 row width:  
+![DefaultColumnWidth](docs/120_row_width.png)
+
+60 row width:  
+![40ColumnWidth](docs/40_row_width.png)
+
+Default 17 column width:  
+![DefaultRowWidth](docs/17_column_width.png)
+
+100 column width:  
+![100RowWidth](docs/100_column_width.png)
+
+Too short or too long widths can cause the output to be unreadable so some adjustments may be necessary. 
 
 ### Output
 
@@ -112,9 +125,13 @@ Updated columns are bordered:
 ![updatedVsNotUpdatedColumns](docs/updated_vs_not_updated_columns.png)  
 `release_year` column has been updated, and `description` hasn't.
 
-In many cases the column's value is too long to be displayed in the columns part of the output. If the value exceeds the maximum length of a column, it will get truncated and ended with an ellipsis. 
-Values that got truncated and were updated in the given operation, are fully displayed below the columns section. For example, if the date in `last_update` column was too long:  
+In many cases the column's value is too long to be displayed in the columns part of the output. If the value exceeds the maximum length of a column, it will get truncated and ended with an ellipsis.  
+With the `-v,--verboseDiff` flag, values that got truncated and were updated in the given operation, are fully displayed below the columns section. For example, if the date in `last_update` column was too long:  
 ![fullColumnDiff](docs/full_column_diff.png)
+
+### Caching
+
+Dbw saves the config file's checksum in the `dbw.cache` file, which is created in the current directory after the first launch. The current and previous checksums are compared during the app's initialization and if they are different, i.e. the config file has been modified, Dbw will carry out the evaluation described in the Usage section of this instruction. 
 
 ## Requirements
 

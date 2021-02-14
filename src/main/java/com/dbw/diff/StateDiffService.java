@@ -18,7 +18,6 @@ import com.dbw.err.StateDataValidationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.output.OutputBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -74,9 +73,9 @@ public class StateDiffService implements DiffService {
         short rowNumber = -1;
         for (StateColumn stateColumn : stateColumns) {
             int stateColumnLength = 
-                (stateColumn.getMaxLength() > TableDiffBuilder.getMaxColumnLength() ? TableDiffBuilder.getMaxColumnLength() : stateColumn.getMaxLength());
+                (stateColumn.getMaxLength() > TableDiffBuilder.getMaxColumnWidth() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxLength());
             stateColumnLength += paddingLength;
-            if (rowNumber < 0 || characterCount + stateColumnLength > TableDiffBuilder.getMaxRowLength()) {
+            if (rowNumber < 0 || characterCount + stateColumnLength > TableDiffBuilder.getMaxRowWidth()) {
                 List<StateColumn> newRow = new ArrayList<StateColumn>();
                 rows.add(newRow);
                 rowNumber++;
