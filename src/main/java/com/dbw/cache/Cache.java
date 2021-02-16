@@ -30,11 +30,14 @@ public class Cache {
         }
     }
 
-    public boolean compareConfigFileChecksums(String currentChecksum) throws IOException, NoSuchAlgorithmException {
+    public boolean compareConfigFileChecksums(String path, String currentChecksum) throws IOException, NoSuchAlgorithmException {
         boolean areNotEqual = true;
         if (getPersistentCache().isPresent()) {
-            String previousChecksum = getPersistentCache().get().getConfig().getChecksum();
-            areNotEqual = !currentChecksum.equals(previousChecksum);
+            Optional<ConfigCache> configCache = getPersistentCache().get().getConfig(path);
+            if (configCache.isPresent()) {
+                String previousChecksum = configCache.get().getChecksum();
+                areNotEqual = !currentChecksum.equals(previousChecksum);
+            }
         }
         return areNotEqual;
     }
@@ -47,15 +50,15 @@ public class Cache {
 
     public void persist() {
         try (FileOutputStream fout = new FileOutputStream(CACHE_FILE_PATH, false);
-            ObjectOutputStream oos = new ObjectOutputStream(fout);) {
+            ObjectOutputStream oos = new ObjectOutputStream(fout)) {
             oos.writeObject(persistentCache.get());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void delete() {
-        File file = new File(CACHE_FILE_PATH);
-        file.delete();
+    public void deleteConfig(String path) {
+        getPersistentCache().get().removeConfig(path);
+        persist();
     }
 }

@@ -59,12 +59,12 @@ public class App {
             File configFile = new File(configPath);
             config = ConfigParser.fromYMLFile(configFile);
             String configFileChecksum = ConfigParser.getFileChecksum(configFile);
-            configChanged = cache.compareConfigFileChecksums(configFileChecksum);
+            configChanged = cache.compareConfigFileChecksums(config.getPath(), configFileChecksum);
             if (configChanged) {
                 ConfigCache configCache = new ConfigCache();
                 configCache.setChecksum(configFileChecksum);
                 cache.createPersistentCacheIfDoesntExist();
-                cache.getPersistentCache().get().setConfig(configCache);
+                cache.getPersistentCache().get().setConfig(config.getPath(), configCache);
                 cache.persist();
             }
             setDb();
@@ -120,7 +120,7 @@ public class App {
         } else {
             Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
         }
-        cache.delete();
+        cache.deleteConfig(config.getPath());
     }
 
     private boolean confirmPurge() throws PurgeException {

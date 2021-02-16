@@ -3,6 +3,9 @@ target/
 .project
 .settings/
 .vscode/
+.idea/
+.gradle/
+*.iml
 config/*
 !config/test.yml
 lib/

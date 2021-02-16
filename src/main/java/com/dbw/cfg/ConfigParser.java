@@ -34,6 +34,7 @@ public class ConfigParser {
         Config config = null;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         config = mapper.readValue(file, Config.class);
+        config.setPath(file.getPath());
         return config;
     }
 
