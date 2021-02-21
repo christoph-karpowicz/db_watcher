@@ -1,18 +1,7 @@
 package com.dbw.diff;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.dbw.app.ObjectCreator;
-import com.dbw.db.AuditRecord;
-import com.dbw.db.Common;
-import com.dbw.db.Database;
-import com.dbw.db.Operation;
-import com.dbw.db.Postgres;
+import com.dbw.db.*;
 import com.dbw.err.StateDataProcessingException;
 import com.dbw.err.StateDataValidationException;
 import com.dbw.log.ErrorMessages;
@@ -22,19 +11,28 @@ import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Singleton
 public class StateDiffService implements DiffService {
     private final String DATE_FMT = "MM-dd-yyyy HH:mm:ss";
-    
+
     @Inject
     private TableDiffBuilder tableDiffBuilder;
     @Inject
     private ColumnDiffBuilder columnDiffBuilder;
 
-    public Diff createDiff(Database db, AuditRecord auditRecord) throws StateDataProcessingException {
+    public Diff createDiff(Database db, AuditRecord auditRecord) throws StateDataProcessingException, SQLException {
         Diff diff;
         if (db instanceof Postgres) {
-            diff = new JsonDiff((Postgres)db, auditRecord.getTableName());
+            String[] tableColumnNames = ((Postgres)db).getWatchedTablesColumnNames().get(auditRecord.getTableName());
+            diff = new JsonDiff(tableColumnNames);
         } else {
             diff = ObjectCreator.create(XmlDiff.class);
         }
@@ -67,7 +65,7 @@ public class StateDiffService implements DiffService {
     }
 
     private List<List<StateColumn>> getStateColumnsDividedIntoRows(List<StateColumn> stateColumns) {
-        List<List<StateColumn>> rows = new ArrayList<List<StateColumn>>();
+        List<List<StateColumn>> rows = new ArrayList<>();
         int paddingLength = OutputBuilder.PADDING.length() * 2;
         short characterCount = 0;
         short rowNumber = -1;
@@ -76,7 +74,7 @@ public class StateDiffService implements DiffService {
                 (stateColumn.getMaxWidth() > TableDiffBuilder.getMaxColumnWidth() ? TableDiffBuilder.getMaxColumnWidth() : stateColumn.getMaxWidth());
             stateColumnWidth += paddingLength;
             if (rowNumber < 0 || characterCount + stateColumnWidth > TableDiffBuilder.getMaxRowWidth()) {
-                List<StateColumn> newRow = new ArrayList<StateColumn>();
+                List<StateColumn> newRow = new ArrayList<>();
                 rows.add(newRow);
                 rowNumber++;
                 characterCount = 0;
@@ -88,9 +86,9 @@ public class StateDiffService implements DiffService {
         return rows;
     } 
 
-    public String findColumnDiff(StateColumn stateColumn, short count) {
+    public String findColumnDiff(StateColumn stateColumn) {
         columnDiffBuilder.init();
-        columnDiffBuilder.build(stateColumn, count);
+        columnDiffBuilder.build(stateColumn);
         return columnDiffBuilder.toString();
     }
 

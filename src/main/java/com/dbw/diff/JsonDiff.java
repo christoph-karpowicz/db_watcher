@@ -1,36 +1,28 @@
 package com.dbw.diff;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.dbw.db.Common;
 import com.dbw.db.Postgres;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
-public class JsonDiff extends Diff {
-    private Postgres db;
-    private String tableName;
+import java.util.*;
 
-    public JsonDiff(Postgres db, String tableName) {
-        this.db = db;
-        this.tableName = tableName;
+public class JsonDiff extends Diff {
+    private final String[] tableColumnNames;
+
+    public JsonDiff(String[] tableColumnNames) {
+        this.tableColumnNames = tableColumnNames;
     }
-    
-    protected Map<String, Object> parseData(String data) throws JsonProcessingException, JsonMappingException {
-        Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
+
+    protected Map<String, Object> parseData(String data) throws JsonProcessingException {
+        Map<String, Object> parsedData = new LinkedHashMap<>();
         if (Strings.isNullOrEmpty(data)) {
             return ImmutableMap.copyOf(parsedData);
         }
         Map<String, Object> parsedJson = new ObjectMapper().readValue(data, LinkedHashMap.class);
-        List<Object> parsedJsonValues = new ArrayList<Object>(parsedJson.values());
-        String[] tableColumnNames = db.getWatchedTablesColumnNames().get(tableName);
+        List<Object> parsedJsonValues = new ArrayList<>(parsedJson.values());
         for (short i = 0; i < tableColumnNames.length; i++) {
             Object columnStateValue = Optional.ofNullable(parsedJsonValues.get(i)).orElse(Common.NULL_AS_STRING);
             parsedData.put(tableColumnNames[i], columnStateValue);

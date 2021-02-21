@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbOperationException;
@@ -23,8 +24,8 @@ public class Orcl extends Database {
     private final String COL_NAME_ALIAS = "COLUMN_NAME";
     private final String DATA_TYPE_ALIAS = "DATA_TYPE";
 
-    public Orcl(DatabaseConfig config) {
-        super(config);
+    public Orcl(Config config) {
+        super(config.getDatabase());
     }
 
     public void connect() throws DbConnectionException {

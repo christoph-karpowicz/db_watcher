@@ -11,7 +11,7 @@ public class ColumnDiffBuilder implements OutputBuilder {
         builder = new StringBuilder();
     }
 
-    public void build(StateColumn stateColumn, short count) {
+    public void build(StateColumn stateColumn) {
         builder.append(SM_HR);
         builder.append(NEW_LINE);
         builder.append(stateColumn.getColumnName() + VERBOSE_DIFF_DIFF);

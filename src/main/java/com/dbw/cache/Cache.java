@@ -1,19 +1,17 @@
 package com.dbw.cache;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Optional;
-
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
+import com.google.inject.Singleton;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.List;
+import java.util.Optional;
+
+@Singleton
 public class Cache {
     public static final String CACHE_FILE_PATH = "./dbw.cache";
     private Optional<PersistentCache> persistentCache;
@@ -31,7 +29,7 @@ public class Cache {
         }
     }
 
-    public boolean compareConfigFileChecksums(String path, String currentChecksum) throws IOException, NoSuchAlgorithmException {
+    public boolean compareConfigFileChecksums(String path, String currentChecksum) {
         boolean areNotEqual = true;
         if (getPersistentCache().isPresent()) {
             Optional<ConfigCache> configCache = getPersistentCache().get().getConfig(path);

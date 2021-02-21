@@ -54,10 +54,9 @@ public class AuditFrameBuilder implements OutputBuilder {
     public String findVerboseColumnDiffs() {
         StringBuilder columnDiffBuilder = new StringBuilder();
 
-        short diffCount = 0;
         for (StateColumn stateColumn : stateColumns) {
             if (stateColumn.hasDiff() && stateColumn.isCut()) {
-                columnDiffBuilder.append(diffService.findColumnDiff(stateColumn, ++diffCount));
+                columnDiffBuilder.append(diffService.findColumnDiff(stateColumn));
             }
         }
         

@@ -1,5 +1,6 @@
 package com.dbw.frame;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,12 +31,12 @@ public class AuditFrame {
         this.db = db;
     }
 
-    public void createDiff() throws StateDataProcessingException {
+    public void createDiff() throws StateDataProcessingException, SQLException {
         diff = diffService.createDiff(db, auditRecord);
     }
 
     public void createStateColumns() {
-        stateColumns = new ArrayList<StateColumn>();
+        stateColumns = new ArrayList<>();
         Set<String> columnNames = diff.getStateColumnNames(auditRecord.getOperation());
         for (String columnName : columnNames) {
             String oldStateValue = diffService.stateValueToString(diff.getOldState().get(columnName));

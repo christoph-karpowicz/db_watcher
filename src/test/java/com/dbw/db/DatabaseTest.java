@@ -33,9 +33,8 @@ public class DatabaseTest {
     
     @Test
     public void shouldBeTheRightDatabaseType() {
-        DatabaseConfig dbConfig = config.getDatabase();
         try {
-            db = DatabaseFactory.getDatabase(dbConfig);
+            db = DatabaseFactory.getDatabase(config);
         } catch (Exception e) {
             fail(e.getMessage());
         }

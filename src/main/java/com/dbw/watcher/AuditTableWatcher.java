@@ -86,7 +86,7 @@ public class AuditTableWatcher implements Watcher {
         }
     }
 
-    private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws StateDataProcessingException {
+    private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws StateDataProcessingException, SQLException {
         AuditFrame frame = ObjectCreator.create(AuditFrame.class);
         frame.setAuditRecord(auditRecord);
         frame.setDb(db);
@@ -112,7 +112,7 @@ public class AuditTableWatcher implements Watcher {
             if (lastIdMinusN <= 0) {
                 Logger.log(Level.WARNING, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
             }
-            return lastIdMinusN > 0 ? lastIdMinusN : 0;
+            return Math.max(lastIdMinusN, 0);
         }
         return lastId;
     }

@@ -37,8 +37,9 @@ import com.google.inject.Inject;
 public class App {
     @Inject
     private AuditTableWatcher watcher;
-    
+    @Inject
     private Cache cache;
+
     public static CLI.ParsedOptions options;
     private Config config;
     private boolean configChanged;
@@ -46,7 +47,6 @@ public class App {
     
     public void init(String[] args) throws AppInitException {
         try {
-            cache = new Cache();
             cache.load();
             CLI cli = new CLI();
             cli.init(args);
@@ -86,8 +86,7 @@ public class App {
     }
 
     private void setDb() throws UnknownDbTypeException {
-        DatabaseConfig dbConfig = config.getDatabase();
-        db = DatabaseFactory.getDatabase(dbConfig);
+        db = DatabaseFactory.getDatabase(config);
     }
 
     private void connectToDb() throws DbConnectionException {

@@ -4,10 +4,10 @@ import java.util.Objects;
 
 public class StateColumn {
     private boolean diff;
-    private String columnName;
-    private String oldState;
-    private String newState;
-    private int maxWidth;
+    private final String columnName;
+    private final String oldState;
+    private final String newState;
+    private final int maxWidth;
     private boolean isCut;
 
     public StateColumn(String columnName, String oldState, String newState) {

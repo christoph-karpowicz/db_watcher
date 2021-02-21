@@ -8,9 +8,9 @@ import com.dbw.log.ErrorMessages;
 import com.dbw.state.XmlStateBuilder;
 
 public class OrclPrepareService {
-    private XmlStateBuilder xmlStateBuilder;
-    private Orcl db;
-    private List<String> watchedTables;
+    private final XmlStateBuilder xmlStateBuilder;
+    private final Orcl db;
+    private final List<String> watchedTables;
     
     public OrclPrepareService(Orcl db, List<String> watchedTables) {
         this.db = db;

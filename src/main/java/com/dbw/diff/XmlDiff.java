@@ -1,31 +1,26 @@
 package com.dbw.diff;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-
+import com.dbw.db.Common;
+import com.dbw.state.*;
+import com.dbw.util.HtmlInXmlEscaper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.dbw.db.Common;
-import com.dbw.state.XmlColumnState;
-import com.dbw.state.XmlColumnStates;
-import com.dbw.state.XmlStateBuilder;
-import com.dbw.state.XmlStateTag;
-import com.dbw.state.XmlStateTagAttribute;
-import com.dbw.util.HtmlInXmlEscaper;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Singleton
 public class XmlDiff extends Diff {
     @Inject
     private HtmlInXmlEscaper htmlInXmlEscaper;
     
-    protected Map<String, Object> parseData(String data) throws JsonProcessingException, JsonMappingException {
-        Map<String, Object> parsedData = new LinkedHashMap<String, Object>();
+    protected Map<String, Object> parseData(String data) throws JsonProcessingException {
+        Map<String, Object> parsedData = new LinkedHashMap<>();
         if (Strings.isNullOrEmpty(data)) {
             return ImmutableMap.copyOf(parsedData);
         }

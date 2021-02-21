@@ -1,12 +1,12 @@
 package com.dbw.diff;
 
-import java.util.List;
-import java.util.Objects;
-
 import com.dbw.app.App;
 import com.dbw.db.Operation;
 import com.dbw.output.OutputBuilder;
 import com.google.inject.Singleton;
+
+import java.util.List;
+import java.util.Objects;
 
 @Singleton
 public class TableDiffBuilder implements OutputBuilder {
@@ -98,18 +98,21 @@ public class TableDiffBuilder implements OutputBuilder {
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
         int maxWidth = getFinalMaxColumnWidth(stateColumn);
         int substringLength = maxWidth - ELLIPSIS.length();
-        String finalValue = (onlyIfDiff && !stateColumn.hasDiff()) ? "" : value;
-        int valueLength = finalValue.length();
+        String initialFinalValue = (onlyIfDiff && !stateColumn.hasDiff()) ? "" : value;
+        StringBuilder finalValueBuilder = new StringBuilder(initialFinalValue);
+        int valueLength = finalValueBuilder.length();
         if (valueLength > maxWidth) {
-            finalValue = value.substring(0, substringLength) + ELLIPSIS;
+            finalValueBuilder.setLength(0);
+            finalValueBuilder.append(value, 0, substringLength);
+            finalValueBuilder.append(ELLIPSIS);
             stateColumn.setCut(true);
         } else if (valueLength < maxWidth) {
             int lengthDiff = substringLength + ELLIPSIS.length() - valueLength;
             for (short i = 0; i < lengthDiff; i++) {
-                finalValue += padding;
+                finalValueBuilder.append(padding);
             }
         }
-        builder.append(finalValue);
+        builder.append(finalValueBuilder.toString());
         builder.append(stateColumn.hasDiff() ? DIFF_VERTICAL_BORDER : PADDING);
         builder.append(PADDING);
     }
