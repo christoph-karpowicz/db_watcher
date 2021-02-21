@@ -7,10 +7,10 @@ import java.util.Optional;
 
 public class PersistentCache implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Map<String, ConfigCache> configs;
+    private final Map<String, ConfigCache> configs;
 
     public PersistentCache() {
-        configs = new HashMap<String, ConfigCache>();
+        configs = new HashMap<>();
     }
 
     public Map<String, ConfigCache> getConfigs() {

@@ -55,6 +55,9 @@ public class OrclPrepareService {
     private void createAuditTriggers() {
         for (String tableName : watchedTables) {
             try {
+                if (db.auditTriggerExists(tableName)) {
+                    continue;
+                }
                 Column[] tableColumns = db.selectTableColumns(tableName);
                 String newStateConcat = xmlStateBuilder.build(OrclSpec.NEW_STATE_PREFIX, tableColumns);
                 String oldStateConcat = xmlStateBuilder.build(OrclSpec.OLD_STATE_PREFIX, tableColumns);
@@ -69,9 +72,7 @@ public class OrclPrepareService {
                     tableName,
                     tableName
                 );
-                if (!db.auditTriggerExists(tableName)) {
-                    db.createAuditTrigger(tableName, auditTriggerQuery);
-                }
+                db.createAuditTrigger(tableName, auditTriggerQuery);
             } catch (SQLException e) {
                 String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableName, e.getMessage());
                 new PreparationException(errMsg, e).setRecoverable().handle();

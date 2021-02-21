@@ -65,7 +65,7 @@ public abstract class Database {
         stmt.close();
     }
 
-    public static String formatQuery(String query, Object... params) {
+    public String formatQuery(String query, Object... params) {
         if (params.length > 0) {
             return String.format(query, params);
         }

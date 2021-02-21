@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 
 import com.dbw.log.Level;
@@ -46,6 +47,15 @@ public class Cache {
         if (!persistentCache.isPresent()) {
             persistentCache = Optional.of(new PersistentCache());
         }
+    }
+
+    public ConfigCache createOrGetConfigCache(String path) {
+        Optional<ConfigCache> persistedConfigCache = getPersistentCache().get().getConfig(path);
+        return persistedConfigCache.orElseGet(ConfigCache::new);
+    }
+
+    public List<String> getConfigTables(String path) {
+        return getPersistentCache().get().getConfig(path).get().getTables();
     }
 
     public void persist() {

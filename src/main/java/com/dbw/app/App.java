@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -50,27 +52,32 @@ public class App {
             cli.init(args);
             options = cli.handleArgs();
             Optional<String> configPathArg = options.getConfigPath();
-            String configPath;
-            if (configPathArg.isPresent()) {
-                configPath = configPathArg.get();
-            } else {
-                configPath = chooseConfigFile();
-            }
-            File configFile = new File(configPath);
-            config = ConfigParser.fromYMLFile(configFile);
-            String configFileChecksum = ConfigParser.getFileChecksum(configFile);
-            configChanged = cache.compareConfigFileChecksums(config.getPath(), configFileChecksum);
-            if (configChanged) {
-                ConfigCache configCache = new ConfigCache();
-                configCache.setChecksum(configFileChecksum);
-                cache.createPersistentCacheIfDoesntExist();
-                cache.getPersistentCache().get().setConfig(config.getPath(), configCache);
-                cache.persist();
-            }
+            loadAndCacheConfig(configPathArg);
             setDb();
             connectToDb();
         } catch (Exception e) {
             throw new AppInitException(e.getMessage(), e);
+        }
+    }
+
+    private void loadAndCacheConfig(Optional<String> configPathArg) throws IOException, NoSuchAlgorithmException, ConfigException {
+        String configPath;
+        if (configPathArg.isPresent()) {
+            configPath = configPathArg.get();
+        } else {
+            configPath = chooseConfigFile();
+        }
+        File configFile = new File(configPath);
+        config = ConfigParser.fromYMLFile(configFile);
+        String configFileChecksum = ConfigParser.getFileChecksum(configFile);
+        configChanged = cache.compareConfigFileChecksums(config.getPath(), configFileChecksum);
+        if (configChanged) {
+            cache.createPersistentCacheIfDoesntExist();
+            ConfigCache configCache = cache.createOrGetConfigCache(config.getPath());
+            configCache.setChecksum(configFileChecksum);
+            configCache.setTables(config.getTables());
+            cache.getPersistentCache().get().setConfig(config.getPath(), configCache);
+            cache.persist();
         }
     }
     
@@ -115,7 +122,8 @@ public class App {
         if (!isConfirmed) {
             return;
         }
-        if (db.purge(config.getTables())) {
+        List<String> tables = cache.getConfigTables(config.getPath());
+        if (db.purge(tables)) {
             Logger.log(Level.INFO, SuccessMessages.CLI_PURGE);
         } else {
             Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
@@ -128,11 +136,7 @@ public class App {
             System.out.println(LogMessages.CONFIRM_PURGE);
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             String input = reader.readLine();
-            if (input.equals("y") || input.equals("Y")) {
-                return true;
-            } else {
-                return false;
-            }
+            return input.equals("y") || input.equals("Y");
         } catch (IOException e) {
             throw new PurgeException(e.getMessage(), e);
         }
