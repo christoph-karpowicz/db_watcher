@@ -14,9 +14,9 @@ import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 
 public class Cache {
-    public final String CACHE_FILE_PATH = "./dbw.cache";
+    public static final String CACHE_FILE_PATH = "./dbw.cache";
     private Optional<PersistentCache> persistentCache;
-    
+
     public Optional<PersistentCache> getPersistentCache() {
         return persistentCache;
     }
@@ -49,15 +49,16 @@ public class Cache {
     }
 
     public void persist() {
-        try (FileOutputStream fout = new FileOutputStream(CACHE_FILE_PATH, false);
-            ObjectOutputStream oos = new ObjectOutputStream(fout)) {
-            oos.writeObject(persistentCache.get());
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (!persistentCache.isPresent()) {
+            return;
         }
+        CachePersister cachePersister = new CachePersister();
+        cachePersister.setPersistentCache(persistentCache.get());
+        Thread cachePersisterThread = new Thread(cachePersister);
+        cachePersisterThread.start();
     }
 
-    public void deleteConfig(String path) {
+    public void removeConfig(String path) {
         getPersistentCache().get().removeConfig(path);
         persist();
     }

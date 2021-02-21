@@ -13,4 +13,5 @@ public class ErrorMessages {
     public final static String CONFIG_NO_YML_FILES = "No YML files found in the current directory. Create a config file in the current directory, start the application from a directory with a config file or use the \"c\" flag to specify the config file's path";
     public final static String CREATE_AUDIT_TABLE = "Failed to create an audit table. (%s)";
     public final static String CREATE_AUDIT_TRIGGER = "Failed to create an audit trigger for \"%s\" table. (%s)";
+    public final static String CACHE_PERSIST_FAILED = "Saving cache to dbw.cache file failed.";
 }

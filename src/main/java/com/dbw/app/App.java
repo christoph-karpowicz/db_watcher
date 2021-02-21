@@ -120,7 +120,7 @@ public class App {
         } else {
             Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
         }
-        cache.deleteConfig(config.getPath());
+        cache.removeConfig(config.getPath());
     }
 
     private boolean confirmPurge() throws PurgeException {
