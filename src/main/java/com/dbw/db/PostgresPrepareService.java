@@ -4,15 +4,12 @@ import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class PostgresPrepareService {
     private final Postgres db;
-    private final List<String> watchedTables;
 
-    public PostgresPrepareService(Postgres db, List<String> watchedTables) {
+    public PostgresPrepareService(Postgres db) {
         this.db = db;
-        this.watchedTables = watchedTables;
     }
 
     public void prepare() throws PreparationException {
@@ -50,7 +47,7 @@ public class PostgresPrepareService {
     private void dropUnusedAuditTriggers() throws SQLException {
         String[] auditTriggers = db.selectAuditTriggers();
         for (String auditTriggerName : auditTriggers) {
-            if (!watchedTables.contains(auditTriggerName)) {
+            if (!db.getWatchedTables().contains(auditTriggerName)) {
                 try {
                     db.dropAuditTrigger(auditTriggerName);
                 } catch (SQLException e) {
@@ -61,7 +58,7 @@ public class PostgresPrepareService {
     }
 
     private void createAuditTriggers() {
-        for (String tableName : watchedTables) {
+        for (String tableName : db.getWatchedTables()) {
             try {
                 if (!db.auditTriggerExists(tableName)) {
                     db.createAuditTrigger(tableName);

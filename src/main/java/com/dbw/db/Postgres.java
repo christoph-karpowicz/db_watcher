@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.dbw.cfg.Config;
-import com.dbw.cfg.DatabaseConfig;
 import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.DbConnectionException;
@@ -30,19 +29,17 @@ public class Postgres extends Database {
         Common.COLNAME_TIMESTAMP
     };
 
-    private final List<String> watchedTables;
     private Map<String, String[]> watchedTablesColumnNames;
     private final String DRIVER = "org.postgresql.Driver";
     
     public Postgres(Config config) {
-        super(config.getDatabase());
-        this.watchedTables = config.getTables();
+        super(config);
     }
 
     public void connect() throws DbConnectionException {
         try {
             Class.forName(DRIVER);
-            Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
+            Connection conn = DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
             setConn(conn);
             Logger.log(Level.INFO, LogMessages.DB_OPENED);
         } catch (SQLException | ClassNotFoundException e) {
@@ -51,18 +48,18 @@ public class Postgres extends Database {
     }
 
     private String getConnectionString() {
-        if (config.getConnectionString() != null) {
-            return config.getConnectionString();
+        if (dbConfig.getConnectionString() != null) {
+            return dbConfig.getConnectionString();
         }
         
-        return "jdbc:" + config.getType() +
-                "://" + config.getHost() +
-                ":" + config.getPort() +
-                "/" + config.getName();
+        return "jdbc:" + dbConfig.getType() +
+                "://" + dbConfig.getHost() +
+                ":" + dbConfig.getPort() +
+                "/" + dbConfig.getName();
     }
 
-    public void prepare(List<String> watchedTables) throws PreparationException {
-        PostgresPrepareService postgresPrepareService = new PostgresPrepareService(this, watchedTables);
+    public void prepare() throws PreparationException {
+        PostgresPrepareService postgresPrepareService = new PostgresPrepareService(this);
         postgresPrepareService.prepare();
     }
 
@@ -71,7 +68,7 @@ public class Postgres extends Database {
             return watchedTablesColumnNames;
         }
         Map<String, String[]> tableColumnNames = new HashMap<>();
-        for (String tableName : watchedTables) {
+        for (String tableName : getWatchedTables()) {
             tableColumnNames.put(tableName, selectTableColumnNames(tableName));
         }
         watchedTablesColumnNames = ImmutableMap.copyOf(tableColumnNames);

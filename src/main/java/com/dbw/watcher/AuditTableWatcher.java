@@ -42,7 +42,7 @@ public class AuditTableWatcher implements Watcher {
         Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
         if (configChanged) {
             Logger.log(Level.INFO, LogMessages.DB_PREPARATION);
-            db.prepare(watchedTables);
+            db.prepare();
         } else {
             Logger.log(Level.INFO, LogMessages.CONFIG_UNCHANGED);
         }

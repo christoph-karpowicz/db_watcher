@@ -11,10 +11,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.dbw.cache.Cache;
-import com.dbw.cache.ConfigCache;
+import com.dbw.cache.ConfigCachePersister;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
-import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cli.CLI;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
@@ -72,15 +71,15 @@ public class App {
         String configFileChecksum = ConfigParser.getFileChecksum(configFile);
         configChanged = cache.compareConfigFileChecksums(config.getPath(), configFileChecksum);
         if (configChanged) {
-            cache.createPersistentCacheIfDoesntExist();
-            ConfigCache configCache = cache.createOrGetConfigCache(config.getPath());
-            configCache.setChecksum(configFileChecksum);
-            configCache.setTables(config.getTables());
-            cache.getPersistentCache().get().setConfig(config.getPath(), configCache);
-            cache.persist();
+            ConfigCachePersister configCachePersister = new ConfigCachePersister();
+            configCachePersister.setCache(cache);
+            configCachePersister.setConfig(config);
+            configCachePersister.setConfigFileChecksum(configFileChecksum);
+            Thread configCachePersisterThread = new Thread(configCachePersister);
+            configCachePersisterThread.start();
         }
     }
-    
+
     private String chooseConfigFile() throws IOException, ConfigException {
         return ConfigParser.getConfigFileNameFromInput();
     }
@@ -159,7 +158,7 @@ public class App {
                 try {
                     shutdown();
                 } catch (SQLException e) {
-                    System.err.println(e.getClass().getName() + ": " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         });

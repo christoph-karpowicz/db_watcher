@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dbw.cfg.Config;
-import com.dbw.cfg.DatabaseConfig;
 import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.DbConnectionException;
@@ -25,13 +24,13 @@ public class Orcl extends Database {
     private final String DATA_TYPE_ALIAS = "DATA_TYPE";
 
     public Orcl(Config config) {
-        super(config.getDatabase());
+        super(config);
     }
 
     public void connect() throws DbConnectionException {
         try {
             Class.forName(DRIVER);
-            Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
+            Connection conn = DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
             setConn(conn);
             Logger.log(Level.INFO, LogMessages.DB_OPENED);
         } catch (SQLException e) {
@@ -42,16 +41,16 @@ public class Orcl extends Database {
     }
 
     private String getConnectionString() {
-        return config.getConnectionString();
+        return dbConfig.getConnectionString();
     }
 
-    public void prepare(List<String> watchedTables) throws PreparationException {
-        OrclPrepareService orclPrepareService = new OrclPrepareService(this, watchedTables);
+    public void prepare() throws PreparationException {
+        OrclPrepareService orclPrepareService = new OrclPrepareService(this);
         orclPrepareService.prepare();
     }
 
     public boolean auditTableExists() throws SQLException {
-        String[] stringArgs = {config.getUser().toUpperCase(), Common.DBW_AUDIT_TABLE_NAME};
+        String[] stringArgs = {dbConfig.getUser().toUpperCase(), Common.DBW_AUDIT_TABLE_NAME};
         return objectExists(OrclQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 

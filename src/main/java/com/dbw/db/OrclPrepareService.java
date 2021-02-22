@@ -10,11 +10,9 @@ import com.dbw.state.XmlStateBuilder;
 public class OrclPrepareService {
     private final XmlStateBuilder xmlStateBuilder;
     private final Orcl db;
-    private final List<String> watchedTables;
-    
-    public OrclPrepareService(Orcl db, List<String> watchedTables) {
+
+    public OrclPrepareService(Orcl db) {
         this.db = db;
-        this.watchedTables = watchedTables;
         this.xmlStateBuilder = new XmlStateBuilder();
     }
 
@@ -43,7 +41,7 @@ public class OrclPrepareService {
         try {
             String[] auditTriggers = db.selectAuditTriggers();
             for (String auditTriggerName : auditTriggers) {
-                if (!watchedTables.contains(auditTriggerName)) {
+                if (!db.getWatchedTables().contains(auditTriggerName)) {
                     db.dropAuditTrigger(auditTriggerName);
                 }
             }
@@ -53,7 +51,7 @@ public class OrclPrepareService {
     }
 
     private void createAuditTriggers() {
-        for (String tableName : watchedTables) {
+        for (String tableName : db.getWatchedTables()) {
             try {
                 if (db.auditTriggerExists(tableName)) {
                     continue;

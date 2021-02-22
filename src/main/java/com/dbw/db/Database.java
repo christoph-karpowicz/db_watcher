@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cli.CLI;
 import com.dbw.err.DbConnectionException;
@@ -20,11 +21,17 @@ import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
 
 public abstract class Database {
-    protected DatabaseConfig config;
+    protected DatabaseConfig dbConfig;
     private Connection conn;
+    private final List<String> watchedTables;
 
-    public Database(DatabaseConfig config) {
-        this.config = config;
+    public Database(Config config) {
+        this.dbConfig = config.getDatabase();
+        this.watchedTables = config.getTables();
+    }
+
+    public List<String> getWatchedTables() {
+        return watchedTables;
     }
 
     public abstract String deleteFirstNRows(String nRows) throws SQLException;
@@ -162,13 +169,13 @@ public abstract class Database {
         this.conn = conn;
     }
 
-    public DatabaseConfig getConfig() {
-        return config;
+    public DatabaseConfig getDbConfig() {
+        return dbConfig;
     }
 
     public abstract void connect() throws DbConnectionException;
 
-    public abstract void prepare(List<String> watchedTables) throws PreparationException;
+    public abstract void prepare() throws PreparationException;
 
     public abstract boolean purge(List<String> watchedTables);
 
