@@ -1,5 +1,6 @@
 package com.dbw.frame;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.dbw.app.App;
@@ -7,6 +8,7 @@ import com.dbw.db.AuditRecord;
 import com.dbw.db.Operation;
 import com.dbw.diff.StateColumn;
 import com.dbw.diff.StateDiffService;
+import com.dbw.diff.TableDiffBuilder;
 import com.dbw.output.OutputBuilder;
 import com.google.inject.Inject;
 
@@ -31,7 +33,8 @@ public class AuditFrameBuilder implements OutputBuilder {
     }
     
     public void build() {
-        builder.append(LG_HR);
+        builder.append(String.join("", Collections.nCopies(TableDiffBuilder.getMaxRowWidth(), HR)));
+        builder.append(DIFF_VERTICAL_BORDER);
         builder.append(NEW_LINE);
         builder.append(FRAME_HEADER_ID + auditRecord.getId());
         builder.append(NEW_LINE);

@@ -3,6 +3,8 @@ package com.dbw.diff;
 import com.dbw.output.OutputBuilder;
 import com.google.inject.Singleton;
 
+import java.util.Collections;
+
 @Singleton
 public class ColumnDiffBuilder implements OutputBuilder {
     private StringBuilder builder;
@@ -12,7 +14,7 @@ public class ColumnDiffBuilder implements OutputBuilder {
     }
 
     public void build(StateColumn stateColumn) {
-        builder.append(SM_HR);
+        builder.append(String.join("", Collections.nCopies(TableDiffBuilder.getMaxRowWidth() / 2, HR)));
         builder.append(NEW_LINE);
         builder.append(stateColumn.getColumnName() + VERBOSE_DIFF_DIFF);
         builder.append(NEW_LINE);

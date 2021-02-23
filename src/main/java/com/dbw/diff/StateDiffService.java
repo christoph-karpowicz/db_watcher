@@ -66,7 +66,7 @@ public class StateDiffService implements DiffService {
 
     private List<List<StateColumn>> getStateColumnsDividedIntoRows(List<StateColumn> stateColumns) {
         List<List<StateColumn>> rows = new ArrayList<>();
-        int paddingLength = OutputBuilder.PADDING.length() * 2;
+        int paddingLength = OutputBuilder.PADDING.length() * 4;
         short characterCount = 0;
         short rowNumber = -1;
         for (StateColumn stateColumn : stateColumns) {
@@ -77,9 +77,9 @@ public class StateDiffService implements DiffService {
                 List<StateColumn> newRow = new ArrayList<>();
                 rows.add(newRow);
                 rowNumber++;
-                characterCount = 0;
+                characterCount = (short)stateColumnWidth;
             } else {
-                characterCount += stateColumnWidth;
+                characterCount += (short)stateColumnWidth;
             }
             rows.get(rowNumber).add(stateColumn);
         }

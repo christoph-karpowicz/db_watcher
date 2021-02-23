@@ -46,7 +46,6 @@ public class CLI {
     private Options options;
     private CommandLine cmd;
     private String[] args;
-    private ParsedOptions parsedOptions;
 
     public void init(String[] args) throws ParseException, InvalidCLIOptionInputException {
         setArgs(args);
@@ -92,7 +91,7 @@ public class CLI {
     }
 
     public ParsedOptions parseArgs() throws InvalidCLIOptionInputException {
-        parsedOptions = new ParsedOptions();
+        ParsedOptions parsedOptions = new ParsedOptions();
         parsedOptions.configPath = getConfigOption();
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
@@ -140,7 +139,11 @@ public class CLI {
     private Short getMaxColumnWidthOption() throws NumberFormatException {
         if(cmd.hasOption(OPTIONS_MAX_COL_WIDTH)) {
             String optionValue = cmd.getOptionValue(OPTIONS_MAX_COL_WIDTH);
-            return Short.parseShort(optionValue);
+            Short value = Short.parseShort(optionValue);
+            if (value <= 3) {
+                throw new NumberFormatException(ErrorMessages.CLI_INVALID_MAX_COLUMN_WIDTH);
+            }
+            return value;
         }
         return null;
     }
@@ -148,7 +151,11 @@ public class CLI {
     private Short getMaxRowWidthOption() throws NumberFormatException {
         if(cmd.hasOption(OPTIONS_MAX_ROW_WIDTH)) {
             String optionValue = cmd.getOptionValue(OPTIONS_MAX_ROW_WIDTH);
-            return Short.parseShort(optionValue);
+            Short value = Short.parseShort(optionValue);
+            if (value <= 10) {
+                throw new NumberFormatException(ErrorMessages.CLI_INVALID_MAX_ROW_WIDTH);
+            }
+            return value;
         }
         return null;
     }
