@@ -23,8 +23,8 @@ public class CLI {
     private final String OPTIONS_CONFIG = "config";
     private final String OPTIONS_DEBUG = "debug";
     private final String OPTIONS_DELETE_FIRST_N_ROWS = "deleteFirstNRows";
-    private final String OPTIONS_FILTER = "filter";
     private final String OPTIONS_SHOW_HELP = "help";
+    private final String OPTIONS_INTERVAL = "interval";
     private final String OPTIONS_MAX_COL_WIDTH = "maxColumnWidth";
     private final String OPTIONS_MAX_ROW_WIDTH = "maxRowWidth";
     private final String OPTIONS_PURGE = "purge";
@@ -33,13 +33,13 @@ public class CLI {
     public static final String OPTIONS_CONFIG_FLAG = "c";
     public static final String OPTIONS_DEBUG_FLAG = "d";
     public static final String OPTIONS_DELETE_FIRST_N_ROWS_FLAG = "D";
-    public static final String OPTIONS_FILTER_FLAG = "f";
     public static final String OPTIONS_SHOW_HELP_FLAG = "h";
+    public static final String OPTIONS_INTERVAL_FLAG = "i";
     public static final String OPTIONS_MAX_COL_WIDTH_FLAG = "w";
     public static final String OPTIONS_MAX_ROW_WIDTH_FLAG = "W";
     public static final String OPTIONS_PURGE_FLAG = "p";
     public static final String OPTIONS_SHOW_LAST_N_CHANGES_FLAG = "n";
-    public static final String OPTIONS_VERBOSE_DIFF_FLAG = "v";
+    public static final String OPTIONS_VERBOSE_DIFF_FLAG = "V";
     public static final String ALL_SYMBOL = "*";
     
     private CommandLineParser parser;
@@ -68,8 +68,8 @@ public class CLI {
         options.addOption(OPTIONS_CONFIG_FLAG, OPTIONS_CONFIG, true, "provide a path to the configuration file");
         options.addOption(OPTIONS_DEBUG_FLAG, OPTIONS_DEBUG, false, "show exception classes and stack traces");
         options.addOption(OPTIONS_DELETE_FIRST_N_ROWS_FLAG, OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
-        // options.addOption(OPTIONS_FILTER_FLAG, OPTIONS_FILTER, true, "show only the specified operations and filter out the rest (i - inserts, u - updates, d - deletes, for example: \"-f u,d\")");
         options.addOption(OPTIONS_SHOW_HELP_FLAG, OPTIONS_SHOW_HELP, false, "show help");
+        options.addOption(OPTIONS_INTERVAL_FLAG, OPTIONS_INTERVAL, true, "set the interval in milliseconds in which the application checks whether there were changes in the watched database (default: 500ms)");
         options.addOption(OPTIONS_MAX_COL_WIDTH_FLAG, OPTIONS_MAX_COL_WIDTH, true, "specify the maximum width of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_WIDTH + ")");
         options.addOption(OPTIONS_MAX_ROW_WIDTH_FLAG, OPTIONS_MAX_ROW_WIDTH, true, "specify the maximum width of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_WIDTH + ")");
         options.addOption(OPTIONS_PURGE_FLAG, OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
@@ -95,6 +95,7 @@ public class CLI {
         parsedOptions.configPath = getConfigOption();
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
+        parsedOptions.interval = getInterval();
         parsedOptions.purge = getPurgeOption();
         parsedOptions.verboseDiff = getVerboseDiff();
         try {
@@ -134,6 +135,21 @@ public class CLI {
 
     private boolean getShowHelpOption() {
         return cmd.hasOption(OPTIONS_SHOW_HELP);
+    }
+
+    private Short getInterval() throws NumberFormatException {
+        if(cmd.hasOption(OPTIONS_INTERVAL)) {
+            String optionValue = cmd.getOptionValue(OPTIONS_INTERVAL);
+            Short value = Short.parseShort(optionValue);
+            if (value < 10) {
+                throw new NumberFormatException(ErrorMessages.CLI_INVALID_INTERVAL_SMALL);
+            }
+            if (value > 10000) {
+                throw new NumberFormatException(ErrorMessages.CLI_INVALID_INTERVAL_BIG);
+            }
+            return value;
+        }
+        return null;
     }
 
     private Short getMaxColumnWidthOption() throws NumberFormatException {
@@ -181,6 +197,7 @@ public class CLI {
         private boolean debug;
         private String deleteFirstNRows;
         private boolean showHelp;
+        private Short interval;
         private Short maxColumnWidth;
         private Short maxRowWidth;
         private boolean purge;
@@ -201,6 +218,10 @@ public class CLI {
 
         public boolean getShowHelp() {
             return showHelp;
+        }
+
+        public Short getInterval() {
+            return interval;
         }
 
         public Short getMaxColumnWidth() {

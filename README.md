@@ -72,11 +72,15 @@ To close the application, use Ctrl+C.
  -D,--deleteFirstNRows <arg>   delete the first n rows from the audit
                                table (* if all)
  -h,--help                     show help
+ -i,--interval <arg>           set the interval in milliseconds in which
+                               the application checks whether there were
+                               changes in the watched database (default:
+                               500ms)
  -n,--lastNChanges <arg>       specify the number of last changes to
                                display after the app starts
  -p,--purge                    remove database audit table, functions and
                                triggers
- -v,--verboseDiff              show verbose output, i.e. with full before
+ -V,--verboseDiff              show verbose output, i.e. with full before
                                and after states of column values that
                                exceeded the maximum column width
  -w,--maxColumnWidth <arg>     specify the maximum width of a column

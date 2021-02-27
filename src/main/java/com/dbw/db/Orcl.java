@@ -1,22 +1,26 @@
 package com.dbw.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.dbw.cfg.Config;
-import com.dbw.err.PurgeException;
-import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
+import com.dbw.err.PurgeException;
+import com.dbw.err.UnknownDbOperationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
-import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
+import com.google.common.base.Strings;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 public class Orcl extends Database {
     private final String DRIVER = "oracle.jdbc.driver.OracleDriver";
@@ -29,15 +33,36 @@ public class Orcl extends Database {
 
     public void connect() throws DbConnectionException {
         try {
-            Class.forName(DRIVER);
-            Connection conn = DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
+            Connection conn;
+            if (!Strings.isNullOrEmpty(dbConfig.getDriverPath())) {
+                conn = getConnectionUsingTheDriverInstance();
+            } else {
+                conn = getConnectionUsingTheDriverManager();
+            }
             setConn(conn);
             Logger.log(Level.INFO, LogMessages.DB_OPENED);
         } catch (SQLException e) {
             throw new DbConnectionException(e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | MalformedURLException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
             throw new DbConnectionException(String.format(ErrorMessages.DB_CONN_FAILED, e.getMessage()), e);
         }
+    }
+
+    private Connection getConnectionUsingTheDriverInstance() throws SQLException, ClassNotFoundException, MalformedURLException, IllegalAccessException, InstantiationException {
+        URL[] urls = {};
+        DriverClassLoader classLoader = new DriverClassLoader(urls);
+        classLoader.addFile(dbConfig.getDriverPath());
+        Class driverClass = Class.forName(DRIVER, true, classLoader);
+        Driver driver = (Driver)driverClass.newInstance();
+        Properties props = new Properties();
+        props.put("user", dbConfig.getUser());
+        props.put("password", dbConfig.getPassword());
+        return driver.connect(getConnectionString(), props);
+    }
+
+    private Connection getConnectionUsingTheDriverManager() throws SQLException {
+        return DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
     }
 
     private String getConnectionString() {

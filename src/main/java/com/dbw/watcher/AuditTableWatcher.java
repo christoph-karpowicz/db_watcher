@@ -3,6 +3,7 @@ package com.dbw.watcher;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
@@ -21,18 +22,14 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class AuditTableWatcher implements Watcher {
-    private final short RUN_INTERVAL = 1000;
+    private final short DEFAULT_RUN_INTERVAL = 500;
     
-    private List<String> watchedTables;
     private Database db;
+    private short interval;
     private boolean isRunning;
     private int runCounter = 0;
     private int lastId;
     private int initialAuditRecordCount;
-
-    public void setWatchedTables(List<String> watchedTables) {
-        this.watchedTables = watchedTables;
-    }
 
     public void setDb(Database db) {
         this.db = db;
@@ -40,12 +37,17 @@ public class AuditTableWatcher implements Watcher {
 
     public void init(boolean configChanged) throws PreparationException {
         Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
+        setInterval();
         if (configChanged) {
             Logger.log(Level.INFO, LogMessages.DB_PREPARATION);
             db.prepare();
         } else {
             Logger.log(Level.INFO, LogMessages.CONFIG_UNCHANGED);
         }
+    }
+
+    private void setInterval() {
+        interval = Optional.ofNullable(App.options.getInterval()).orElse(DEFAULT_RUN_INTERVAL);
     }
 
     public void start() throws SQLException {
@@ -62,7 +64,7 @@ public class AuditTableWatcher implements Watcher {
 
     private void run() {
         try {
-            Thread.sleep(RUN_INTERVAL);
+            Thread.sleep(interval);
             selectAndProcessAuditRecords();
             findLastId();
         } catch (InterruptedException | SQLException e) {

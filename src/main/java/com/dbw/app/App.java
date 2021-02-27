@@ -45,9 +45,9 @@ public class App {
     private Database db;
     
     public void init(String[] args) throws AppInitException {
+        CLI cli = new CLI();
+        cache.load();
         try {
-            cache.load();
-            CLI cli = new CLI();
             cli.init(args);
             options = cli.handleArgs();
             Optional<String> configPathArg = options.getConfigPath();
@@ -142,7 +142,6 @@ public class App {
 
     private void startWatcher() throws WatcherStartException {
         try {
-            watcher.setWatchedTables(config.getTables());
             watcher.setDb(db);
             watcher.init(configChanged);
             watcher.start();

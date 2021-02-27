@@ -8,6 +8,7 @@ public class DatabaseConfig {
     private String connectionString;
     private String user;
     private String password;
+    private String driverPath;
 
     public String getName() {
         return name;
@@ -35,5 +36,9 @@ public class DatabaseConfig {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getDriverPath() {
+        return driverPath;
     }
 }
