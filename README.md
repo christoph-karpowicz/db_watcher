@@ -34,6 +34,7 @@ database:
     connectionString    : jdbc:oracle:thin:@localhost:32118:XE
     user                : christoph
     password            : pwd1234
+    driverPath          : /home/christoph/dbw/lib/ojdbc7.jar
 tables:
     - FILM
     - ACTOR
@@ -45,6 +46,8 @@ tables:
 
 In the `database` dictionary, `host` and `port` mappings can be replaced with a `connectionString` for a PostgreSQL configuration, whereas for an Oracle DB there can be only a `connectionString` mapping. 
 `tables` is a collection of table names that will be watched.
+
+The `driverPath` mapping is optional and is an easier way of adding a JDBC driver to the classpath; when specified, the relevant driver class will be loaded at runtime, without the need of using the `cp` flag in the `java` command. The provided value has to be an absolute path. 
 
 ## Usage
 
@@ -60,7 +63,7 @@ An example application start for Oracle configuration:
 java -cp lib/ojdbc7.jar:./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml
 ```
 
-Note that in order to use Dbw with an Oracle database, you will have to add an Oracle JDBC driver to the classpath as shown above (`lib/ojdbc7.jar` for example).
+Note that in order to use Dbw with an Oracle database, you will have to add an Oracle JDBC driver to the classpath as shown above (`lib/ojdbc7.jar` for example) or by adding a `driverPath` mapping to the configuration file.
 
 To close the application, use Ctrl+C.
 
