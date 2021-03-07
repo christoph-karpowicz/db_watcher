@@ -29,6 +29,7 @@ public class CLI {
     private final String OPTIONS_MAX_ROW_WIDTH = "maxRowWidth";
     private final String OPTIONS_PURGE = "purge";
     private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
+    private final String OPTIONS_TIME_DIFF_SEPARATOR = "timeDiffSeparatorMinVal";
     private final String OPTIONS_VERBOSE_DIFF = "verboseDiff";
     public static final String OPTIONS_CONFIG_FLAG = "c";
     public static final String OPTIONS_DEBUG_FLAG = "d";
@@ -39,6 +40,7 @@ public class CLI {
     public static final String OPTIONS_MAX_ROW_WIDTH_FLAG = "W";
     public static final String OPTIONS_PURGE_FLAG = "p";
     public static final String OPTIONS_SHOW_LAST_N_CHANGES_FLAG = "n";
+    public static final String OPTIONS_TIME_DIFF_SEPARATOR_FLAG = "t";
     public static final String OPTIONS_VERBOSE_DIFF_FLAG = "V";
     public static final String ALL_SYMBOL = "*";
     
@@ -74,6 +76,7 @@ public class CLI {
         options.addOption(OPTIONS_MAX_ROW_WIDTH_FLAG, OPTIONS_MAX_ROW_WIDTH, true, "specify the maximum width of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_WIDTH + ")");
         options.addOption(OPTIONS_PURGE_FLAG, OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
         options.addOption(OPTIONS_SHOW_LAST_N_CHANGES_FLAG, OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
+        options.addOption(OPTIONS_TIME_DIFF_SEPARATOR_FLAG, OPTIONS_TIME_DIFF_SEPARATOR, true, "specify the time in milliseconds after which a time difference separator will appear between two frames (default: 5000)");
         options.addOption(OPTIONS_VERBOSE_DIFF_FLAG, OPTIONS_VERBOSE_DIFF, false, "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column width");
     }
 
@@ -95,14 +98,15 @@ public class CLI {
         parsedOptions.configPath = getConfigOption();
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
-        parsedOptions.interval = getInterval();
         parsedOptions.purge = getPurgeOption();
         parsedOptions.verboseDiff = getVerboseDiff();
         try {
             parsedOptions.deleteFirstNRows = getDeleteFirstNRowsOption();
+            parsedOptions.interval = getInterval();
             parsedOptions.maxColumnWidth = getMaxColumnWidthOption();
             parsedOptions.maxRowWidth = getMaxRowWidthOption();
             parsedOptions.showLastNChanges = getShowLastNChangesOption();
+            parsedOptions.timeDiffSeparatorMinVal = getTimeDiffSeparatorMinVal();
         } catch (NumberFormatException e) {
             throw new InvalidCLIOptionInputException(e.getMessage(), e, parsedOptions.debug);
         }
@@ -188,6 +192,18 @@ public class CLI {
         return null;
     }
 
+    private Short getTimeDiffSeparatorMinVal() throws NumberFormatException {
+        if(cmd.hasOption(OPTIONS_TIME_DIFF_SEPARATOR)) {
+            String optionValue = cmd.getOptionValue(OPTIONS_TIME_DIFF_SEPARATOR);
+            Short value = Short.parseShort(optionValue);
+            if (value < 0) {
+                throw new NumberFormatException(ErrorMessages.CLI_TIME_DIFF_SEP_LT_ZERO);
+            }
+            return value;
+        }
+        return null;
+    }
+
     private boolean getVerboseDiff() {
         return cmd.hasOption(OPTIONS_VERBOSE_DIFF);
     }
@@ -202,6 +218,7 @@ public class CLI {
         private Short maxRowWidth;
         private boolean purge;
         private Short showLastNChanges;
+        private Short timeDiffSeparatorMinVal;
         private boolean verboseDiff;
 
         public Optional<String> getConfigPath() {
@@ -238,6 +255,10 @@ public class CLI {
 
         public Short getShowLastNChanges() {
             return showLastNChanges;
+        }
+
+        public Short getTimeDiffSeparatorMinVal() {
+            return timeDiffSeparatorMinVal;
         }
 
         public boolean getVerboseDiff() {

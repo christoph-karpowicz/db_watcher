@@ -1,6 +1,7 @@
 package com.dbw.watcher;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,18 +19,20 @@ import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
+import com.dbw.output.TimeDiffSeparator;
 import com.google.inject.Singleton;
 
 @Singleton
 public class AuditTableWatcher implements Watcher {
     private final short DEFAULT_RUN_INTERVAL = 500;
-    
+
     private Database db;
     private short interval;
     private boolean isRunning;
     private int runCounter = 0;
     private int lastId;
     private int initialAuditRecordCount;
+    private Timestamp lastAuditRecordsTime;
 
     public void setDb(Database db) {
         this.db = db;
@@ -78,7 +81,10 @@ public class AuditTableWatcher implements Watcher {
             List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
             for (AuditRecord auditRecord : auditRecords) {
                 try {
-                    createAuditFrameAndFindDiff(auditRecord);
+                    Optional<TimeDiffSeparator> timeSeparator = TimeDiffSeparator.create(lastAuditRecordsTime, auditRecord.getTimestamp());
+                    timeSeparator.ifPresent(separator -> System.out.println(separator.toString()));
+                    AuditFrame auditFrame = createAuditFrameAndFindDiff(auditRecord);
+                    System.out.println(auditFrame.toString());
                 } catch (StateDataProcessingException e) {
                     new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
                 }
@@ -88,13 +94,14 @@ public class AuditTableWatcher implements Watcher {
         }
     }
 
-    private void createAuditFrameAndFindDiff(AuditRecord auditRecord) throws StateDataProcessingException, SQLException {
+    private AuditFrame createAuditFrameAndFindDiff(AuditRecord auditRecord) throws StateDataProcessingException, SQLException {
         AuditFrame frame = ObjectCreator.create(AuditFrame.class);
         frame.setAuditRecord(auditRecord);
         frame.setDb(db);
         frame.createDiff();
         frame.createStateColumns();
-        System.out.println(frame.toString());
+        setLastAuditRecordsTime(auditRecord.getTimestamp());
+        return frame;
     }
 
     private void findLastId() throws SQLException {
@@ -143,9 +150,12 @@ public class AuditTableWatcher implements Watcher {
     private synchronized void incrementRunCounter() {
         runCounter++;
     }
-    
-    public void setInitialAuditRecordCount() throws SQLException {
+
+    private void setInitialAuditRecordCount() throws SQLException {
         this.initialAuditRecordCount = db.getAuditRecordCount();
     }
 
+    private void setLastAuditRecordsTime(Timestamp lastAuditRecordsTime) {
+        this.lastAuditRecordsTime = lastAuditRecordsTime;
+    }
 }

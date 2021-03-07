@@ -12,6 +12,7 @@ public class ErrorMessages {
     public final static String CLI_INVALID_MAX_COLUMN_WIDTH = "Maximum column width has to be greater than 3.";
     public final static String CLI_INVALID_MAX_ROW_WIDTH = "Maximum row width has to be greater than 10.";
     public final static String CLI_PURGE = "Errors occured while deleting database objects.";
+    public final static String CLI_TIME_DIFF_SEP_LT_ZERO = "Minimal value after which a time difference separator appears must not be less than 0.";
     public final static String INPUT_NAN = "Invalid input. Enter a number from the list.";
     public final static String INPUT_OUT_OF_BOUNDS = "Invalid input. Number out of list bounds.";
     public final static String CONFIG_NO_YML_FILES = "No YML files found in the current directory. Create a config file in the current directory, start the application from a directory with a config file or use the \"c\" flag to specify the config file's path";

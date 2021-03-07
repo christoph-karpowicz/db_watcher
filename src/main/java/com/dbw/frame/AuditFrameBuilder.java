@@ -10,6 +10,7 @@ import com.dbw.diff.StateColumn;
 import com.dbw.diff.StateDiffService;
 import com.dbw.diff.TableDiffBuilder;
 import com.dbw.output.OutputBuilder;
+import com.dbw.util.StringUtils;
 import com.google.inject.Inject;
 
 public class AuditFrameBuilder implements OutputBuilder {
@@ -33,8 +34,8 @@ public class AuditFrameBuilder implements OutputBuilder {
     }
     
     public void build() {
-        builder.append(String.join("", Collections.nCopies(TableDiffBuilder.getMaxRowWidth(), HR)));
-        builder.append(DIFF_VERTICAL_BORDER);
+        builder.append(StringUtils.multiplyNTimes(TableDiffBuilder.getMaxRowWidth(), HR));
+        builder.append(VERTICAL_BORDER);
         builder.append(NEW_LINE);
         builder.append(FRAME_HEADER_ID + auditRecord.getId());
         builder.append(NEW_LINE);

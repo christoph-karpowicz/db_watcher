@@ -1,6 +1,7 @@
 package com.dbw.diff;
 
 import com.dbw.output.OutputBuilder;
+import com.dbw.util.StringUtils;
 import com.google.inject.Singleton;
 
 import java.util.Collections;
@@ -14,7 +15,7 @@ public class ColumnDiffBuilder implements OutputBuilder {
     }
 
     public void build(StateColumn stateColumn) {
-        builder.append(String.join("", Collections.nCopies(TableDiffBuilder.getMaxRowWidth() / 2, HR)));
+        builder.append(StringUtils.multiplyNTimes(TableDiffBuilder.getMaxRowWidth() / 2, HR));
         builder.append(NEW_LINE);
         builder.append(stateColumn.getColumnName() + VERBOSE_DIFF_DIFF);
         builder.append(NEW_LINE);
