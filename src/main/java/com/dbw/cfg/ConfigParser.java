@@ -1,22 +1,5 @@
 package com.dbw.cfg;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.io.FileInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import com.dbw.err.ConfigException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
@@ -26,19 +9,33 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.collect.Sets;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConfigParser {
     private final static String YML_PATTERN = ".+\\.ya?ml$";
 
     public static Config fromYMLFile(File file) throws JsonMappingException, JsonParseException, IOException {
-        Config config = null;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        config = mapper.readValue(file, Config.class);
+        Config config = mapper.readValue(file, Config.class);
         config.setPath(file.getPath());
         return config;
     }
 
-    public static String getConfigFileNameFromInput() throws IOException, ConfigException {
+    public static Set<String> getConfigFileNamesFromInput() throws IOException, ConfigException {
         List<String> configFileList = getYMLFileListFromCurrentDir();
         if (configFileList.size() == 0) {
             throw new ConfigException(ErrorMessages.CONFIG_NO_YML_FILES);
@@ -46,20 +43,31 @@ public class ConfigParser {
         System.out.println(LogMessages.CHOOSE_CONFIG);
         outputConfigFileListFromCurrentDir(configFileList);
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Integer fileNameIndex = null;
-        while (Objects.isNull(fileNameIndex)) {
+        boolean inputComplete = false;
+        Set<Integer> configFileIndices = Sets.newHashSet();
+        while (!inputComplete) {
             String input = reader.readLine();
             try {
-                fileNameIndex = Integer.parseInt(input);
-                if (fileNameIndex > configFileList.size() || fileNameIndex < 1) {
-                    Logger.log(Level.ERROR, ErrorMessages.INPUT_OUT_OF_BOUNDS);
-                    fileNameIndex = null;
+                String[] configFileInputIndices = input.split(",");
+                Set<String> configFileRawIndices = Sets.newHashSet(configFileInputIndices);
+                for (String index : configFileRawIndices) {
+                    Integer fileNameIndex = Integer.parseInt(index);
+                    if (fileNameIndex > configFileList.size() || fileNameIndex < 1) {
+                        throw new Exception(ErrorMessages.INPUT_OUT_OF_BOUNDS);
+                    }
+                    configFileIndices.add(fileNameIndex);
                 }
             } catch (NumberFormatException e) {
                 Logger.log(Level.ERROR, ErrorMessages.INPUT_NAN);
+            } catch (Exception e) {
+                Logger.log(Level.ERROR, e.getMessage());
             }
+            inputComplete = true;
         }
-        return configFileList.get(fileNameIndex - 1);
+        return configFileIndices
+                .stream()
+                .map(index -> configFileList.get(index - 1))
+                .collect(Collectors.toSet());
     }
     
     private static void outputConfigFileListFromCurrentDir(List<String> configFileList) {

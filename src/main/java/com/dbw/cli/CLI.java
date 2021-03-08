@@ -1,17 +1,13 @@
 package com.dbw.cli;
 
-import java.util.Optional;
-
 import com.dbw.diff.TableDiffBuilder;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.log.ErrorMessages;
+import com.google.common.collect.Sets;
+import org.apache.commons.cli.*;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import java.util.Optional;
+import java.util.Set;
 
 public class CLI {
     private final String HELP_USAGE = 
@@ -95,7 +91,7 @@ public class CLI {
 
     public ParsedOptions parseArgs() throws InvalidCLIOptionInputException {
         ParsedOptions parsedOptions = new ParsedOptions();
-        parsedOptions.configPath = getConfigOption();
+        parsedOptions.configPaths = getConfigOption();
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
         parsedOptions.purge = getPurgeOption();
@@ -113,12 +109,14 @@ public class CLI {
         return parsedOptions;
     }
 
-    private Optional<String> getConfigOption() {
-        String configPath = null;
+    private Optional<Set<String>> getConfigOption() {
         if(cmd.hasOption(OPTIONS_CONFIG)) {
-            configPath = cmd.getOptionValue(OPTIONS_CONFIG);
+            String configOption = cmd.getOptionValue(OPTIONS_CONFIG);
+            String[] configPaths = configOption.split(",");
+            Set<String> configPathsSet = Sets.newHashSet(configPaths);
+            return Optional.of(configPathsSet);
         }
-        return Optional.ofNullable(configPath);
+        return Optional.empty();
     }
     
     private boolean getDebugOption() {
@@ -209,7 +207,7 @@ public class CLI {
     }
 
     public class ParsedOptions {
-        private Optional<String> configPath;
+        private Optional<Set<String>> configPaths;
         private boolean debug;
         private String deleteFirstNRows;
         private boolean showHelp;
@@ -221,8 +219,8 @@ public class CLI {
         private Short timeDiffSeparatorMinVal;
         private boolean verboseDiff;
 
-        public Optional<String> getConfigPath() {
-            return configPath;
+        public Optional<Set<String>> getConfigPaths() {
+            return configPaths;
         }
         
         public boolean getDebug() {

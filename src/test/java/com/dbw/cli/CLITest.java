@@ -53,7 +53,7 @@ public class CLITest {
             fail(e.getMessage());
         }
         assertEquals(OPTIONS_DELETE_FIRST_N_ROWS_VALUE, options.getDeleteFirstNRows());
-        assertEquals(TEST_CONFIG_VALUE, options.getConfigPath().get());
+        assertEquals(TEST_CONFIG_VALUE, options.getConfigPaths().get());
         assertTrue(options.getDebug());
         assertTrue(options.getPurge());
         assertEquals(toShort(TEST_MAX_COLUMN_WIDTH_VALUE), options.getMaxColumnWidth());

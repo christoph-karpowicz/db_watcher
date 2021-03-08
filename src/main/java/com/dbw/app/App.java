@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import com.dbw.cache.Cache;
 import com.dbw.cache.ConfigCachePersister;
@@ -40,7 +41,7 @@ public class App {
     private Cache cache;
 
     public static CLI.ParsedOptions options;
-    private Config config;
+    private Config configs;
     private boolean configChanged;
     private Database db;
     
@@ -50,8 +51,16 @@ public class App {
         try {
             cli.init(args);
             options = cli.handleArgs();
-            Optional<String> configPathArg = options.getConfigPath();
-            loadAndCacheConfig(configPathArg);
+            Optional<Set<String>> configPathsArg = options.getConfigPaths();
+            Set<String> configPaths;
+            if (configPathsArg.isPresent()) {
+                configPaths = configPathsArg.get();
+            } else {
+                configPaths = chooseConfigFile();
+            }
+            for (String configPath : configPaths) {
+                loadAndCacheConfig(configPath);
+            }
             setDb();
             connectToDb();
         } catch (Exception e) {
@@ -59,33 +68,27 @@ public class App {
         }
     }
 
-    private void loadAndCacheConfig(Optional<String> configPathArg) throws IOException, NoSuchAlgorithmException, ConfigException {
-        String configPath;
-        if (configPathArg.isPresent()) {
-            configPath = configPathArg.get();
-        } else {
-            configPath = chooseConfigFile();
-        }
+    private void loadAndCacheConfig(String configPath) throws IOException, NoSuchAlgorithmException {
         File configFile = new File(configPath);
-        config = ConfigParser.fromYMLFile(configFile);
+        configs = ConfigParser.fromYMLFile(configFile);
         String configFileChecksum = ConfigParser.getFileChecksum(configFile);
-        configChanged = cache.compareConfigFileChecksums(config.getPath(), configFileChecksum);
+        configChanged = cache.compareConfigFileChecksums(configs.getPath(), configFileChecksum);
         if (configChanged) {
             ConfigCachePersister configCachePersister = new ConfigCachePersister();
             configCachePersister.setCache(cache);
-            configCachePersister.setConfig(config);
+            configCachePersister.setConfig(configs);
             configCachePersister.setConfigFileChecksum(configFileChecksum);
             Thread configCachePersisterThread = new Thread(configCachePersister);
             configCachePersisterThread.start();
         }
     }
 
-    private String chooseConfigFile() throws IOException, ConfigException {
-        return ConfigParser.getConfigFileNameFromInput();
+    private Set<String> chooseConfigFile() throws IOException, ConfigException {
+        return ConfigParser.getConfigFileNamesFromInput();
     }
 
     private void setDb() throws UnknownDbTypeException {
-        db = DatabaseFactory.getDatabase(config);
+        db = DatabaseFactory.getDatabase(configs);
     }
 
     private void connectToDb() throws DbConnectionException {
@@ -120,13 +123,13 @@ public class App {
         if (!isConfirmed) {
             return;
         }
-        List<String> tables = cache.getConfigTables(config.getPath());
+        List<String> tables = cache.getConfigTables(configs.getPath());
         if (db.purge(tables)) {
             Logger.log(Level.INFO, SuccessMessages.CLI_PURGE);
         } else {
             Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
         }
-        cache.removeConfig(config.getPath());
+        cache.removeConfig(configs.getPath());
     }
 
     private boolean confirmPurge() throws PurgeException {

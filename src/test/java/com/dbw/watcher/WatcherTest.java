@@ -26,7 +26,6 @@ public class WatcherTest
         } catch(Exception e) {
             fail(e.getMessage());
         }
-        watcher.setWatchedTables(config.getTables());
     }
     
     @Test
