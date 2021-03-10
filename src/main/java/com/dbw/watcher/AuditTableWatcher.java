@@ -8,25 +8,23 @@ import java.util.Optional;
 
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
+import com.dbw.cfg.Config;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
-import com.dbw.err.PreparationException;
-import com.dbw.err.StateDataProcessingException;
-import com.dbw.err.UnknownDbOperationException;
-import com.dbw.err.WatcherRunException;
+import com.dbw.db.DatabaseFactory;
+import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 import com.dbw.output.TimeDiffSeparator;
-import com.google.inject.Singleton;
 
-@Singleton
-public class AuditTableWatcher implements Watcher {
+public class AuditTableWatcher {
     private final short DEFAULT_RUN_INTERVAL = 500;
 
     private Database db;
+    private Config cfg;
     private short interval;
     private boolean isRunning;
     private int runCounter = 0;
@@ -34,19 +32,32 @@ public class AuditTableWatcher implements Watcher {
     private int initialAuditRecordCount;
     private Timestamp lastAuditRecordsTime;
 
-    public void setDb(Database db) {
-        this.db = db;
+    public AuditTableWatcher(Config cfg) {
+        this.cfg = cfg;
     }
 
-    public void init(boolean configChanged) throws PreparationException {
+    public void setDb() throws UnknownDbTypeException {
+        this.db = DatabaseFactory.getDatabase(cfg);
+    }
+
+    public void init() throws PreparationException, DbConnectionException {
         Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
+        connectDb();
         setInterval();
-        if (configChanged) {
+        if (cfg.isChanged()) {
             Logger.log(Level.INFO, LogMessages.DB_PREPARATION);
             db.prepare();
         } else {
             Logger.log(Level.INFO, LogMessages.CONFIG_UNCHANGED);
         }
+    }
+
+    private void connectDb() throws DbConnectionException {
+        db.connect();
+    }
+
+    public void closeDb() throws SQLException {
+        db.close();
     }
 
     private void setInterval() {

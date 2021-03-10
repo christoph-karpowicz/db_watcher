@@ -1,5 +1,16 @@
 package com.dbw.app;
 
+import com.dbw.cache.Cache;
+import com.dbw.cache.ConfigCachePersister;
+import com.dbw.cfg.Config;
+import com.dbw.cfg.ConfigParser;
+import com.dbw.cli.CLI;
+import com.dbw.err.*;
+import com.dbw.log.*;
+import com.dbw.watcher.WatcherManager;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -11,46 +22,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.dbw.cache.Cache;
-import com.dbw.cache.ConfigCachePersister;
-import com.dbw.cfg.Config;
-import com.dbw.cfg.ConfigParser;
-import com.dbw.cli.CLI;
-import com.dbw.db.Database;
-import com.dbw.db.DatabaseFactory;
-import com.dbw.err.AppInitException;
-import com.dbw.err.ConfigException;
-import com.dbw.err.DbConnectionException;
-import com.dbw.err.InitialAuditRecordDeleteException;
-import com.dbw.err.PreparationException;
-import com.dbw.err.PurgeException;
-import com.dbw.err.UnknownDbTypeException;
-import com.dbw.err.WatcherStartException;
-import com.dbw.log.ErrorMessages;
-import com.dbw.log.Level;
-import com.dbw.log.LogMessages;
-import com.dbw.log.Logger;
-import com.dbw.log.SuccessMessages;
-import com.dbw.watcher.AuditTableWatcher;
-import com.google.inject.Inject;
-
 public class App {
     @Inject
-    private AuditTableWatcher watcher;
+    private WatcherManager watcherManager;
     @Inject
     private Cache cache;
 
     public static CLI.ParsedOptions options;
-    private Config configs;
-    private boolean configChanged;
-    private Database db;
-    
+    private List<Config> configs;
+
     public void init(String[] args) throws AppInitException {
         CLI cli = new CLI();
         cache.load();
         try {
             cli.init(args);
             options = cli.handleArgs();
+            configs = Lists.newArrayList();
             Optional<Set<String>> configPathsArg = options.getConfigPaths();
             Set<String> configPaths;
             if (configPathsArg.isPresent()) {
@@ -59,40 +46,34 @@ public class App {
                 configPaths = chooseConfigFile();
             }
             for (String configPath : configPaths) {
-                loadAndCacheConfig(configPath);
+                Config cfg = loadAndCacheConfig(configPath);
+                watcherManager.addWatcher(cfg);
             }
-            setDb();
-            connectToDb();
         } catch (Exception e) {
             throw new AppInitException(e.getMessage(), e);
         }
     }
 
-    private void loadAndCacheConfig(String configPath) throws IOException, NoSuchAlgorithmException {
+    private Config loadAndCacheConfig(String configPath) throws IOException, NoSuchAlgorithmException {
         File configFile = new File(configPath);
-        configs = ConfigParser.fromYMLFile(configFile);
+        Config cfg = ConfigParser.fromYMLFile(configFile);
+        configs.add(cfg);
         String configFileChecksum = ConfigParser.getFileChecksum(configFile);
-        configChanged = cache.compareConfigFileChecksums(configs.getPath(), configFileChecksum);
+        boolean configChanged = cache.compareConfigFileChecksums(cfg.getPath(), configFileChecksum);
+        cfg.setChanged(configChanged);
         if (configChanged) {
             ConfigCachePersister configCachePersister = new ConfigCachePersister();
             configCachePersister.setCache(cache);
-            configCachePersister.setConfig(configs);
+            configCachePersister.setConfig(cfg);
             configCachePersister.setConfigFileChecksum(configFileChecksum);
             Thread configCachePersisterThread = new Thread(configCachePersister);
             configCachePersisterThread.start();
         }
+        return cfg;
     }
 
     private Set<String> chooseConfigFile() throws IOException, ConfigException {
         return ConfigParser.getConfigFileNamesFromInput();
-    }
-
-    private void setDb() throws UnknownDbTypeException {
-        db = DatabaseFactory.getDatabase(configs);
-    }
-
-    private void connectToDb() throws DbConnectionException {
-        db.connect();
     }
 
     public void start() throws WatcherStartException, InitialAuditRecordDeleteException, PurgeException {
@@ -105,7 +86,7 @@ public class App {
             return;
         }
         addShutdownHook();
-        startWatcher();
+        startWatchers();
     }
 
     private void deleteFirstNRows(String nRows) throws InitialAuditRecordDeleteException {
@@ -143,11 +124,9 @@ public class App {
         }
     }
 
-    private void startWatcher() throws WatcherStartException {
+    private void startWatchers() throws WatcherStartException {
         try {
-            watcher.setDb(db);
-            watcher.init(configChanged);
-            watcher.start();
+            watcherManager.startAll();
         } catch (PreparationException | SQLException e) {
             throw new WatcherStartException(e.getMessage(), e);
         }
@@ -167,6 +146,6 @@ public class App {
     }
 
     private void shutdown() throws SQLException {
-        db.close();
+        watcherManager.terminateAll();
     }
 }
