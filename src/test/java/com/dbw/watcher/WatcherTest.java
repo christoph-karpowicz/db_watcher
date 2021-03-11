@@ -14,12 +14,12 @@ import org.junit.Test;
 public class WatcherTest 
 {
 
-    private static AuditTableWatcher watcher;
+    private static Watcher watcher;
     private static Config config;
     
     @BeforeClass
     public static void setup() {
-        watcher = new AuditTableWatcher(config);
+        watcher = new Watcher(config);
         try {
             File configFile = new File(ConfigParserTest.TEST_CONFIG_PATH);
             config = ConfigParser.fromYMLFile(configFile);

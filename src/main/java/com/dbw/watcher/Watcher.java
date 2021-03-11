@@ -20,7 +20,7 @@ import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 import com.dbw.output.TimeDiffSeparator;
 
-public class AuditTableWatcher {
+public class Watcher {
     private final short DEFAULT_RUN_INTERVAL = 500;
 
     private Database db;
@@ -32,7 +32,7 @@ public class AuditTableWatcher {
     private int initialAuditRecordCount;
     private Timestamp lastAuditRecordsTime;
 
-    public AuditTableWatcher(Config cfg) {
+    public Watcher(Config cfg) {
         this.cfg = cfg;
     }
 
@@ -58,6 +58,10 @@ public class AuditTableWatcher {
 
     public void closeDb() throws SQLException {
         db.close();
+    }
+
+    public Database getDb() {
+        return db;
     }
 
     private void setInterval() {

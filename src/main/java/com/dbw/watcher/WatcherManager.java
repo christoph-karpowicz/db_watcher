@@ -1,9 +1,11 @@
 package com.dbw.watcher;
 
 import com.dbw.cfg.Config;
+import com.dbw.db.DatabaseManager;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnknownDbTypeException;
 import com.dbw.err.WatcherStartException;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import java.sql.SQLException;
@@ -11,15 +13,20 @@ import java.util.List;
 
 @Singleton
 public class WatcherManager {
-    private List<AuditTableWatcher> watchers;
+    @Inject
+    private DatabaseManager databaseManager;
+
+    private List<Watcher> watchers;
 
     public void addWatcher(Config cfg) throws UnknownDbTypeException {
-        AuditTableWatcher watcher = new AuditTableWatcher(cfg);
+        Watcher watcher = new Watcher(cfg);
         watcher.setDb();
+        watchers.add(watcher);
+        databaseManager.addDatabase(cfg.getPath(), watcher.getDb());
     }
 
     public void startAll() throws WatcherStartException {
-        for (AuditTableWatcher watcher : watchers) {
+        for (Watcher watcher : watchers) {
             try {
                 watcher.init();
                 watcher.start();
@@ -30,7 +37,7 @@ public class WatcherManager {
     }
 
     public void terminateAll() throws SQLException {
-        for (AuditTableWatcher watcher : watchers) {
+        for (Watcher watcher : watchers) {
             watcher.closeDb();
         }
     }
