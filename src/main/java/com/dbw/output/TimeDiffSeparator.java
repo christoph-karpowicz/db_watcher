@@ -19,12 +19,16 @@ public class TimeDiffSeparator implements OutputBuilder {
     }
 
     public static Optional<TimeDiffSeparator> create(Timestamp lastAuditRecordsTime, Timestamp currentAuditRecordsTime) {
+        System.out.println(lastAuditRecordsTime);
+        System.out.println(currentAuditRecordsTime);
+
         if (lastAuditRecordsTime == null) {
             return Optional.empty();
         }
         long timeDiffInMillis = getTimeDiffInMillis(lastAuditRecordsTime, currentAuditRecordsTime);
         short timeDiffSepMinVal =
                 App.options.getTimeDiffSeparatorMinVal() != null ? App.options.getTimeDiffSeparatorMinVal() : DEFAULT_TIME_DIFF_SEP_MIN_VAL;
+        System.out.println(timeDiffInMillis);
         if (timeDiffInMillis > timeDiffSepMinVal) {
             long timeDiffInSeconds = getTimeDiffInSeconds(timeDiffInMillis);
             TimeDiffSeparator ts = new TimeDiffSeparator(timeDiffInSeconds);

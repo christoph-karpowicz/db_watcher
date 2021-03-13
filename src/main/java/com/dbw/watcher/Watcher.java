@@ -19,20 +19,19 @@ import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 import com.dbw.output.TimeDiffSeparator;
+import com.google.inject.Inject;
 
-public class Watcher {
-    private final short DEFAULT_RUN_INTERVAL = 500;
-
+public class Watcher implements Runnable {
+    private final WatcherManager watcherManager;
+    private final Config cfg;
     private Database db;
-    private Config cfg;
-    private short interval;
     private boolean isRunning;
     private int runCounter = 0;
     private int lastId;
     private int initialAuditRecordCount;
-    private Timestamp lastAuditRecordsTime;
 
-    public Watcher(Config cfg) {
+    public Watcher(WatcherManager watcherManager, Config cfg) {
+        this.watcherManager = watcherManager;
         this.cfg = cfg;
     }
 
@@ -43,7 +42,6 @@ public class Watcher {
     public void init() throws PreparationException, DbConnectionException {
         Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
         connectDb();
-        setInterval();
         if (cfg.isChanged()) {
             Logger.log(Level.INFO, LogMessages.DB_PREPARATION);
             db.prepare();
@@ -64,25 +62,26 @@ public class Watcher {
         return db;
     }
 
-    private void setInterval() {
-        interval = Optional.ofNullable(App.options.getInterval()).orElse(DEFAULT_RUN_INTERVAL);
-    }
-
-    public void start() throws SQLException {
-        setInitialAuditRecordCount();
-        findLastId();
-        setIsRunning(true);
-        while (getIsRunning()) {
-            run();
-            if (getRunCounter() == 1) {
-                outputInfo();
+    @Override
+    public void run() {
+        try {
+            setInitialAuditRecordCount();
+            findLastId();
+            setIsRunning(true);
+            while (getIsRunning()) {
+                watch();
+                if (getRunCounter() == 1) {
+                    outputInfo();
+                }
             }
+        } catch (SQLException e) {
+            new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
     }
 
-    private void run() {
+    private void watch() {
         try {
-            Thread.sleep(interval);
+            Thread.sleep(App.getInterval());
             selectAndProcessAuditRecords();
             findLastId();
         } catch (InterruptedException | SQLException e) {
@@ -96,10 +95,8 @@ public class Watcher {
             List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
             for (AuditRecord auditRecord : auditRecords) {
                 try {
-                    Optional<TimeDiffSeparator> timeSeparator = TimeDiffSeparator.create(lastAuditRecordsTime, auditRecord.getTimestamp());
-                    timeSeparator.ifPresent(separator -> System.out.println(separator.toString()));
                     AuditFrame auditFrame = createAuditFrameAndFindDiff(auditRecord);
-                    System.out.println(auditFrame.toString());
+                    watcherManager.addFrame(auditFrame);
                 } catch (StateDataProcessingException e) {
                     new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
                 }
@@ -115,7 +112,6 @@ public class Watcher {
         frame.setDb(db);
         frame.createDiff();
         frame.createStateColumns();
-        setLastAuditRecordsTime(auditRecord.getTimestamp());
         return frame;
     }
 
@@ -168,9 +164,5 @@ public class Watcher {
 
     private void setInitialAuditRecordCount() throws SQLException {
         this.initialAuditRecordCount = db.getAuditRecordCount();
-    }
-
-    private void setLastAuditRecordsTime(Timestamp lastAuditRecordsTime) {
-        this.lastAuditRecordsTime = lastAuditRecordsTime;
     }
 }

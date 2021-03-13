@@ -8,31 +8,40 @@ import com.dbw.cache.ConfigCachePersister;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cli.CLI;
-import com.dbw.db.DatabaseManager;
-import com.dbw.err.*;
+import com.dbw.err.AppInitException;
+import com.dbw.err.ConfigException;
+import com.dbw.err.DbwException;
+import com.dbw.err.WatcherStartException;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
+import com.dbw.output.OutputManager;
 import com.dbw.watcher.WatcherManager;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 public class App {
+    public static final short DEFAULT_RUN_INTERVAL = 500;
+
     @Inject
     private WatcherManager watcherManager;
+    @Inject
+    private OutputManager outputManager;
     @Inject
     private Cache cache;
 
     public static CLI.ParsedOptions options;
+
+    public static short getInterval() {
+        return Optional.ofNullable(App.options.getInterval()).orElse(DEFAULT_RUN_INTERVAL);
+    }
 
     public void init(String[] args) throws AppInitException {
         CLI cli = new CLI();
@@ -95,7 +104,8 @@ public class App {
     private void startWatchers() throws WatcherStartException {
         try {
             watcherManager.startAll();
-        } catch (PreparationException | SQLException e) {
+            outputManager.pollAndOutput();
+        } catch (WatcherStartException e) {
             throw new WatcherStartException(e.getMessage(), e);
         }
     }

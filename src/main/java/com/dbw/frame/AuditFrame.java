@@ -23,6 +23,10 @@ public class AuditFrame {
     @Inject
     private StateDiffService diffService;
 
+    public AuditRecord getAuditRecord() {
+        return auditRecord;
+    }
+
     public void setAuditRecord(AuditRecord auditRecord) {
         this.auditRecord = auditRecord;
     }

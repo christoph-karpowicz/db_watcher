@@ -1,9 +1,8 @@
 package com.dbw.db;
 
 import com.dbw.cache.Cache;
-import com.dbw.err.DbwException;
 import com.dbw.err.InitialAuditRecordDeleteException;
-import com.dbw.err.PurgeException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.log.*;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -38,7 +37,7 @@ public class DatabaseManager {
         }
     }
 
-    public void purge() throws DbwException {
+    public void purge() throws UnrecoverableException {
         for (Map.Entry<String, Database> db : dbs.entrySet()) {
             boolean isConfirmed = confirmPurge();
             if (!isConfirmed) {
@@ -54,14 +53,14 @@ public class DatabaseManager {
         }
     }
 
-    private boolean confirmPurge() throws DbwException {
+    private boolean confirmPurge() throws UnrecoverableException {
         try {
             System.out.println(LogMessages.CONFIRM_PURGE);
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             String input = reader.readLine();
             return input.equals("y") || input.equals("Y");
         } catch (IOException e) {
-            throw new DbwException(e.getMessage(), e);
+            throw new UnrecoverableException("PurgeException" ,e.getMessage(), e);
         }
     }
 }
