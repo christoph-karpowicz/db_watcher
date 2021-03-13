@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cache.Cache;
+import com.dbw.err.DbwException;
 import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.PurgeException;
 import com.dbw.log.*;
@@ -20,7 +21,7 @@ public class DatabaseManager {
     @Inject
     private Cache cache;
 
-    private Map<String, Database> dbs = Maps.newHashMap();
+    private final Map<String, Database> dbs = Maps.newHashMap();
 
     public void addDatabase(String configPath, Database db) {
         dbs.put(configPath, db);
@@ -37,7 +38,7 @@ public class DatabaseManager {
         }
     }
 
-    public void purge() throws PurgeException {
+    public void purge() throws DbwException {
         for (Map.Entry<String, Database> db : dbs.entrySet()) {
             boolean isConfirmed = confirmPurge();
             if (!isConfirmed) {
@@ -53,14 +54,14 @@ public class DatabaseManager {
         }
     }
 
-    private boolean confirmPurge() throws PurgeException {
+    private boolean confirmPurge() throws DbwException {
         try {
             System.out.println(LogMessages.CONFIRM_PURGE);
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             String input = reader.readLine();
             return input.equals("y") || input.equals("Y");
         } catch (IOException e) {
-            throw new PurgeException(e.getMessage(), e);
+            throw new DbwException(e.getMessage(), e);
         }
     }
 }

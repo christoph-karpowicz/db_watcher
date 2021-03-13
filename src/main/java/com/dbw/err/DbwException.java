@@ -6,7 +6,7 @@ import com.dbw.app.App;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 
-public abstract class DbwException extends Exception {
+public class DbwException extends Exception {
     private Exception childException;
     private boolean isRecoverable = false;
     private boolean debug = false;

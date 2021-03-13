@@ -1,5 +1,8 @@
 package com.dbw.app;
 
+import com.dbw.actions.DbAction;
+import com.dbw.actions.DeleteFirstNRowsAction;
+import com.dbw.actions.PurgeAction;
 import com.dbw.cache.Cache;
 import com.dbw.cache.ConfigCachePersister;
 import com.dbw.cfg.Config;
@@ -27,12 +30,9 @@ public class App {
     @Inject
     private WatcherManager watcherManager;
     @Inject
-    private DatabaseManager databaseManager;
-    @Inject
     private Cache cache;
 
     public static CLI.ParsedOptions options;
-    private List<Config> configs;
 
     public void init(String[] args) throws AppInitException {
         CLI cli = new CLI();
@@ -40,7 +40,6 @@ public class App {
         try {
             cli.init(args);
             options = cli.handleArgs();
-            configs = Lists.newArrayList();
             Optional<Set<String>> configPathsArg = options.getConfigPaths();
             Set<String> configPaths;
             if (configPathsArg.isPresent()) {
@@ -60,7 +59,6 @@ public class App {
     private Config loadAndCacheConfig(String configPath) throws IOException, NoSuchAlgorithmException {
         File configFile = new File(configPath);
         Config cfg = ConfigParser.fromYMLFile(configFile);
-        configs.add(cfg);
         String configFileChecksum = ConfigParser.getFileChecksum(configFile);
         boolean configChanged = cache.compareConfigFileChecksums(cfg.getPath(), configFileChecksum);
         cfg.setChanged(configChanged);
@@ -79,13 +77,15 @@ public class App {
         return ConfigParser.getConfigFileNamesFromInput();
     }
 
-    public void start() throws WatcherStartException, InitialAuditRecordDeleteException, PurgeException {
+    public void start() throws WatcherStartException, DbwException {
         String deleteFirstNRowsOption = options.getDeleteFirstNRows();
         if (!Objects.isNull(deleteFirstNRowsOption)) {
-            databaseManager.deleteFirstNRows(deleteFirstNRowsOption);
+            DeleteFirstNRowsAction deleteFirstNRowsAction = new DeleteFirstNRowsAction(deleteFirstNRowsOption);
+            deleteFirstNRowsAction.execute();
         }
         if (options.getPurge()) {
-            databaseManager.purge();
+            DbAction purgeAction = new PurgeAction();
+            purgeAction.execute();
             return;
         }
         addShutdownHook();
