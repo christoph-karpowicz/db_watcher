@@ -59,6 +59,7 @@ public class AuditFrame {
     @Override
     public String toString() {
         AuditFrameBuilder builder = ObjectCreator.create(AuditFrameBuilder.class);
+        builder.setDbConfig(db.getDbConfig());
         builder.setAuditRecord(auditRecord);
         builder.setStateColumns(stateColumns);
         builder.init();

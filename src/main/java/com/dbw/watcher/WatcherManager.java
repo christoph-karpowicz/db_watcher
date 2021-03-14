@@ -55,4 +55,8 @@ public class WatcherManager {
     public LinkedBlockingQueue<AuditFrame> getFrameQueue() {
         return frameQueue;
     }
+
+    public int getWatchersSize() {
+        return watchers.size();
+    }
 }

@@ -11,6 +11,9 @@ public interface OutputBuilder {
     String DIFF_EDGE_BORDER = "+";
     String NEW_LINE = "\n";
     String FRAME_HEADER_ID = "ID: ";
+    String FRAME_HEADER_DB = "Database: ";
+    String FRAME_HEADER_DB_TYPE = "    type: ";
+    String FRAME_HEADER_DB_NAME = "    name: ";
     String FRAME_HEADER_TABLE = "Table: ";
     String FRAME_HEADER_OPERATION = "Operation: ";
     String FRAME_HEADER_TIMESTAMP = "Timestamp: ";

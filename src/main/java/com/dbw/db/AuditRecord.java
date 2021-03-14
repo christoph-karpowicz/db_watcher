@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class AuditRecord {
     private int id;
@@ -61,6 +62,10 @@ public class AuditRecord {
 
     public Timestamp getTimestamp() {
         return timestamp;
+    }
+
+    public String getFormattedTimestamp() {
+        return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp);
     }
 
     public void setTimestamp(Timestamp timestamp) {
