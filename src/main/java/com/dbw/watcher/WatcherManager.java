@@ -59,4 +59,14 @@ public class WatcherManager {
     public int getWatchersSize() {
         return watchers.size();
     }
+
+    public boolean areAllAfterInitialRun() {
+        return watchers.stream().allMatch(Watcher::isAfterInitialRun);
+    }
+
+    public void outputInitialInfo() {
+        for (Watcher watcher : watchers) {
+            watcher.outputInitialInfo();
+        }
+    }
 }

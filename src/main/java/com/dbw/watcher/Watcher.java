@@ -25,14 +25,17 @@ public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
     private final Config cfg;
     private Database db;
+    private final String dbName;
     private boolean isRunning;
     private int runCounter = 0;
     private int lastId;
     private int initialAuditRecordCount;
+    private boolean isAfterInitialRun;
 
     public Watcher(WatcherManager watcherManager, Config cfg) {
         this.watcherManager = watcherManager;
         this.cfg = cfg;
+        this.dbName = cfg.getDatabase().getName();
     }
 
     public void setDb() throws UnknownDbTypeException {
@@ -40,13 +43,13 @@ public class Watcher implements Runnable {
     }
 
     public void init() throws PreparationException, DbConnectionException {
-        Logger.log(Level.INFO, LogMessages.WATCHER_INIT);
+        Logger.log(Level.INFO, dbName, LogMessages.WATCHER_INIT);
         connectDb();
         if (cfg.isChanged()) {
-            Logger.log(Level.INFO, LogMessages.DB_PREPARATION);
+            Logger.log(Level.INFO, dbName, LogMessages.DB_PREPARATION);
             db.prepare();
         } else {
-            Logger.log(Level.INFO, LogMessages.CONFIG_UNCHANGED);
+            Logger.log(Level.INFO, dbName, LogMessages.CONFIG_UNCHANGED);
         }
     }
 
@@ -71,7 +74,7 @@ public class Watcher implements Runnable {
             while (getIsRunning()) {
                 watch();
                 if (getRunCounter() == 1) {
-                    outputInfo();
+                    setAfterInitialRun();
                 }
             }
         } catch (SQLException e) {
@@ -124,22 +127,22 @@ public class Watcher implements Runnable {
         boolean lastNChangesGtZero = Objects.nonNull(lastNChanges) && lastNChanges > 0;
         if (getRunCounter() == 0 && lastNChangesGtZero) {
             if (initialAuditRecordCount == 0) {
-                Logger.log(Level.WARNING, WarningMessages.NO_LAST_N_CHANGES);
+                Logger.log(Level.WARNING, dbName, WarningMessages.NO_LAST_N_CHANGES);
                 return 0;
             }
             
             int lastIdMinusN = lastId - (int)lastNChanges;
             if (lastIdMinusN <= 0) {
-                Logger.log(Level.WARNING, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
+                Logger.log(Level.WARNING, dbName, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
             }
             return Math.max(lastIdMinusN, 0);
         }
         return lastId;
     }
 
-    private void outputInfo() {
-        Logger.log(Level.INFO, LogMessages.WATCHER_STARTED);
-        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
+    public void outputInitialInfo() {
+        Logger.log(Level.INFO, dbName, LogMessages.WATCHER_STARTED);
+        Logger.log(Level.INFO, dbName, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
     }
 
     private void setLastId(int lastId) {
@@ -158,11 +161,19 @@ public class Watcher implements Runnable {
         return runCounter;
     }
 
-    private synchronized void incrementRunCounter() {
+    private void incrementRunCounter() {
         runCounter++;
     }
 
     private void setInitialAuditRecordCount() throws SQLException {
         this.initialAuditRecordCount = db.getAuditRecordCount();
+    }
+
+    public boolean isAfterInitialRun() {
+        return isAfterInitialRun;
+    }
+
+    public void setAfterInitialRun() {
+        isAfterInitialRun = true;
     }
 }

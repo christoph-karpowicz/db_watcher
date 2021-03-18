@@ -6,6 +6,7 @@ import com.dbw.err.UnrecoverableException;
 import com.dbw.log.*;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import java.io.BufferedReader;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Singleton
 public class DatabaseManager {
     @Inject
-    private Cache cache;
+    private Provider<Cache> cache;
 
     private final Map<String, Database> dbs = Maps.newHashMap();
 
@@ -30,7 +31,7 @@ public class DatabaseManager {
         for (Database db : dbs.values()) {
             try {
                 String successMessage = db.deleteFirstNRows(nRows);
-                Logger.log(Level.INFO, String.format(successMessage, nRows));
+                Logger.log(Level.INFO, db.getDbConfig().getName(), String.format(successMessage, nRows));
             } catch (SQLException e) {
                 throw new InitialAuditRecordDeleteException(e.getMessage(), e);
             }
@@ -43,13 +44,14 @@ public class DatabaseManager {
             if (!isConfirmed) {
                 return;
             }
-            List<String> tables = cache.getConfigTables(db.getKey());
+            List<String> tables = cache.get().getConfigTables(db.getKey());
+            String dbName = db.getValue().getDbConfig().getName();
             if (db.getValue().purge(tables)) {
-                Logger.log(Level.INFO, SuccessMessages.CLI_PURGE);
+                Logger.log(Level.INFO, dbName, SuccessMessages.CLI_PURGE);
             } else {
-                Logger.log(Level.ERROR, ErrorMessages.CLI_PURGE);
+                Logger.log(Level.ERROR, dbName,ErrorMessages.CLI_PURGE);
             }
-            cache.removeConfig(db.getKey());
+            cache.get().removeConfig(db.getKey());
         }
     }
 

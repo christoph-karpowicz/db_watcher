@@ -40,7 +40,7 @@ public class Orcl extends Database {
                 conn = getConnectionUsingTheDriverManager();
             }
             setConn(conn);
-            Logger.log(Level.INFO, LogMessages.DB_OPENED);
+            Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_OPENED);
         } catch (SQLException e) {
             throw new DbConnectionException(e.getMessage(), e);
         } catch (ClassNotFoundException | MalformedURLException | IllegalAccessException | InstantiationException e) {
@@ -81,7 +81,7 @@ public class Orcl extends Database {
 
     public void createAuditTable() throws SQLException {
         executeFormattedQueryUpdate(OrclQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME);
-        Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_CREATED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
     public boolean auditTriggerExists(String tableName) throws SQLException {
@@ -91,7 +91,7 @@ public class Orcl extends Database {
 
     public void createAuditTrigger(String tableName, String query) throws SQLException {
         executeFormattedQueryUpdate(query);
-        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
+        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {
@@ -100,7 +100,7 @@ public class Orcl extends Database {
 
     public void dropAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName));
-        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
+        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
     public boolean purge(List<String> watchedTables) {
@@ -161,7 +161,7 @@ public class Orcl extends Database {
  
     public void close() throws SQLException {
         getConn().close();
-        Logger.log(Level.INFO, LogMessages.DB_CLOSED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_CLOSED);
     }
     
 }

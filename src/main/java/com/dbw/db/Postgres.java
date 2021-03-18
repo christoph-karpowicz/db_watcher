@@ -41,7 +41,7 @@ public class Postgres extends Database {
             Class.forName(DRIVER);
             Connection conn = DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
             setConn(conn);
-            Logger.log(Level.INFO, LogMessages.DB_OPENED);
+            Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_OPENED);
         } catch (SQLException | ClassNotFoundException e) {
             throw new DbConnectionException(e.getMessage(), e);
         }
@@ -82,7 +82,7 @@ public class Postgres extends Database {
 
     public void createAuditTable() throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME.toLowerCase());
-        Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_CREATED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
     public boolean auditFunctionExists() throws SQLException {
@@ -92,12 +92,12 @@ public class Postgres extends Database {
 
     public void createAuditFunction() throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION);
-        Logger.log(Level.INFO, LogMessages.AUDIT_FUNCTION_CREATED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_CREATED);
     }
 
     public void dropAuditFunction() throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_FUNCTION);
-        Logger.log(Level.INFO, LogMessages.AUDIT_FUNCTION_DROPPED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_DROPPED);
     }
 
     public boolean auditTriggerExists(String tableName) throws SQLException {
@@ -107,7 +107,7 @@ public class Postgres extends Database {
 
     public void createAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
-        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
+        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {
@@ -116,7 +116,7 @@ public class Postgres extends Database {
 
     public void dropAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
-        Logger.log(Level.INFO, String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
+        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
     public boolean purge(List<String> watchedTables) {
@@ -166,6 +166,6 @@ public class Postgres extends Database {
 
     public void close() throws SQLException {
         getConn().close();
-        Logger.log(Level.INFO, LogMessages.DB_CLOSED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_CLOSED);
     }
 }

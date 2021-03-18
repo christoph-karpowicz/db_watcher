@@ -56,7 +56,7 @@ public abstract class Database {
 
     public void dropAuditTable() throws SQLException {
         executeFormattedQueryUpdate("DROP TABLE " + Common.DBW_AUDIT_TABLE_NAME);
-        Logger.log(Level.INFO, LogMessages.AUDIT_TABLE_DROPPED);
+        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_DROPPED);
     }
 
     protected void executePreparedStatementUpdateWithSingleInt(String query, int param) throws SQLException {

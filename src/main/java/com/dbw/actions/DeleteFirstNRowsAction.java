@@ -8,9 +8,9 @@ public class DeleteFirstNRowsAction {
     @Inject
     private DatabaseManager databaseManager;
 
-    private final String numberOfRowsToDelete;
+    private String numberOfRowsToDelete;
 
-    public DeleteFirstNRowsAction(String numberOfRowsToDelete) {
+    public void setNumberOfRowsToDelete(String numberOfRowsToDelete) {
         this.numberOfRowsToDelete = numberOfRowsToDelete;
     }
 

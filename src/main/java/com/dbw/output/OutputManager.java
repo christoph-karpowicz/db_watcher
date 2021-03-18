@@ -3,6 +3,9 @@ package com.dbw.output;
 import com.dbw.app.App;
 import com.dbw.err.WatcherRunException;
 import com.dbw.frame.AuditFrame;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
 import com.dbw.watcher.WatcherManager;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -19,15 +22,19 @@ public class OutputManager {
     @Inject
     private WatcherManager watcherManager;
 
-    private boolean isRunning = true;
     private Timestamp lastAuditRecordsTime;
 
     public void pollAndOutput() {
+        boolean outputInitialInfoDone = false;
         try {
-            while (isRunning) {
+            while (true) {
                 Thread.sleep(App.getInterval());
                 List<AuditFrame> frames = getSortedFrames();
                 frames.forEach(this::outputFrame);
+                if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {
+                    outputInitialInfo();
+                    outputInitialInfoDone = true;
+                }
             }
         } catch (InterruptedException e) {
             new WatcherRunException(e.getMessage(), e).handle();
@@ -50,6 +57,10 @@ public class OutputManager {
         timeSeparator.ifPresent(separator -> System.out.println(separator.toString()));
         System.out.println(frame.toString());
         setLastAuditRecordsTime(currentRecordsTime);
+    }
+
+    private void outputInitialInfo() {
+        watcherManager.outputInitialInfo();
     }
 
     private void setLastAuditRecordsTime(Timestamp lastAuditRecordsTime) {

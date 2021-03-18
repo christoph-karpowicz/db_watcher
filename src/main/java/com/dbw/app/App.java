@@ -44,6 +44,7 @@ public class App {
     }
 
     public void init(String[] args) throws AppInitException {
+        Logger.setWatcherManager(watcherManager);
         CLI cli = new CLI();
         cache.load();
         try {
@@ -86,14 +87,15 @@ public class App {
         return ConfigParser.getConfigFileNamesFromInput();
     }
 
-    public void start() throws WatcherStartException, DbwException {
+    public void start() throws DbwException {
         String deleteFirstNRowsOption = options.getDeleteFirstNRows();
         if (!Objects.isNull(deleteFirstNRowsOption)) {
-            DeleteFirstNRowsAction deleteFirstNRowsAction = new DeleteFirstNRowsAction(deleteFirstNRowsOption);
+            DeleteFirstNRowsAction deleteFirstNRowsAction = ObjectCreator.create(DeleteFirstNRowsAction.class);
+            deleteFirstNRowsAction.setNumberOfRowsToDelete(deleteFirstNRowsOption);
             deleteFirstNRowsAction.execute();
         }
         if (options.getPurge()) {
-            DbAction purgeAction = new PurgeAction();
+            DbAction purgeAction = ObjectCreator.create(PurgeAction.class);
             purgeAction.execute();
             return;
         }
@@ -102,12 +104,8 @@ public class App {
     }
 
     private void startWatchers() throws WatcherStartException {
-        try {
-            watcherManager.startAll();
-            outputManager.pollAndOutput();
-        } catch (WatcherStartException e) {
-            throw new WatcherStartException(e.getMessage(), e);
-        }
+        watcherManager.startAll();
+        outputManager.pollAndOutput();
     }
 
     private void addShutdownHook() {
