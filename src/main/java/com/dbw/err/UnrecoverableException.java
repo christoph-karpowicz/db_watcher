@@ -5,6 +5,9 @@ public class UnrecoverableException extends DbwException {
     public UnrecoverableException(String name, String errorMessage, Exception childException) {
         super(errorMessage);
         setChildException(childException);
-        setRecoverable();
+    }
+
+    public UnrecoverableException(String name, String errorMessage) {
+        super(errorMessage);
     }
 }

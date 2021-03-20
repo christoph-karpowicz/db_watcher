@@ -62,6 +62,7 @@ public class App {
             }
             for (String configPath : configPaths) {
                 Config cfg = loadAndCacheConfig(configPath);
+                cfg.validate();
                 watcherManager.addWatcher(cfg);
             }
         } catch (Exception e) {

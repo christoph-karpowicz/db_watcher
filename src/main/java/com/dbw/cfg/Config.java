@@ -1,5 +1,7 @@
 package com.dbw.cfg;
 
+import com.dbw.err.UnrecoverableException;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -33,5 +35,15 @@ public class Config {
 
     public void setChanged(boolean changed) {
         this.changed = changed;
+    }
+
+    public void validate() throws UnrecoverableException {
+        ConfigValidator.ValidationResult result =
+                ConfigValidator.isAuditTableOnWatchList()
+                .and(ConfigValidator.isDbTypeKnown())
+                .apply(this);
+        if (!result.equals(ConfigValidator.ValidationResult.SUCCESS)) {
+            throw new UnrecoverableException("ConfigValidationException", result.msg);
+        }
     }
 }

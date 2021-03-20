@@ -23,7 +23,7 @@ public class WatcherManager {
     private final List<Watcher> watchers = Lists.newArrayList();
     private final LinkedBlockingQueue<AuditFrame> frameQueue = new LinkedBlockingQueue<>();
 
-    public void addWatcher(Config cfg) throws UnknownDbTypeException {
+    public void addWatcher(Config cfg) {
         Watcher watcher = new Watcher(this, cfg);
         watcher.setDb();
         watchers.add(watcher);

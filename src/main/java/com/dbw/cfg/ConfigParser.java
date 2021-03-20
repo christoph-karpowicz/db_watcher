@@ -98,7 +98,7 @@ public class ConfigParser {
         int bytesCount;
         while ((bytesCount = fis.read(byteArray)) != -1) {
             digest.update(byteArray, 0, bytesCount);
-        };
+        }
         fis.close();
         byte[] bytes = digest.digest();
         StringBuilder sb = new StringBuilder();

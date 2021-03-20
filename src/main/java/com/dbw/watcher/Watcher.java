@@ -38,7 +38,7 @@ public class Watcher implements Runnable {
         this.dbName = cfg.getDatabase().getName();
     }
 
-    public void setDb() throws UnknownDbTypeException {
+    public void setDb() {
         this.db = DatabaseFactory.getDatabase(cfg);
     }
 

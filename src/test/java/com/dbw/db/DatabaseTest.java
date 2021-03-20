@@ -33,11 +33,7 @@ public class DatabaseTest {
     
     @Test
     public void shouldBeTheRightDatabaseType() {
-        try {
-            db = DatabaseFactory.getDatabase(config);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        db = DatabaseFactory.getDatabase(config);
         if (testConfigPathFromArgument.contains("orcl")) {
             assertEquals(Orcl.class, db.getClass());
         } else {
