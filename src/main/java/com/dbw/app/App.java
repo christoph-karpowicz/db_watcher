@@ -8,6 +8,7 @@ import com.dbw.cache.ConfigCachePersister;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cli.CLI;
+import com.dbw.db.DatabaseManager;
 import com.dbw.err.AppInitException;
 import com.dbw.err.ConfigException;
 import com.dbw.err.DbwException;
@@ -32,6 +33,8 @@ public class App {
 
     @Inject
     private WatcherManager watcherManager;
+    @Inject
+    private DatabaseManager databaseManager;
     @Inject
     private OutputManager outputManager;
     @Inject
@@ -88,6 +91,7 @@ public class App {
     }
 
     public void start() throws DbwException {
+        databaseManager.connectDbs();
         String deleteFirstNRowsOption = options.getDeleteFirstNRows();
         if (!Objects.isNull(deleteFirstNRowsOption)) {
             DeleteFirstNRowsAction deleteFirstNRowsAction = ObjectCreator.create(DeleteFirstNRowsAction.class);
@@ -109,16 +113,14 @@ public class App {
     }
 
     private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                Logger.log(Level.INFO, LogMessages.SHUTDOWN);
-                try {
-                    shutdown();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logger.log(Level.INFO, LogMessages.SHUTDOWN);
+            try {
+                shutdown();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
     private void shutdown() throws SQLException {

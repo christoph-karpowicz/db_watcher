@@ -5,7 +5,7 @@ public class LogMessages {
     public final static String DB_CLOSED = "Database connection closed.";
     public final static String CHOOSE_CONFIG = "Choose the config file by entering its number from the list:";
     public final static String CONFIG_UNCHANGED = "Config file hasn't changed. Database preparation will be omitted.";
-    public final static String CONFIRM_PURGE = "Are you sure you want to remove all database objects related to this application? (y/n)";
+    public final static String CONFIRM_PURGE = "Are you sure you want to remove all \"%s\" database objects related to this application? (y/n)";
     public final static String WATCHER_INIT = "Initializing ...";
     public final static String DB_PREPARATION = "Preparing database objects...";
     public final static String WATCHER_STARTED = "Watcher started.";

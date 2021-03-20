@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cache.Cache;
+import com.dbw.err.DbConnectionException;
 import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.log.*;
@@ -27,6 +28,12 @@ public class DatabaseManager {
         dbs.put(configPath, db);
     }
 
+    public void connectDbs() throws DbConnectionException {
+        for (Database db : dbs.values()) {
+            db.connect();
+        }
+    }
+
     public void deleteFirstNRows(String nRows) throws InitialAuditRecordDeleteException {
         for (Database db : dbs.values()) {
             try {
@@ -40,7 +47,7 @@ public class DatabaseManager {
 
     public void purge() throws UnrecoverableException {
         for (Map.Entry<String, Database> db : dbs.entrySet()) {
-            boolean isConfirmed = confirmPurge();
+            boolean isConfirmed = confirmPurge(db.getValue().getDbConfig().getName());
             if (!isConfirmed) {
                 return;
             }
@@ -55,9 +62,9 @@ public class DatabaseManager {
         }
     }
 
-    private boolean confirmPurge() throws UnrecoverableException {
+    private boolean confirmPurge(String dbName) throws UnrecoverableException {
         try {
-            System.out.println(LogMessages.CONFIRM_PURGE);
+            System.out.println(String.format(LogMessages.CONFIRM_PURGE, dbName));
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             String input = reader.readLine();
             return input.equals("y") || input.equals("Y");

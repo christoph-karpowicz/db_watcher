@@ -44,17 +44,12 @@ public class Watcher implements Runnable {
 
     public void init() throws PreparationException, DbConnectionException {
         Logger.log(Level.INFO, dbName, LogMessages.WATCHER_INIT);
-        connectDb();
         if (cfg.isChanged()) {
             Logger.log(Level.INFO, dbName, LogMessages.DB_PREPARATION);
             db.prepare();
         } else {
             Logger.log(Level.INFO, dbName, LogMessages.CONFIG_UNCHANGED);
         }
-    }
-
-    private void connectDb() throws DbConnectionException {
-        db.connect();
     }
 
     public void closeDb() throws SQLException {

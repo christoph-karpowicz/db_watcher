@@ -3,7 +3,6 @@ package com.dbw.app;
 import com.dbw.err.DbwException;
 
 public class Dbw {
-
     public static App app;
     
     public static void main(String[] args) {

@@ -5,8 +5,6 @@ import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Sets;
@@ -18,7 +16,6 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +25,7 @@ import java.util.stream.Stream;
 public class ConfigParser {
     private final static String YML_PATTERN = ".+\\.ya?ml$";
 
-    public static Config fromYMLFile(File file) throws JsonMappingException, JsonParseException, IOException {
+    public static Config fromYMLFile(File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         Config config = mapper.readValue(file, Config.class);
         config.setPath(file.getPath());
@@ -89,8 +86,7 @@ public class ConfigParser {
     }
 
     private static boolean isYMLFile(Path path) {
-        String ymlFilePatternString = YML_PATTERN;
-        Pattern ymlFilePattern = Pattern.compile(ymlFilePatternString);
+        Pattern ymlFilePattern = Pattern.compile(YML_PATTERN);
         Matcher ymlFilePatternMatcher = ymlFilePattern.matcher(path.getFileName().toString());
         return ymlFilePatternMatcher.matches();
     }
@@ -99,15 +95,15 @@ public class ConfigParser {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         FileInputStream fis = new FileInputStream(file);
         byte[] byteArray = new byte[1024];
-        int bytesCount = 0; 
+        int bytesCount;
         while ((bytesCount = fis.read(byteArray)) != -1) {
             digest.update(byteArray, 0, bytesCount);
         };
         fis.close();
         byte[] bytes = digest.digest();
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i< bytes.length; i++) {
-            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        for (byte aByte : bytes) {
+            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }
         return sb.toString();
     }
