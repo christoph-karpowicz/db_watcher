@@ -1,24 +1,16 @@
 package com.dbw.db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
-import com.dbw.cli.CLI;
+import com.dbw.cli.CLIStrings;
 import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnknownDbOperationException;
-import com.dbw.log.ErrorMessages;
-import com.dbw.log.Level;
-import com.dbw.log.LogMessages;
-import com.dbw.log.Logger;
-import com.dbw.log.SuccessMessages;
+import com.dbw.log.*;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Database {
     protected DatabaseConfig dbConfig;
@@ -41,7 +33,7 @@ public abstract class Database {
         if (rowCount == 0) {
             return SuccessMessages.CLI_AUDIT_TABLE_EMPTY;
         }
-        if (nRows.equals(CLI.ALL_SYMBOL)) {
+        if (nRows.equals(CLIStrings.ALL_SYMBOL)) {
             executeFormattedQueryUpdate(deleteAllQuery);
             return String.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
@@ -101,7 +93,7 @@ public abstract class Database {
     public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException;
     
     protected List<AuditRecord> selectAuditRecords(String query, int fromId) throws SQLException, UnknownDbOperationException {
-        List<AuditRecord> result = new ArrayList<AuditRecord>();
+        List<AuditRecord> result = new ArrayList<>();
         PreparedStatement pstmt = conn.prepareStatement(query);
         pstmt.setInt(1, fromId);
         ResultSet rs = pstmt.executeQuery();
@@ -133,7 +125,7 @@ public abstract class Database {
     }
 
     protected List<String> selectStringArray(String query, String[] stringArgs) throws SQLException {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         PreparedStatement pstmt = conn.prepareStatement(query);
         for (short i = 0; i < stringArgs.length; i++) {
             pstmt.setString(i + 1, stringArgs[i]);
@@ -149,7 +141,7 @@ public abstract class Database {
     public abstract int selectMaxId() throws SQLException;
 
     protected int selectSingleIntValue(String query, String columnName) throws SQLException {
-        int result = 0;
+        int result;
         Statement pstmt = conn.createStatement();
         ResultSet rs = pstmt.executeQuery(query);
         if (rs.next()) {

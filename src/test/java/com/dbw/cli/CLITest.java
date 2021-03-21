@@ -1,11 +1,9 @@
 package com.dbw.cli;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class CLITest {
     private static final String TEST_CONFIG_VALUE = "config/test.yml";
@@ -14,17 +12,17 @@ public class CLITest {
     private static final String TEST_MAX_ROW_WIDTH_VALUE = "120";
     private static final String OPTIONS_SHOW_LAST_N_CHANGES_VALUE = "6";
     private static final String[] TEST_ARGS = new String[]{
-        prependHyphen(CLI.OPTIONS_DEBUG_FLAG),
-        prependHyphen(CLI.OPTIONS_DELETE_FIRST_N_ROWS_FLAG),
+        prependHyphen(CLIStrings.DEBUG_FLAG),
+        prependHyphen(CLIStrings.DELETE_FIRST_N_ROWS_FLAG),
         OPTIONS_DELETE_FIRST_N_ROWS_VALUE,
-        prependHyphen(CLI.OPTIONS_PURGE_FLAG),
-        prependHyphen(CLI.OPTIONS_CONFIG_FLAG),
+        prependHyphen(CLIStrings.PURGE_FLAG),
+        prependHyphen(CLIStrings.CONFIG_FLAG),
         TEST_CONFIG_VALUE,
-        prependHyphen(CLI.OPTIONS_MAX_COL_WIDTH_FLAG),
+        prependHyphen(CLIStrings.MAX_COL_WIDTH_FLAG),
         TEST_MAX_COLUMN_WIDTH_VALUE,
-        prependHyphen(CLI.OPTIONS_MAX_ROW_WIDTH_FLAG),
+        prependHyphen(CLIStrings.MAX_ROW_WIDTH_FLAG),
         TEST_MAX_ROW_WIDTH_VALUE,
-        prependHyphen(CLI.OPTIONS_SHOW_LAST_N_CHANGES_FLAG),
+        prependHyphen(CLIStrings.SHOW_LAST_N_CHANGES_FLAG),
         OPTIONS_SHOW_LAST_N_CHANGES_VALUE,
     };
     

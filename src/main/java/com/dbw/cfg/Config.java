@@ -43,7 +43,7 @@ public class Config {
                 .and(ConfigValidator.isDbTypeKnown())
                 .apply(this);
         if (!result.equals(ConfigValidator.ValidationResult.SUCCESS)) {
-            throw new UnrecoverableException("ConfigValidationException", result.msg);
+            throw new UnrecoverableException("ConfigValidationException", String.format(result.msg, path));
         }
     }
 }

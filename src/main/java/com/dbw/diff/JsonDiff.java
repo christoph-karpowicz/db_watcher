@@ -1,7 +1,6 @@
 package com.dbw.diff;
 
 import com.dbw.db.Common;
-import com.dbw.db.Postgres;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;

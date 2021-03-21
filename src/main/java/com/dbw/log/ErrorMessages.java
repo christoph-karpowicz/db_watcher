@@ -6,8 +6,8 @@ public class ErrorMessages {
     public final static String DB_CONN_FAILED = "Database connection attempt failed. Make sure you've provided the right path for the driver. Error message: %s";
     public final static String COULDNT_SELECT_MAX = "Couldn't select audit table's max id.";
     public final static String STATE_VALIDATION_NULL_OR_EMPTY = "Audit record ID: %d. Could not parse state data. Provided %s state string is null or empty.";
-    public final static String UNKNOWN_DB_OPERATION = "Uknown database operation.";
-    public final static String UNKNOWN_DB_TYPE = "Unknown or not supported database type.";
+    public final static String UNKNOWN_DB_OPERATION = "%s: Uknown database operation.";
+    public final static String UNKNOWN_DB_TYPE = "%s: Unknown or not supported database type.";
     public final static String AUDIT_TABLE_WATCH_ATTEMPT = Common.DBW_AUDIT_TABLE_NAME + " table name found on tables list. An audit trigger must not be created on the audit table.";
     public final static String CLI_INVALID_DELETE_N_ROWS = "Invalid -D flag value. It has to be either a number or an asterisk.";
     public final static String CLI_INVALID_INTERVAL_SMALL = "The interval is too small. It cannot be less than 10 milliseconds.";

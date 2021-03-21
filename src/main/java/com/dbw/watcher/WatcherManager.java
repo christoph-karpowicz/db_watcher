@@ -4,7 +4,6 @@ import com.dbw.cfg.Config;
 import com.dbw.db.DatabaseManager;
 import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
-import com.dbw.err.UnknownDbTypeException;
 import com.dbw.err.WatcherStartException;
 import com.dbw.frame.AuditFrame;
 import com.google.common.collect.Lists;

@@ -10,36 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public class CLI {
-    private final String HELP_USAGE = 
-        "\nAn example application start for PostgreSQL configuration:" + 
-        "\njava -cp ./dbw.jar com.dbw.app.Dbw -c ./postgres-example-config.yml" + 
-        "\nAn example application start for Oracle configuration:" + 
-        "\njava -cp lib/ojdbc7.jar:./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml"
-        ;
-    private final String OPTIONS_CONFIG = "config";
-    private final String OPTIONS_DEBUG = "debug";
-    private final String OPTIONS_DELETE_FIRST_N_ROWS = "deleteFirstNRows";
-    private final String OPTIONS_SHOW_HELP = "help";
-    private final String OPTIONS_INTERVAL = "interval";
-    private final String OPTIONS_MAX_COL_WIDTH = "maxColumnWidth";
-    private final String OPTIONS_MAX_ROW_WIDTH = "maxRowWidth";
-    private final String OPTIONS_PURGE = "purge";
-    private final String OPTIONS_SHOW_LAST_N_CHANGES = "lastNChanges";
-    private final String OPTIONS_TIME_DIFF_SEPARATOR = "timeDiffSeparatorMinVal";
-    private final String OPTIONS_VERBOSE_DIFF = "verboseDiff";
-    public static final String OPTIONS_CONFIG_FLAG = "c";
-    public static final String OPTIONS_DEBUG_FLAG = "d";
-    public static final String OPTIONS_DELETE_FIRST_N_ROWS_FLAG = "D";
-    public static final String OPTIONS_SHOW_HELP_FLAG = "h";
-    public static final String OPTIONS_INTERVAL_FLAG = "i";
-    public static final String OPTIONS_MAX_COL_WIDTH_FLAG = "w";
-    public static final String OPTIONS_MAX_ROW_WIDTH_FLAG = "W";
-    public static final String OPTIONS_PURGE_FLAG = "p";
-    public static final String OPTIONS_SHOW_LAST_N_CHANGES_FLAG = "n";
-    public static final String OPTIONS_TIME_DIFF_SEPARATOR_FLAG = "t";
-    public static final String OPTIONS_VERBOSE_DIFF_FLAG = "V";
-    public static final String ALL_SYMBOL = "*";
-    
     private CommandLineParser parser;
     private Options options;
     private CommandLine cmd;
@@ -63,22 +33,22 @@ public class CLI {
     }
 
     private void setOptions() {
-        options.addOption(OPTIONS_CONFIG_FLAG, OPTIONS_CONFIG, true, "provide a path to the configuration file");
-        options.addOption(OPTIONS_DEBUG_FLAG, OPTIONS_DEBUG, false, "show exception classes and stack traces");
-        options.addOption(OPTIONS_DELETE_FIRST_N_ROWS_FLAG, OPTIONS_DELETE_FIRST_N_ROWS, true, "delete the first n rows from the audit table (" + ALL_SYMBOL + " if all)");
-        options.addOption(OPTIONS_SHOW_HELP_FLAG, OPTIONS_SHOW_HELP, false, "show help");
-        options.addOption(OPTIONS_INTERVAL_FLAG, OPTIONS_INTERVAL, true, "set the interval in milliseconds in which the application checks whether there were changes in the watched database (default: 500ms)");
-        options.addOption(OPTIONS_MAX_COL_WIDTH_FLAG, OPTIONS_MAX_COL_WIDTH, true, "specify the maximum width of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_WIDTH + ")");
-        options.addOption(OPTIONS_MAX_ROW_WIDTH_FLAG, OPTIONS_MAX_ROW_WIDTH, true, "specify the maximum width of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_WIDTH + ")");
-        options.addOption(OPTIONS_PURGE_FLAG, OPTIONS_PURGE, false, "remove database audit table, functions and triggers");
-        options.addOption(OPTIONS_SHOW_LAST_N_CHANGES_FLAG, OPTIONS_SHOW_LAST_N_CHANGES, true, "specify the number of last changes to display after the app starts");
-        options.addOption(OPTIONS_TIME_DIFF_SEPARATOR_FLAG, OPTIONS_TIME_DIFF_SEPARATOR, true, "specify the time in milliseconds after which a time difference separator will appear between two frames (default: 5000)");
-        options.addOption(OPTIONS_VERBOSE_DIFF_FLAG, OPTIONS_VERBOSE_DIFF, false, "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column width");
+        options.addOption(CLIStrings.CONFIG_FLAG, CLIStrings.CONFIG, true, CLIStrings.CONFIG_FLAG_DESC);
+        options.addOption(CLIStrings.DEBUG_FLAG, CLIStrings.DEBUG, false, CLIStrings.DEBUG_FLAG_DESC);
+        options.addOption(CLIStrings.DELETE_FIRST_N_ROWS_FLAG, CLIStrings.DELETE_FIRST_N_ROWS, true, CLIStrings.DELETE_FIRST_N_ROWS_FLAG_DESC);
+        options.addOption(CLIStrings.SHOW_HELP_FLAG, CLIStrings.SHOW_HELP, false, CLIStrings.SHOW_HELP_FLAG_DESC);
+        options.addOption(CLIStrings.INTERVAL_FLAG, CLIStrings.INTERVAL, true, CLIStrings.INTERVAL_FLAG_DESC);
+        options.addOption(CLIStrings.MAX_COL_WIDTH_FLAG, CLIStrings.MAX_COL_WIDTH, true, CLIStrings.MAX_COL_WIDTH_FLAG_DESC);
+        options.addOption(CLIStrings.MAX_ROW_WIDTH_FLAG, CLIStrings.MAX_ROW_WIDTH, true, CLIStrings.MAX_ROW_WIDTH_FLAG_DESC);
+        options.addOption(CLIStrings.PURGE_FLAG, CLIStrings.PURGE, false, CLIStrings.PURGE_FLAG_DESC);
+        options.addOption(CLIStrings.SHOW_LAST_N_CHANGES_FLAG, CLIStrings.SHOW_LAST_N_CHANGES, true, CLIStrings.SHOW_LAST_N_CHANGES_FLAG_DESC);
+        options.addOption(CLIStrings.TIME_DIFF_SEPARATOR_FLAG, CLIStrings.TIME_DIFF_SEPARATOR, true, CLIStrings.TIME_DIFF_SEPARATOR_FLAG_DESC);
+        options.addOption(CLIStrings.VERBOSE_DIFF_FLAG, CLIStrings.VERBOSE_DIFF, false, CLIStrings.VERBOSE_DIFF_FLAG_DESC);
     }
 
     public void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(HELP_USAGE, options);
+        formatter.printHelp(CLIStrings.HELP_USAGE, options);
     }
 
     private void setCmd() throws ParseException {
@@ -110,8 +80,8 @@ public class CLI {
     }
 
     private Optional<Set<String>> getConfigOption() {
-        if(cmd.hasOption(OPTIONS_CONFIG)) {
-            String configOption = cmd.getOptionValue(OPTIONS_CONFIG);
+        if(cmd.hasOption(CLIStrings.CONFIG)) {
+            String configOption = cmd.getOptionValue(CLIStrings.CONFIG);
             String[] configPaths = configOption.split(",");
             Set<String> configPathsSet = Sets.newHashSet(configPaths);
             return Optional.of(configPathsSet);
@@ -120,14 +90,14 @@ public class CLI {
     }
     
     private boolean getDebugOption() {
-        return cmd.hasOption(OPTIONS_DEBUG);
+        return cmd.hasOption(CLIStrings.DEBUG);
     }
 
     private String getDeleteFirstNRowsOption() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_DELETE_FIRST_N_ROWS)) {
-            String value = cmd.getOptionValue(OPTIONS_DELETE_FIRST_N_ROWS);
+        if(cmd.hasOption(CLIStrings.DELETE_FIRST_N_ROWS)) {
+            String value = cmd.getOptionValue(CLIStrings.DELETE_FIRST_N_ROWS);
             boolean isNumeric = value.chars().allMatch(Character::isDigit);
-            if (!isNumeric && !value.trim().equals(ALL_SYMBOL)) {
+            if (!isNumeric && !value.trim().equals(CLIStrings.ALL_SYMBOL)) {
                 throw new NumberFormatException(ErrorMessages.CLI_INVALID_DELETE_N_ROWS);
             }
             return value;
@@ -136,12 +106,12 @@ public class CLI {
     }
 
     private boolean getShowHelpOption() {
-        return cmd.hasOption(OPTIONS_SHOW_HELP);
+        return cmd.hasOption(CLIStrings.SHOW_HELP);
     }
 
     private Short getInterval() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_INTERVAL)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_INTERVAL);
+        if(cmd.hasOption(CLIStrings.INTERVAL)) {
+            String optionValue = cmd.getOptionValue(CLIStrings.INTERVAL);
             Short value = Short.parseShort(optionValue);
             if (value < 10) {
                 throw new NumberFormatException(ErrorMessages.CLI_INVALID_INTERVAL_SMALL);
@@ -155,8 +125,8 @@ public class CLI {
     }
 
     private Short getMaxColumnWidthOption() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_MAX_COL_WIDTH)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_MAX_COL_WIDTH);
+        if(cmd.hasOption(CLIStrings.MAX_COL_WIDTH)) {
+            String optionValue = cmd.getOptionValue(CLIStrings.MAX_COL_WIDTH);
             Short value = Short.parseShort(optionValue);
             if (value <= 3) {
                 throw new NumberFormatException(ErrorMessages.CLI_INVALID_MAX_COLUMN_WIDTH);
@@ -167,8 +137,8 @@ public class CLI {
     }
 
     private Short getMaxRowWidthOption() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_MAX_ROW_WIDTH)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_MAX_ROW_WIDTH);
+        if(cmd.hasOption(CLIStrings.MAX_ROW_WIDTH)) {
+            String optionValue = cmd.getOptionValue(CLIStrings.MAX_ROW_WIDTH);
             Short value = Short.parseShort(optionValue);
             if (value <= 10) {
                 throw new NumberFormatException(ErrorMessages.CLI_INVALID_MAX_ROW_WIDTH);
@@ -179,20 +149,20 @@ public class CLI {
     }
 
     private boolean getPurgeOption() {
-        return cmd.hasOption(OPTIONS_PURGE);
+        return cmd.hasOption(CLIStrings.PURGE);
     }
     
     private Short getShowLastNChangesOption() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_SHOW_LAST_N_CHANGES)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_SHOW_LAST_N_CHANGES);
+        if(cmd.hasOption(CLIStrings.SHOW_LAST_N_CHANGES)) {
+            String optionValue = cmd.getOptionValue(CLIStrings.SHOW_LAST_N_CHANGES);
             return Short.parseShort(optionValue);
         }
         return null;
     }
 
     private Short getTimeDiffSeparatorMinVal() throws NumberFormatException {
-        if(cmd.hasOption(OPTIONS_TIME_DIFF_SEPARATOR)) {
-            String optionValue = cmd.getOptionValue(OPTIONS_TIME_DIFF_SEPARATOR);
+        if(cmd.hasOption(CLIStrings.TIME_DIFF_SEPARATOR)) {
+            String optionValue = cmd.getOptionValue(CLIStrings.TIME_DIFF_SEPARATOR);
             Short value = Short.parseShort(optionValue);
             if (value < 0) {
                 throw new NumberFormatException(ErrorMessages.CLI_TIME_DIFF_SEP_LT_ZERO);
@@ -203,7 +173,7 @@ public class CLI {
     }
 
     private boolean getVerboseDiff() {
-        return cmd.hasOption(OPTIONS_VERBOSE_DIFF);
+        return cmd.hasOption(CLIStrings.VERBOSE_DIFF);
     }
 
     public class ParsedOptions {

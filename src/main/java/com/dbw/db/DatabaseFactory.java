@@ -1,8 +1,6 @@
 package com.dbw.db;
 
 import com.dbw.cfg.Config;
-import com.dbw.cfg.DatabaseConfig;
-import com.dbw.err.UnknownDbTypeException;
 import com.dbw.log.ErrorMessages;
 
 public class DatabaseFactory {
