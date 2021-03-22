@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class TimeDiffSeparator implements OutputBuilder {
     private static final Short DEFAULT_TIME_DIFF_SEP_MIN_VAL = 5000;
@@ -14,8 +15,8 @@ public class TimeDiffSeparator implements OutputBuilder {
 
     private final String timeDiff;
 
-    public TimeDiffSeparator(long timeDiff) {
-        this.timeDiff = timeDiff + SECONDS_SYMBOL;
+    public TimeDiffSeparator(String timeDiff) {
+        this.timeDiff = timeDiff;
     }
 
     public static Optional<TimeDiffSeparator> create(Timestamp lastAuditRecordsTime, Timestamp currentAuditRecordsTime) {
@@ -26,7 +27,7 @@ public class TimeDiffSeparator implements OutputBuilder {
         short timeDiffSepMinVal =
                 App.options.getTimeDiffSeparatorMinVal() != null ? App.options.getTimeDiffSeparatorMinVal() : DEFAULT_TIME_DIFF_SEP_MIN_VAL;
         if (timeDiffInMillis > timeDiffSepMinVal) {
-            long timeDiffInSeconds = getTimeDiffInSeconds(timeDiffInMillis);
+            String timeDiffInSeconds = getTimeFormattedDiff(timeDiffInMillis);
             TimeDiffSeparator ts = new TimeDiffSeparator(timeDiffInSeconds);
             return Optional.of(ts);
         }
@@ -40,8 +41,37 @@ public class TimeDiffSeparator implements OutputBuilder {
         return timeDiff.toMillis();
     }
 
-    private static long getTimeDiffInSeconds(long timeDiffInMillis) {
-        return Math.floorDiv(timeDiffInMillis, 1000);
+    private static String getTimeFormattedDiff(long timeDiffInMillis) {
+        long days = TimeUnit.MILLISECONDS.toDays(timeDiffInMillis);
+        timeDiffInMillis -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(timeDiffInMillis);
+        timeDiffInMillis -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiffInMillis);
+        timeDiffInMillis -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(timeDiffInMillis);
+        long millis = timeDiffInMillis - TimeUnit.SECONDS.toMillis(seconds);
+
+        StringBuilder builder = new StringBuilder();
+        if (days > 0) {
+            builder.append(days + DAYS_SYMBOL);
+            builder.append(SPACE);
+        }
+        if (hours > 0) {
+            builder.append(hours + HOURS_SYMBOL);
+            builder.append(SPACE);
+        }
+        if (minutes > 0) {
+            builder.append(minutes + MINUTES_SYMBOL);
+            builder.append(SPACE);
+        }
+        if (seconds > 0) {
+            builder.append(seconds + SECONDS_SYMBOL);
+            builder.append(SPACE);
+        }
+        if (millis > 0) {
+            builder.append(millis + MILLIS_SYMBOL);
+        }
+        return builder.toString();
     }
 
     @Override

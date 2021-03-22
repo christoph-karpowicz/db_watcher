@@ -15,7 +15,7 @@ public class OrclQueries {
             Common.COLNAME_OLD_STATE + "     CLOB, " +
             Common.COLNAME_NEW_STATE + "     CLOB, " +
             Common.COLNAME_OPERATION + "     CHAR(1 CHAR) NOT NULL, " +
-            Common.COLNAME_TIMESTAMP + "     TIMESTAMP(6) DEFAULT sysdate NOT NULL" +
+            Common.COLNAME_TIMESTAMP + "     TIMESTAMP(3) DEFAULT LOCALTIMESTAMP(3) NOT NULL" +
         ")";
 
     public static final String FIND_AUDIT_TRIGGER = "SELECT COUNT(*) AS \"" + Common.EXISTS + "\" from sys.all_triggers WHERE TRIGGER_NAME = ?";
@@ -47,7 +47,7 @@ public class OrclQueries {
         "AFTER INSERT OR UPDATE OR DELETE ON %s \n" +
         "FOR EACH ROW \n" +
         "DECLARE \n" +
-        "v_operation VARCHAR2(6) := \n" +
+        "v_operation CHAR(1) := \n" +
         "    case when updating then 'U' \n" +
         "        when deleting then 'D' \n" +
         "        else 'I' end; \n" +
