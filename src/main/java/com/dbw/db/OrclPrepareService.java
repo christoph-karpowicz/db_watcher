@@ -21,7 +21,7 @@ public class OrclPrepareService {
             prepareAuditTable();
         } catch (SQLException e) {
             String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TABLE, e.getMessage());
-            new PreparationException(errMsg, e).handle();
+            throw new PreparationException(errMsg, e);
         }
         prepareAuditTriggers();
     }

@@ -1,5 +1,6 @@
 package com.dbw.watcher;
 
+import com.dbw.cache.Cache;
 import com.dbw.cfg.Config;
 import com.dbw.db.DatabaseManager;
 import com.dbw.err.DbConnectionException;
@@ -18,6 +19,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class WatcherManager {
     @Inject
     private DatabaseManager databaseManager;
+    @Inject
+    private Cache cache;
 
     private final List<Watcher> watchers = Lists.newArrayList();
     private final LinkedBlockingQueue<AuditFrame> frameQueue = new LinkedBlockingQueue<>();
@@ -36,6 +39,9 @@ public class WatcherManager {
                 Thread watcherThread = new Thread(watcher);
                 watcherThread.start();
             } catch (PreparationException | DbConnectionException e) {
+                if (e instanceof PreparationException) {
+                    cache.removeConfig(watcher.getCfg().getPath());
+                }
                 throw new WatcherStartException(e.getMessage(), e);
             }
         }

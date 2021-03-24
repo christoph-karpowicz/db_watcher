@@ -3,6 +3,8 @@ package com.dbw.db;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.log.ErrorMessages;
 
+import java.util.Arrays;
+
 public enum Operation {
     INSERT("I"),
     UPDATE("U"),
@@ -10,7 +12,7 @@ public enum Operation {
 
     public final String symbol;
  
-    private Operation(String symbol) {
+    Operation(String symbol) {
         this.symbol = symbol;
     }
 
@@ -21,5 +23,9 @@ public enum Operation {
             }
         }
         throw new UnknownDbOperationException(ErrorMessages.UNKNOWN_DB_OPERATION);
+    }
+
+    public boolean in(Operation... operations) {
+        return Arrays.asList(operations).contains(this);
     }
 }

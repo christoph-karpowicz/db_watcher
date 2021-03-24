@@ -20,6 +20,10 @@ public class DbwException extends Exception {
         return this;
     }
 
+    public Exception getChildException() {
+        return childException;
+    }
+
     protected void setChildException(Exception childException) {
         this.childException = childException;
     }
@@ -45,7 +49,7 @@ public class DbwException extends Exception {
     }
 
     private void printDebugMessage() {
-        if (Objects.isNull(childException)) {
+        if (childException == null) {
             System.out.printf("%s: %s\n", this.getClass().getName(), this.getMessage());
             this.printStackTrace();
         } else {

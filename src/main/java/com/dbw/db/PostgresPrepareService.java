@@ -22,13 +22,13 @@ public class PostgresPrepareService {
         }
     }
 
-    private void prepareAuditTable() throws SQLException {
+    private void prepareAuditTable() throws SQLException, PreparationException {
         if (!db.auditTableExists()) {
             try {
                 db.createAuditTable();
             } catch (SQLException e) {
                 String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TABLE, e.getMessage());
-                new PreparationException(errMsg, e).handle();
+                throw new PreparationException(errMsg, e);
             }
         }
     }

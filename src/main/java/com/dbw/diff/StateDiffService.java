@@ -21,7 +21,7 @@ import java.util.List;
 
 @Singleton
 public class StateDiffService implements DiffService {
-    private final String DATE_FMT = "MM-dd-yyyy HH:mm:ss";
+    private final String DATE_FMT = "MM.dd.yyyy HH:mm:ss";
 
     @Inject
     private TableDiffBuilder tableDiffBuilder;
@@ -47,14 +47,12 @@ public class StateDiffService implements DiffService {
     }
 
     private void validateStateData(AuditRecord auditRecord) throws StateDataValidationException {
-        boolean isUpdate = auditRecord.getOperation().equals(Operation.UPDATE);
-        boolean isInsert = auditRecord.getOperation().equals(Operation.INSERT);
-        boolean isDelete = auditRecord.getOperation().equals(Operation.DELETE);
-        if ((isDelete || isUpdate) && Strings.isNullOrEmpty(auditRecord.getOldData())) {
-            throw new StateDataValidationException(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "old"));
-        }
-        if ((isInsert || isUpdate) && Strings.isNullOrEmpty(auditRecord.getNewData())) {
-            throw new StateDataValidationException(String.format(ErrorMessages.STATE_VALIDATION_NULL_OR_EMPTY, auditRecord.getId(), "new"));
+        StateDataValidator.ValidationResult result =
+                StateDataValidator.isOldStateNullOrEmpty()
+                .and(StateDataValidator.isNewStateNullOrEmpty())
+                .apply(auditRecord);
+        if (!result.equals(StateDataValidator.ValidationResult.SUCCESS)) {
+            throw new StateDataValidationException(result.getErrorMessage(auditRecord));
         }
     }
 

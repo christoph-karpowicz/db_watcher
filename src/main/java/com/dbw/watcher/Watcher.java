@@ -56,6 +56,10 @@ public class Watcher implements Runnable {
         db.close();
     }
 
+    public Config getCfg() {
+        return cfg;
+    }
+
     public Database getDb() {
         return db;
     }
