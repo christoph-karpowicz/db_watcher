@@ -20,10 +20,4 @@ public interface OutputBuilder {
     String VERBOSE_DIFF_DIFF = " diff: ";
     String VERBOSE_DIFF_BEFORE = "Before: ";
     String VERBOSE_DIFF_AFTER = "After: ";
-    String DAYS_SYMBOL = "d";
-    String HOURS_SYMBOL = "h";
-    String MINUTES_SYMBOL = "m";
-    String SECONDS_SYMBOL = "s";
-    String MILLIS_SYMBOL = "ms";
-    String SPACE = " ";
 }

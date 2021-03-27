@@ -19,6 +19,7 @@ public class AuditFrame {
     private Diff diff;
     private Database db;
     private List<StateColumn> stateColumns;
+    private String timeSincePrevious;
 
     @Inject
     private StateDiffService diffService;
@@ -56,12 +57,17 @@ public class AuditFrame {
         this.stateColumns = stateColumns;
     }
 
+    public void setTimeSincePrevious(String timeSincePrevious) {
+        this.timeSincePrevious = timeSincePrevious;
+    }
+
     @Override
     public String toString() {
         AuditFrameBuilder builder = ObjectCreator.create(AuditFrameBuilder.class);
         builder.setDbConfig(db.getDbConfig());
         builder.setAuditRecord(auditRecord);
         builder.setStateColumns(stateColumns);
+        builder.setTimeSincePrevious(timeSincePrevious);
         builder.init();
         builder.build();
         return builder.toString();

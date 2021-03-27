@@ -10,7 +10,7 @@ public class DriverClassLoader extends URLClassLoader {
         super(urls);
     }
 
-    public void addFile (String path) throws MalformedURLException {
+    public void addFile(String path) throws MalformedURLException {
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.equals("linux")) {
             path = "/" + path;

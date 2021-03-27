@@ -29,34 +29,25 @@ public class OutputManager {
         try {
             while (true) {
                 Thread.sleep(App.getInterval());
-                List<AuditFrame> frames = getSortedFrames();
-                frames.forEach(this::outputFrame);
+                OutputBatch frames = getSortedFrames();
+                frames.output();
                 if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {
                     outputInitialInfo();
                     outputInitialInfoDone = true;
                 }
+                setLastAuditRecordsTime(frames.getPreviousTime());
             }
         } catch (InterruptedException e) {
             new WatcherRunException(e.getMessage(), e).handle();
         }
     }
 
-    private List<AuditFrame> getSortedFrames() {
-        List<AuditFrame> frames = Lists.newArrayList();
+    private OutputBatch getSortedFrames() {
+        OutputBatch frames = new OutputBatch(lastAuditRecordsTime);
         watcherManager.getFrameQueue().drainTo(frames);
-        return frames
-                .stream()
-                .sorted(Comparator.comparing(frameA -> frameA.getAuditRecord().getTimestamp()))
-                .collect(Collectors.toList());
-    }
-
-    private void outputFrame(AuditFrame frame) {
-        Timestamp currentRecordsTime = frame.getAuditRecord().getTimestamp();
-        Optional<TimeDiffSeparator> timeSeparator =
-                TimeDiffSeparator.create(lastAuditRecordsTime, currentRecordsTime);
-        timeSeparator.ifPresent(separator -> System.out.println(separator.toString()));
-        System.out.println(frame.toString());
-        setLastAuditRecordsTime(currentRecordsTime);
+        frames.sort();
+        frames.calculateTimes();
+        return frames;
     }
 
     private void outputInitialInfo() {

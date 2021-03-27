@@ -12,6 +12,7 @@ import com.dbw.diff.TableDiffBuilder;
 import com.dbw.output.OutputBuilder;
 import com.dbw.util.StringUtils;
 import com.dbw.watcher.WatcherManager;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
 public class AuditFrameBuilder implements OutputBuilder {
@@ -21,6 +22,7 @@ public class AuditFrameBuilder implements OutputBuilder {
     private DatabaseConfig dbConfig;
     private AuditRecord auditRecord;
     private List<StateColumn> stateColumns;
+    private String timeSincePrevious;
     private StringBuilder builder;
 
     @Inject
@@ -38,12 +40,16 @@ public class AuditFrameBuilder implements OutputBuilder {
         this.stateColumns = stateColumns;
     }
 
+    public void setTimeSincePrevious(String timeSincePrevious) {
+        this.timeSincePrevious = timeSincePrevious;
+    }
+
     public void init() {
         builder = new StringBuilder();
     }
     
     public void build() {
-        builder.append(StringUtils.multiplyNTimes(TableDiffBuilder.getMaxRowWidth(), HR));
+        builder.append(buildSeparator());
         builder.append(VERTICAL_BORDER);
         builder.append(NEW_LINE);
         builder.append(FRAME_HEADER_ID + auditRecord.getId());
@@ -61,6 +67,29 @@ public class AuditFrameBuilder implements OutputBuilder {
         if (Operation.UPDATE.equals(auditRecord.getOperation()) && App.options.getVerboseDiff()) {
             builder.append(findVerboseColumnDiffs());
         }
+    }
+
+    private String buildSeparator() {
+        int lineLength;
+        StringBuilder builder = new StringBuilder();
+        if (!Strings.isNullOrEmpty(timeSincePrevious)) {
+            String front = buildSeparatorFrontWithTime();
+            lineLength = TableDiffBuilder.getMaxRowWidth() - front.length();
+            builder.append(front);
+        } else {
+            lineLength = TableDiffBuilder.getMaxRowWidth();
+        }
+        builder.append(StringUtils.multiplyNTimes(lineLength, HR));
+        return builder.toString();
+    }
+
+    private String buildSeparatorFrontWithTime() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(HR);
+        builder.append(PADDING);
+        builder.append(timeSincePrevious);
+        builder.append(PADDING);
+        return builder.toString();
     }
 
     private void addDatabaseInfo() {
