@@ -25,6 +25,10 @@ public class PersistentCache implements Serializable {
         configs.put(path, configCache);
     }
 
+    public boolean isConfigPresent(String path) {
+        return configs.containsKey(path);
+    }
+
     public void removeConfig(String path) {
         configs.remove(path);
     }

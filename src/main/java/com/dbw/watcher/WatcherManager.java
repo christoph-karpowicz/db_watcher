@@ -13,7 +13,9 @@ import com.google.inject.Singleton;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 @Singleton
 public class WatcherManager {
@@ -61,10 +63,6 @@ public class WatcherManager {
         return frameQueue;
     }
 
-    public int getWatchersSize() {
-        return watchers.size();
-    }
-
     public boolean areAllAfterInitialRun() {
         return watchers.stream().allMatch(Watcher::isAfterInitialRun);
     }
@@ -73,5 +71,16 @@ public class WatcherManager {
         for (Watcher watcher : watchers) {
             watcher.outputInitialInfo();
         }
+    }
+
+    public int getWatchersSize() {
+        return watchers.size();
+    }
+
+    public Set<String> getConfigPaths() {
+        return watchers
+                .stream()
+                .map(watcher -> watcher.getCfg().getPath())
+                .collect(Collectors.toSet());
     }
 }

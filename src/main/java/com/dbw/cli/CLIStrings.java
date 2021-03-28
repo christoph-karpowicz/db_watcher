@@ -10,6 +10,7 @@ public class CLIStrings {
                     "\njava -cp ./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml"
             ;
 
+    public static final String CLEAR_CACHE = "clear-cache";
     public static final String CONFIG = "config";
     public static final String DEBUG = "debug";
     public static final String DELETE_FIRST_N_ROWS = "delete-first-n-rows";
@@ -22,6 +23,7 @@ public class CLIStrings {
     public static final String TIME_DIFF_SEPARATOR = "time-diff-separator-min-val";
     public static final String VERBOSE_DIFF = "verbose-diff";
 
+    public static final String CLEAR_CACHE_FLAG = "C";
     public static final String CONFIG_FLAG = "c";
     public static final String DEBUG_FLAG = "d";
     public static final String DELETE_FIRST_N_ROWS_FLAG = "D";
@@ -34,6 +36,7 @@ public class CLIStrings {
     public static final String TIME_DIFF_SEPARATOR_FLAG = "t";
     public static final String VERBOSE_DIFF_FLAG = "V";
 
+    public static final String CLEAR_CACHE_FLAG_DESC = "clear the given config's cache";
     public static final String CONFIG_FLAG_DESC = "provide a path to the configuration file";
     public static final String DEBUG_FLAG_DESC = "show exception classes and stack traces";
     public static final String DELETE_FIRST_N_ROWS_FLAG_DESC = "delete the first n rows from the audit table (" + CLIStrings.ALL_SYMBOL + " if all)";

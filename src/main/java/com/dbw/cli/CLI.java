@@ -1,6 +1,5 @@
 package com.dbw.cli;
 
-import com.dbw.diff.TableDiffBuilder;
 import com.dbw.err.InvalidCLIOptionInputException;
 import com.dbw.log.ErrorMessages;
 import com.google.common.collect.Sets;
@@ -33,6 +32,7 @@ public class CLI {
     }
 
     private void setOptions() {
+        options.addOption(CLIStrings.CLEAR_CACHE_FLAG, CLIStrings.CLEAR_CACHE, false, CLIStrings.CLEAR_CACHE_FLAG_DESC);
         options.addOption(CLIStrings.CONFIG_FLAG, CLIStrings.CONFIG, true, CLIStrings.CONFIG_FLAG_DESC);
         options.addOption(CLIStrings.DEBUG_FLAG, CLIStrings.DEBUG, false, CLIStrings.DEBUG_FLAG_DESC);
         options.addOption(CLIStrings.DELETE_FIRST_N_ROWS_FLAG, CLIStrings.DELETE_FIRST_N_ROWS, true, CLIStrings.DELETE_FIRST_N_ROWS_FLAG_DESC);
@@ -61,6 +61,7 @@ public class CLI {
 
     public ParsedOptions parseArgs() throws InvalidCLIOptionInputException {
         ParsedOptions parsedOptions = new ParsedOptions();
+        parsedOptions.clearCache = getClearCache();
         parsedOptions.configPaths = getConfigOption();
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
@@ -77,6 +78,10 @@ public class CLI {
             throw new InvalidCLIOptionInputException(e.getMessage(), e, parsedOptions.debug);
         }
         return parsedOptions;
+    }
+
+    private boolean getClearCache() {
+        return cmd.hasOption(CLIStrings.CLEAR_CACHE);
     }
 
     private Optional<Set<String>> getConfigOption() {
@@ -177,6 +182,7 @@ public class CLI {
     }
 
     public class ParsedOptions {
+        private boolean clearCache;
         private Optional<Set<String>> configPaths;
         private boolean debug;
         private String deleteFirstNRows;
@@ -188,6 +194,10 @@ public class CLI {
         private Short showLastNChanges;
         private Short timeDiffSeparatorMinVal;
         private boolean verboseDiff;
+
+        public boolean getClearCache() {
+            return clearCache;
+        }
 
         public Optional<Set<String>> getConfigPaths() {
             return configPaths;

@@ -66,6 +66,10 @@ public class Cache {
         cachePersisterThread.start();
     }
 
+    public boolean isConfigPresent(String path) {
+        return getPersistentCache().get().isConfigPresent(path);
+    }
+
     public void removeConfig(String path) {
         getPersistentCache().get().removeConfig(path);
         persist();
