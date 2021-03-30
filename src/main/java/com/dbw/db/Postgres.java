@@ -85,6 +85,10 @@ public class Postgres extends Database {
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
+    public int getAuditRecordCount() throws SQLException {
+        return selectSingleIntValue(PostgresQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
+    }
+
     public boolean auditFunctionExists() throws SQLException {
         String[] stringArgs = {};
         return objectExists(PostgresQueries.FIND_AUDIT_FUNCTION, stringArgs);
@@ -111,7 +115,7 @@ public class Postgres extends Database {
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {
-        return deleteFirstNRows(nRows, PostgresQueries.DELETE_ALL_AUDIT_RECORDS, PostgresQueries.DELETE_AUDIT_RECORDS_WITH_ID_LTE);
+        return deleteFirstNRows(nRows, PostgresQueries.DELETE_ALL_AUDIT_RECORDS, PostgresQueries.DELETE_FIRST_N_AUDIT_RECORDS);
     }
 
     public void dropAuditTrigger(String tableName) throws SQLException {

@@ -11,12 +11,8 @@ import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.google.common.base.Strings;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +80,10 @@ public class Orcl extends Database {
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
+    public int getAuditRecordCount() throws SQLException {
+        return selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
+    }
+
     public boolean auditTriggerExists(String tableName) throws SQLException {
         String[] stringArgs = {Common.DBW_PREFIX + tableName + Common.AUDIT_POSTFIX};
         return objectExists(OrclQueries.FIND_AUDIT_TRIGGER, stringArgs);
@@ -95,7 +95,7 @@ public class Orcl extends Database {
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {
-        return deleteFirstNRows(nRows, OrclQueries.DELETE_ALL_AUDIT_RECORDS, OrclQueries.DELETE_AUDIT_RECORDS_WITH_ID_LTE);
+        return deleteFirstNRows(nRows, OrclQueries.DELETE_ALL_AUDIT_RECORDS, OrclQueries.DELETE_FIRST_N_AUDIT_RECORDS);
     }
 
     public void dropAuditTrigger(String tableName) throws SQLException {

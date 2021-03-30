@@ -94,8 +94,7 @@ public class App {
 
     public void start() throws DbwException {
         databaseManager.connectDbs();
-        boolean clearCacheOption = options.getClearCache();
-        if (clearCacheOption) {
+        if (options.getClearCache()) {
             ClearCacheAction clearCacheAction = ObjectCreator.create(ClearCacheAction.class);
             Set<String> configPaths = watcherManager.getConfigPaths();
             clearCacheAction.setConfigPaths(configPaths);

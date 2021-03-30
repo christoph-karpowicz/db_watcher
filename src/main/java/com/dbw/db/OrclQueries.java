@@ -4,8 +4,6 @@ public class OrclQueries {
 
     public static final String SELECT_TABLE_COLUMNS = "SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLS WHERE TABLE_NAME = ? AND HIDDEN_COLUMN='NO' AND VIRTUAL_COLUMN='NO' ORDER BY COLUMN_ID";
 
-    public static final String SELECT_TABLE_NAMES = "SELECT * FROM all_tables WHERE OWNER = ?";
-
     public static final String FIND_AUDIT_TABLE = "SELECT COUNT(*) AS \"" + Common.EXISTS + "\" FROM all_tables WHERE OWNER = ? AND TABLE_NAME = ?";
     
     public static final String CREATE_AUDIT_TABLE = 
@@ -87,12 +85,10 @@ public class OrclQueries {
 
     public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?";
 
-    public static final String SELECT_NTH_AUDIT_RECORD = "SELECT ID FROM (SELECT ID, ROWNUM AS rn FROM " + Common.DBW_AUDIT_TABLE_NAME + ") WHERE rn = ?";
-
     public static final String COUNT_AUDIT_RECORDS = "SELECT COUNT(*) AS ROW_COUNT FROM " + Common.DBW_AUDIT_TABLE_NAME;
 
     public static final String DELETE_ALL_AUDIT_RECORDS = "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME;
 
-    public static final String DELETE_AUDIT_RECORDS_WITH_ID_LTE = "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE ID <= ?";
+    public static final String DELETE_FIRST_N_AUDIT_RECORDS = "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE ROWNUM <= ?";
 
 }

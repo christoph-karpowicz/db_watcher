@@ -28,6 +28,20 @@ public abstract class Database {
 
     public abstract String deleteFirstNRows(String nRows) throws SQLException;
 
+    public abstract int getAuditRecordCount() throws SQLException;
+
+    public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException;
+
+    public abstract int selectMaxId() throws SQLException;
+
+    public abstract void connect() throws DbConnectionException;
+
+    public abstract void prepare() throws PreparationException;
+
+    public abstract boolean purge(List<String> watchedTables);
+
+    public abstract void close() throws SQLException;
+
     protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
         int rowCount = getAuditRecordCount();
         if (rowCount == 0) {
@@ -71,10 +85,6 @@ public abstract class Database {
         return query;
     }
 
-    public int getAuditRecordCount() throws SQLException {
-        return selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
-    }
-
     protected boolean objectExists(String query, String[] stringArgs) throws SQLException {
         boolean exists = false;
         PreparedStatement pstmt = conn.prepareStatement(query);
@@ -90,8 +100,6 @@ public abstract class Database {
         return exists;
     }
 
-    public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException;
-    
     protected List<AuditRecord> selectAuditRecords(String query, int fromId) throws SQLException, UnknownDbOperationException {
         List<AuditRecord> result = new ArrayList<>();
         PreparedStatement pstmt = conn.prepareStatement(query);
@@ -138,8 +146,6 @@ public abstract class Database {
         return result;
     }
 
-    public abstract int selectMaxId() throws SQLException;
-
     protected int selectSingleIntValue(String query, String columnName) throws SQLException {
         int result;
         Statement pstmt = conn.createStatement();
@@ -164,13 +170,4 @@ public abstract class Database {
     public DatabaseConfig getDbConfig() {
         return dbConfig;
     }
-
-    public abstract void connect() throws DbConnectionException;
-
-    public abstract void prepare() throws PreparationException;
-
-    public abstract boolean purge(List<String> watchedTables);
-
-    public abstract void close() throws SQLException;
-    
 }
