@@ -23,6 +23,8 @@ public class WatcherManager {
     private DatabaseManager databaseManager;
     @Inject
     private Cache cache;
+    @Inject
+    private WatcherCheckIn watcherCheckIn;
 
     private final List<Watcher> watchers = Lists.newArrayList();
     private final LinkedBlockingQueue<AuditFrame> frameQueue = new LinkedBlockingQueue<>();
@@ -35,6 +37,7 @@ public class WatcherManager {
     }
 
     public void startAll() throws WatcherStartException {
+        watcherCheckIn.init(watchers);
         for (Watcher watcher : watchers) {
             try {
                 watcher.init();
@@ -53,6 +56,18 @@ public class WatcherManager {
         for (Watcher watcher : watchers) {
             watcher.closeDb();
         }
+    }
+
+    public void checkIn(Watcher watcher) {
+        watcherCheckIn.checkIn(watcher);
+    }
+
+    public boolean areAllCheckedIn() {
+        return watcherCheckIn.areAllCheckedIn();
+    }
+
+    public void checkOutAll() {
+        watcherCheckIn.checkOutAll();
     }
 
     public void addFrame(AuditFrame frame) {

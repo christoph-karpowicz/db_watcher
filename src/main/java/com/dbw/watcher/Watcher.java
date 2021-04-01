@@ -2,6 +2,7 @@ package com.dbw.watcher;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,10 +82,11 @@ public class Watcher implements Runnable {
         }
     }
 
-    private void watch() {
+    private synchronized void watch() {
         try {
             Thread.sleep(App.getInterval());
             selectAndProcessAuditRecords();
+            watcherManager.checkIn(this);
             findLastId();
         } catch (InterruptedException | SQLException e) {
             new WatcherRunException(e.getMessage(), e).handle();

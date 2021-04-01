@@ -2,23 +2,16 @@ package com.dbw.output;
 
 import com.dbw.app.App;
 import com.dbw.err.WatcherRunException;
-import com.dbw.frame.AuditFrame;
-import com.dbw.log.Level;
-import com.dbw.log.LogMessages;
-import com.dbw.log.Logger;
 import com.dbw.watcher.WatcherManager;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Singleton
 public class OutputManager {
+    private final short INTERVAL = 50;
+
     @Inject
     private WatcherManager watcherManager;
 
@@ -28,14 +21,17 @@ public class OutputManager {
         boolean outputInitialInfoDone = false;
         try {
             while (true) {
-                Thread.sleep(App.getInterval());
-                OutputBatch frames = getSortedFrames();
-                frames.output();
-                if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {
-                    outputInitialInfo();
-                    outputInitialInfoDone = true;
+                Thread.sleep(INTERVAL);
+                if (watcherManager.areAllCheckedIn()) {
+                    OutputBatch frames = getSortedFrames();
+                    frames.output();
+                    if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {
+                        outputInitialInfo();
+                        outputInitialInfoDone = true;
+                    }
+                    setLastAuditRecordsTime(frames.getPreviousTime());
+                    watcherManager.checkOutAll();
                 }
-                setLastAuditRecordsTime(frames.getPreviousTime());
             }
         } catch (InterruptedException e) {
             new WatcherRunException(e.getMessage(), e).handle();
