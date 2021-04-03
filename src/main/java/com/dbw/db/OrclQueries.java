@@ -83,6 +83,13 @@ public class OrclQueries {
 
     public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(ID) AS \"" + Common.MAX + "\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
 
+    public static final String SELECT_LATEST_WITH_SECONDS =
+        "WITH latest_id AS " +
+        "(SELECT min(da.ID) AS " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
+        "WHERE da.\"TIMESTAMP\" > LOCALTIMESTAMP - NUMTODSINTERVAL(?, 'SECOND')) " +
+        "SELECT max(da.ID) AS " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
+        "WHERE id < (SELECT id FROM latest_id)";
+
     public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?";
 
     public static final String COUNT_AUDIT_RECORDS = "SELECT COUNT(*) AS ROW_COUNT FROM " + Common.DBW_AUDIT_TABLE_NAME;

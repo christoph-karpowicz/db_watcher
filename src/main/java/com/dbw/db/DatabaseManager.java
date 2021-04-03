@@ -49,14 +49,14 @@ public class DatabaseManager {
         for (Map.Entry<String, Database> db : dbs.entrySet()) {
             boolean isConfirmed = confirmPurge(db.getValue().getDbConfig().getName());
             if (!isConfirmed) {
-                return;
+                continue;
             }
             List<String> tables = cache.get().getConfigTables(db.getKey());
             String dbName = db.getValue().getDbConfig().getName();
             if (db.getValue().purge(tables)) {
                 Logger.log(Level.INFO, dbName, SuccessMessages.CLI_PURGE);
             } else {
-                Logger.log(Level.ERROR, dbName,ErrorMessages.CLI_PURGE);
+                Logger.log(Level.ERROR, dbName, ErrorMessages.CLI_PURGE);
             }
             cache.get().removeConfig(db.getKey());
         }
@@ -67,7 +67,7 @@ public class DatabaseManager {
             System.out.println(String.format(LogMessages.CONFIRM_PURGE, dbName));
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             String input = reader.readLine();
-            return input.equals("y") || input.equals("Y");
+            return input.equalsIgnoreCase("y");
         } catch (IOException e) {
             throw new UnrecoverableException("PurgeException" ,e.getMessage(), e);
         }

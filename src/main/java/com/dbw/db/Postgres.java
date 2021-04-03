@@ -13,6 +13,7 @@ import com.dbw.err.PurgeException;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
+import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.LogMessages;
@@ -157,11 +158,19 @@ public class Postgres extends Database {
     public String[] selectTableColumnNames(String tableName) throws SQLException {
         String[] stringArgs = {Config.DEFAULT_SCHEMA, tableName};
         List<String> tableColumnNames = selectStringArray(PostgresQueries.FIND_TABLE_COLUMNS, stringArgs);
-        return (String[])tableColumnNames.toArray(new String[tableColumnNames.size()]);
+        return tableColumnNames.toArray(new String[0]);
     }
 
     public int selectMaxId() throws SQLException {
-        return selectSingleIntValue(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
+        int maxId = selectSingleIntValue(PostgresQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
+        if (maxId <= 0) {
+            throw new SQLException(ErrorMessages.COULDNT_SELECT_MAX);
+        }
+        return maxId;
+    }
+
+    public Integer selectLatestAuditRecordId(int seconds) throws SQLException {
+        return selectSingleIntValue(PostgresQueries.SELECT_LATEST_WITH_SECONDS, Common.COLNAME_ID, seconds);
     }
 
     public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException {

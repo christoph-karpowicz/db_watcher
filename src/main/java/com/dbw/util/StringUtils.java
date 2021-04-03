@@ -8,4 +8,8 @@ public class StringUtils {
         return String.join("", Collections.nCopies(n, str));
     }
 
+    public static boolean isNumeric(String val) {
+        return val.chars().allMatch(Character::isDigit);
+    }
+
 }

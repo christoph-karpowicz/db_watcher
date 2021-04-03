@@ -22,7 +22,7 @@ public class CLITest {
         TEST_MAX_COLUMN_WIDTH_VALUE,
         prependHyphen(CLIStrings.MAX_ROW_WIDTH_FLAG),
         TEST_MAX_ROW_WIDTH_VALUE,
-        prependHyphen(CLIStrings.SHOW_LAST_N_CHANGES_FLAG),
+        prependHyphen(CLIStrings.SHOW_LATEST_OP_FLAG),
         OPTIONS_SHOW_LAST_N_CHANGES_VALUE,
     };
     
@@ -56,7 +56,7 @@ public class CLITest {
         assertTrue(options.getPurge());
         assertEquals(toShort(TEST_MAX_COLUMN_WIDTH_VALUE), options.getMaxColumnWidth());
         assertEquals(toShort(TEST_MAX_ROW_WIDTH_VALUE), options.getMaxRowWidth());
-        assertEquals(toShort(OPTIONS_SHOW_LAST_N_CHANGES_VALUE), options.getShowLastNChanges());
+        assertEquals(toShort(OPTIONS_SHOW_LAST_N_CHANGES_VALUE), options.getShowLatestOperations());
     }
 
     private Short toShort(String val) {

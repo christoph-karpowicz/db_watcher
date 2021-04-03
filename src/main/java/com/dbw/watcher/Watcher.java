@@ -1,15 +1,12 @@
 package com.dbw.watcher;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
+import com.dbw.cli.ShowLatestOperationsOption;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
@@ -19,8 +16,6 @@ import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
-import com.dbw.output.TimeDiffSeparator;
-import com.google.inject.Inject;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
@@ -82,7 +77,7 @@ public class Watcher implements Runnable {
         }
     }
 
-    private synchronized void watch() {
+    private void watch() {
         try {
             Thread.sleep(App.getInterval());
             selectAndProcessAuditRecords();
@@ -123,20 +118,26 @@ public class Watcher implements Runnable {
         setLastId(db.selectMaxId());
     }
 
-    private int getLastId() {
-        Short lastNChanges = App.options.getShowLastNChanges();
-        boolean lastNChangesGtZero = Objects.nonNull(lastNChanges) && lastNChanges > 0;
+    private int getLastId() throws SQLException {
+        ShowLatestOperationsOption latestOperations = App.options.getShowLatestOperations();
+        boolean lastNChangesGtZero = latestOperations != null && latestOperations.getValue() > 0;
         if (getRunCounter() == 0 && lastNChangesGtZero) {
             if (initialAuditRecordCount == 0) {
                 Logger.log(Level.WARNING, dbName, WarningMessages.NO_LAST_N_CHANGES);
                 return 0;
             }
-            
-            int lastIdMinusN = lastId - (int)lastNChanges;
-            if (lastIdMinusN <= 0) {
-                Logger.log(Level.WARNING, dbName, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
+
+            if (latestOperations.isTime()) {
+                Integer latestAuditRecord = db.selectLatestAuditRecordId(latestOperations.getValue());
+                System.out.println(latestAuditRecord);
+                return latestAuditRecord != null ? latestAuditRecord : lastId;
+            } else {
+                int lastIdMinusN = lastId - (int)latestOperations.getValue();
+                if (lastIdMinusN <= 0) {
+                    Logger.log(Level.WARNING, dbName, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
+                }
+                return Math.max(lastIdMinusN, 0);
             }
-            return Math.max(lastIdMinusN, 0);
         }
         return lastId;
     }

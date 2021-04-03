@@ -152,7 +152,15 @@ public class Orcl extends Database {
     }
 
     public int selectMaxId() throws SQLException {
-        return selectSingleIntValue(OrclQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
+        int maxId = selectSingleIntValue(OrclQueries.SELECT_AUDIT_TABLE_MAX_ID, Common.MAX);
+        if (maxId <= 0) {
+            throw new SQLException(ErrorMessages.COULDNT_SELECT_MAX);
+        }
+        return maxId;
+    }
+
+    public Integer selectLatestAuditRecordId(int seconds) throws SQLException {
+        return selectSingleIntValue(OrclQueries.SELECT_LATEST_WITH_SECONDS, Common.COLNAME_ID, seconds);
     }
 
     public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException {

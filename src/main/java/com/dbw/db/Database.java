@@ -30,6 +30,8 @@ public abstract class Database {
 
     public abstract int getAuditRecordCount() throws SQLException;
 
+    public abstract Integer selectLatestAuditRecordId(int seconds) throws SQLException;
+
     public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException;
 
     public abstract int selectMaxId() throws SQLException;
@@ -146,17 +148,33 @@ public abstract class Database {
         return result;
     }
 
-    protected int selectSingleIntValue(String query, String columnName) throws SQLException {
-        int result;
-        Statement pstmt = conn.createStatement();
-        ResultSet rs = pstmt.executeQuery(query);
-        if (rs.next()) {
-            result = rs.getInt(columnName);
-        } else {
-            throw new SQLException(ErrorMessages.COULDNT_SELECT_MAX);
-        }
+    protected Integer selectSingleIntValue(String query, String columnName, int arg) throws SQLException {
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, arg);
+        ResultSet rs = pstmt.executeQuery();
+        Integer result = getSingleIntValue(rs, columnName);
         pstmt.close();
         return result;
+    }
+
+    protected Integer selectSingleIntValue(String query, String columnName) throws SQLException {
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        Integer result = getSingleIntValue(rs, columnName);
+        stmt.close();
+        return result;
+    }
+
+    private Integer getSingleIntValue(ResultSet rs, String columnName) throws SQLException {
+        if (rs.next()) {
+            Integer value = rs.getInt(columnName);
+            if (rs.wasNull()) {
+                return null;
+            }
+            return value;
+        } else {
+            return null;
+        }
     }
 
     public Connection getConn() {

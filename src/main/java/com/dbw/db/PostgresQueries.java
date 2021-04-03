@@ -103,6 +103,13 @@ public class PostgresQueries {
 
     public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(id) FROM " + Common.DBW_AUDIT_TABLE_NAME + ";";
 
+    public static final String SELECT_LATEST_WITH_SECONDS =
+        "WITH latest_id AS " +
+        "(SELECT min(id) as " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
+        "WHERE da.\"timestamp\" > now() - make_interval(0,0,0,0,0,0,?)) " +
+        "SELECT max(id) AS " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
+        "WHERE id < (SELECT id FROM latest_id)";
+
     public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?;";
 
     public static final String COUNT_AUDIT_RECORDS = "SELECT COUNT(*) AS \"ROW_COUNT\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
@@ -110,8 +117,8 @@ public class PostgresQueries {
     public static final String DELETE_ALL_AUDIT_RECORDS = "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME;
 
     public static final String DELETE_FIRST_N_AUDIT_RECORDS =
-            "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME +
-            " WHERE id = " +
-            "any(array(SELECT id FROM " + Common.DBW_AUDIT_TABLE_NAME + " ORDER BY timestamp LIMIT ?))";
+        "DELETE FROM " + Common.DBW_AUDIT_TABLE_NAME +
+        " WHERE id = " +
+        "any(array(SELECT id FROM " + Common.DBW_AUDIT_TABLE_NAME + " ORDER BY timestamp LIMIT ?))";
 
 }

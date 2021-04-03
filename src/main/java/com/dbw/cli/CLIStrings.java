@@ -19,7 +19,7 @@ public class CLIStrings {
     public static final String MAX_COL_WIDTH = "max-column-width";
     public static final String MAX_ROW_WIDTH = "max-row-width";
     public static final String PURGE = "purge";
-    public static final String SHOW_LAST_N_CHANGES = "last-n-changes";
+    public static final String SHOW_LATEST_OP = "latest-changes";
     public static final String TIME_DIFF_SEPARATOR = "time-diff-separator-min-val";
     public static final String VERBOSE_DIFF = "verbose-diff";
 
@@ -32,7 +32,7 @@ public class CLIStrings {
     public static final String MAX_COL_WIDTH_FLAG = "w";
     public static final String MAX_ROW_WIDTH_FLAG = "W";
     public static final String PURGE_FLAG = "p";
-    public static final String SHOW_LAST_N_CHANGES_FLAG = "n";
+    public static final String SHOW_LATEST_OP_FLAG = "n";
     public static final String TIME_DIFF_SEPARATOR_FLAG = "t";
     public static final String VERBOSE_DIFF_FLAG = "V";
 
@@ -45,7 +45,7 @@ public class CLIStrings {
     public static final String MAX_COL_WIDTH_FLAG_DESC = "specify the maximum width of a column (default: " + TableDiffBuilder.DEFAULT_MAX_COL_WIDTH + ")";
     public static final String MAX_ROW_WIDTH_FLAG_DESC = "specify the maximum width of a row (default: " + TableDiffBuilder.DEFAULT_MAX_ROW_WIDTH + ")";
     public static final String PURGE_FLAG_DESC = "remove database audit table, functions and triggers";
-    public static final String SHOW_LAST_N_CHANGES_FLAG_DESC = "specify the number of last changes to display after the app starts";
+    public static final String SHOW_LATEST_OP_FLAG_DESC = "show the latest operations after the app starts. Accepts a number or a number combined with the seconds, minutes or hours symbol, where for example 3 means three latest operations and 3s means all operations from the last 3 seconds - use \"m\" or \"h\" for minutes or hours";
     public static final String TIME_DIFF_SEPARATOR_FLAG_DESC = "specify the time in milliseconds after which a time difference separator will appear between two frames (default: 5000)";
     public static final String VERBOSE_DIFF_FLAG_DESC = "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column width";
 
