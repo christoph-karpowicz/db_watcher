@@ -1,8 +1,5 @@
 package com.dbw.watcher;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
@@ -17,13 +14,15 @@ import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 
+import java.sql.SQLException;
+import java.util.List;
+
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
     private final Config cfg;
     private Database db;
     private final String dbName;
     private boolean isRunning;
-    private int runCounter = 0;
     private int lastId;
     private int initialAuditRecordCount;
     private boolean isAfterInitialRun;
@@ -67,26 +66,25 @@ public class Watcher implements Runnable {
             findLastId();
             setIsRunning(true);
             while (getIsRunning()) {
+                Thread.sleep(App.getInterval());
                 watch();
-                if (getRunCounter() == 1) {
+                if (!isAfterInitialRun()) {
                     setAfterInitialRun();
                 }
             }
-        } catch (SQLException e) {
+        } catch (InterruptedException | SQLException e) {
             new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
     }
 
     private void watch() {
         try {
-            Thread.sleep(App.getInterval());
             selectAndProcessAuditRecords();
             watcherManager.checkIn(this);
             findLastId();
-        } catch (InterruptedException | SQLException e) {
-            new WatcherRunException(e.getMessage(), e).handle();
+        } catch (SQLException e) {
+            new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
-        incrementRunCounter();
     }
 
     private void selectAndProcessAuditRecords() {
@@ -97,15 +95,16 @@ public class Watcher implements Runnable {
                     AuditFrame auditFrame = createAuditFrameAndFindDiff(auditRecord);
                     watcherManager.addFrame(auditFrame);
                 } catch (StateDataProcessingException e) {
-                    new WatcherRunException(e.getMessage(), e).setRecoverable().handle();
+                    new RecoverableException("WatcherRunException", e.getMessage(), e).handle();
                 }
             }
         } catch (SQLException | UnknownDbOperationException e) {
-            new WatcherRunException(e.getMessage(), e).handle();
+            new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
     }
 
-    private AuditFrame createAuditFrameAndFindDiff(AuditRecord auditRecord) throws StateDataProcessingException, SQLException {
+    private AuditFrame createAuditFrameAndFindDiff(AuditRecord auditRecord)
+            throws StateDataProcessingException, SQLException {
         AuditFrame frame = ObjectCreator.create(AuditFrame.class);
         frame.setAuditRecord(auditRecord);
         frame.setDb(db);
@@ -121,7 +120,7 @@ public class Watcher implements Runnable {
     private int getLastId() throws SQLException {
         ShowLatestOperationsOption latestOperations = App.options.getShowLatestOperations();
         boolean lastNChangesGtZero = latestOperations != null && latestOperations.getValue() > 0;
-        if (getRunCounter() == 0 && lastNChangesGtZero) {
+        if (!isAfterInitialRun() && lastNChangesGtZero) {
             if (initialAuditRecordCount == 0) {
                 Logger.log(Level.WARNING, dbName, WarningMessages.NO_LAST_N_CHANGES);
                 return 0;
@@ -129,7 +128,6 @@ public class Watcher implements Runnable {
 
             if (latestOperations.isTime()) {
                 Integer latestAuditRecord = db.selectLatestAuditRecordId(latestOperations.getValue());
-                System.out.println(latestAuditRecord);
                 return latestAuditRecord != null ? latestAuditRecord : lastId;
             } else {
                 int lastIdMinusN = lastId - (int)latestOperations.getValue();
@@ -157,14 +155,6 @@ public class Watcher implements Runnable {
     
     private void setIsRunning(boolean isRunning) {
         this.isRunning = isRunning;
-    }
-
-    private int getRunCounter() {
-        return runCounter;
-    }
-
-    private void incrementRunCounter() {
-        runCounter++;
     }
 
     private void setInitialAuditRecordCount() throws SQLException {

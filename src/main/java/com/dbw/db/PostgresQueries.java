@@ -107,8 +107,8 @@ public class PostgresQueries {
         "WITH latest_id AS " +
         "(SELECT min(id) as " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
         "WHERE da.\"timestamp\" > now() - make_interval(0,0,0,0,0,0,?)) " +
-        "SELECT max(id) AS " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
-        "WHERE id < (SELECT id FROM latest_id)";
+        "SELECT COALESCE(max(id), 0) AS " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
+        "WHERE id < COALESCE((SELECT id FROM latest_id), (SELECT max(id) + 1 FROM " + Common.DBW_AUDIT_TABLE_NAME + "))";
 
     public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?;";
 

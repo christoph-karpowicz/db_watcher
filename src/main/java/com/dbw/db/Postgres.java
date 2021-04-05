@@ -169,7 +169,7 @@ public class Postgres extends Database {
         return maxId;
     }
 
-    public Integer selectLatestAuditRecordId(int seconds) throws SQLException {
+    public Integer selectLatestAuditRecordId(long seconds) throws SQLException {
         return selectSingleIntValue(PostgresQueries.SELECT_LATEST_WITH_SECONDS, Common.COLNAME_ID, seconds);
     }
 

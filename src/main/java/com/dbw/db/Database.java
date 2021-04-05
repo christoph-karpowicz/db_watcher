@@ -30,7 +30,7 @@ public abstract class Database {
 
     public abstract int getAuditRecordCount() throws SQLException;
 
-    public abstract Integer selectLatestAuditRecordId(int seconds) throws SQLException;
+    public abstract Integer selectLatestAuditRecordId(long seconds) throws SQLException;
 
     public abstract List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException;
 
@@ -148,9 +148,9 @@ public abstract class Database {
         return result;
     }
 
-    protected Integer selectSingleIntValue(String query, String columnName, int arg) throws SQLException {
+    protected Integer selectSingleIntValue(String query, String columnName, long arg) throws SQLException {
         PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setInt(1, arg);
+        pstmt.setLong(1, arg);
         ResultSet rs = pstmt.executeQuery();
         Integer result = getSingleIntValue(rs, columnName);
         pstmt.close();

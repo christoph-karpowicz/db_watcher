@@ -1,7 +1,6 @@
 package com.dbw.output;
 
-import com.dbw.app.App;
-import com.dbw.err.WatcherRunException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.watcher.WatcherManager;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -34,7 +33,7 @@ public class OutputManager {
                 }
             }
         } catch (InterruptedException e) {
-            new WatcherRunException(e.getMessage(), e).handle();
+            new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
     }
 
