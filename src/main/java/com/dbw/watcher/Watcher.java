@@ -3,6 +3,7 @@ package com.dbw.watcher;
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
+import com.dbw.cli.CLIStrings;
 import com.dbw.cli.ShowLatestOperationsOption;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
@@ -118,21 +119,28 @@ public class Watcher implements Runnable {
     }
 
     private int getLastId() throws SQLException {
-        ShowLatestOperationsOption latestOperations = App.options.getShowLatestOperations();
-        boolean lastNChangesGtZero = latestOperations != null && latestOperations.getValue() > 0;
-        if (!isAfterInitialRun() && lastNChangesGtZero) {
+        ShowLatestOperationsOption latestOps = App.options.getShowLatestOperations();
+        boolean latestOpsOptionPresent = latestOps != null && latestOps.getValue() > 0;
+        if (!isAfterInitialRun() && latestOpsOptionPresent) {
             if (initialAuditRecordCount == 0) {
-                Logger.log(Level.WARNING, dbName, WarningMessages.NO_LAST_N_CHANGES);
+                Logger.log(Level.WARNING, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, WarningMessages.NO_LATEST_OPS);
                 return 0;
             }
 
-            if (latestOperations.isTime()) {
-                Integer latestAuditRecord = db.selectLatestAuditRecordId(latestOperations.getValue());
-                return latestAuditRecord != null ? latestAuditRecord : lastId;
+            if (latestOps.isTime()) {
+                Integer latestAuditRecord = db.selectLatestAuditRecordId(latestOps.getValue());
+                if (latestAuditRecord == 0) {
+                    String wrnMsg = String.format(WarningMessages.LATEST_OPS_TIME_SPANS_ALL, latestOps.getRaw());
+                    Logger.log(Level.INFO, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, wrnMsg);
+                } else if (latestAuditRecord == lastId) {
+                    String wrnMsg = String.format(WarningMessages.LATEST_OPS_TIME_SPANS_NONE, latestOps.getRaw());
+                    Logger.log(Level.INFO, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, wrnMsg);
+                }
+                return latestAuditRecord;
             } else {
-                int lastIdMinusN = lastId - (int)latestOperations.getValue();
+                int lastIdMinusN = lastId - (int)latestOps.getValue();
                 if (lastIdMinusN <= 0) {
-                    Logger.log(Level.WARNING, dbName, WarningMessages.LAST_N_CHANGES_GT_AUDIT_RECORD_COUNT);
+                    Logger.log(Level.WARNING, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, WarningMessages.LATEST_OPS_NUM_GT_AUDIT_RECORD_COUNT);
                 }
                 return Math.max(lastIdMinusN, 0);
             }

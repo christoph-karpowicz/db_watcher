@@ -1,6 +1,5 @@
 package com.dbw.log;
 
-import com.dbw.cli.CLIStrings;
 import com.dbw.db.Common;
 
 public class ErrorMessages {
@@ -15,7 +14,7 @@ public class ErrorMessages {
     public final static String CLI_INVALID_INTERVAL_BIG = "The interval is too big. You probably don't want it to be bigger than 10 seconds.";
     public final static String CLI_INVALID_MAX_COLUMN_WIDTH = "Maximum column width has to be greater than 3.";
     public final static String CLI_INVALID_MAX_ROW_WIDTH = "Maximum row width has to be greater than 10.";
-    public final static String CLI_INVALID_LATEST_OP = "[-" + CLIStrings.SHOW_LATEST_OP_FLAG + "] latest operations option value is invalid";
+    public final static String CLI_INVALID_LATEST_OP = "Latest operations option value is invalid";
     public final static String CLI_PURGE = "Errors occured while deleting database objects.";
     public final static String CLI_TIME_DIFF_SEP_LT_ZERO = "Minimal value after which a time difference separator appears must not be less than 0.";
     public final static String INPUT_NAN = "Invalid input. Enter a number from the list.";

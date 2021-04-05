@@ -10,8 +10,17 @@ public class ShowLatestOperationsOption {
     private static final long MINUTE_IN_SECONDS = 60;
     private static final long HOUR_IN_SECONDS = MINUTE_IN_SECONDS * 60;
 
+    private final String raw;
     private boolean isTime;
     private long value;
+
+    private ShowLatestOperationsOption(String raw) {
+        this.raw = raw;
+    }
+
+    public String getRaw() {
+        return raw;
+    }
 
     public boolean isTime() {
         return isTime;
@@ -30,12 +39,12 @@ public class ShowLatestOperationsOption {
     }
 
     public static ShowLatestOperationsOption create(String input) throws NumberFormatException {
-        ShowLatestOperationsOption opt = new ShowLatestOperationsOption();
+        ShowLatestOperationsOption opt = new ShowLatestOperationsOption(input);
         if (StringUtils.isNumeric(input)) {
             opt.setIsTime(false);
             opt.setValue(Short.parseShort(input));
         } else {
-            if (!isValid(input)) {
+            if (!opt.isValid()) {
                 throw new NumberFormatException(ErrorMessages.CLI_INVALID_LATEST_OP);
             }
             long minutesMultiplier = input.contains("m") ? MINUTE_IN_SECONDS : 1;
@@ -48,9 +57,9 @@ public class ShowLatestOperationsOption {
         return opt;
     }
 
-    private static boolean isValid(String input) {
+    private boolean isValid() {
         Pattern validationPattern = Pattern.compile("^\\d+(s|m|h){1}$");
-        Matcher validationMatcher = validationPattern.matcher(input.trim());
+        Matcher validationMatcher = validationPattern.matcher(raw.trim());
         return validationMatcher.matches();
     }
 }

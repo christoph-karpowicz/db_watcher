@@ -9,6 +9,18 @@ public class Logger {
         Logger.watcherManager = watcherManager;
     }
 
+    public static void log(Level level, String dbName, String flag, String msg) {
+        if (watcherManager.getWatchersSize() > 1) {
+            System.out.printf("[%s] %s: (-%s) %s\n", level.name(), dbName, flag, removeNewLines(msg));
+        } else {
+            System.out.printf("[%s] (-%s) %s\n", level.name(), flag, removeNewLines(msg));
+        }
+    }
+
+    public static void logWithFlag(Level level, String flag, String msg) {
+        System.out.printf("[%s] (-%s) %s\n", level.name(), flag, removeNewLines(msg));
+    }
+
     public static void log(Level level, String dbName, String msg) {
         if (watcherManager.getWatchersSize() > 1) {
             System.out.printf("[%s] %s: %s\n", level.name(), dbName, removeNewLines(msg));

@@ -1,6 +1,7 @@
 package com.dbw.actions;
 
 import com.dbw.cache.Cache;
+import com.dbw.cli.CLIStrings;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
@@ -23,12 +24,12 @@ public class ClearCacheAction {
         configPaths.forEach(path -> {
             if (!cache.isConfigPresent(path)) {
                 String warnMsg = String.format(WarningMessages.CLEAR_CACHE_NOT_FOUND, path);
-                Logger.log(Level.WARNING, warnMsg);
+                Logger.logWithFlag(Level.WARNING, CLIStrings.CLEAR_CACHE_FLAG, warnMsg);
                 return;
             }
             cache.removeConfig(path);
             String successMsg = String.format(SuccessMessages.CLEAR_CACHE_SUCCESS, path);
-            Logger.log(Level.INFO, successMsg);
+            Logger.logWithFlag(Level.INFO, CLIStrings.CLEAR_CACHE_FLAG, successMsg);
         });
     }
 }
