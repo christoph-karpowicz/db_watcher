@@ -26,6 +26,7 @@ public class Watcher implements Runnable {
     private boolean isRunning;
     private int lastId;
     private int initialAuditRecordCount;
+    private int numberOfLatestOp;
     private boolean isAfterInitialRun;
 
     public Watcher(WatcherManager watcherManager, Config cfg) {
@@ -99,6 +100,9 @@ public class Watcher implements Runnable {
                     new RecoverableException("WatcherRunException", e.getMessage(), e).handle();
                 }
             }
+            if (!isAfterInitialRun()) {
+                numberOfLatestOp = auditRecords.size();
+            }
         } catch (SQLException | UnknownDbOperationException e) {
             new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
@@ -119,28 +123,19 @@ public class Watcher implements Runnable {
     }
 
     private int getLastId() throws SQLException {
-        ShowLatestOperationsOption latestOps = App.options.getShowLatestOperations();
-        boolean latestOpsOptionPresent = latestOps != null && latestOps.getValue() > 0;
-        if (!isAfterInitialRun() && latestOpsOptionPresent) {
+        if (!isAfterInitialRun() && App.options.showLatestOperationsPresentAndGtThanZero()) {
+            ShowLatestOperationsOption latestOps = App.options.getShowLatestOperations();
             if (initialAuditRecordCount == 0) {
-                Logger.log(Level.WARNING, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, WarningMessages.NO_LATEST_OPS);
+                Logger.log(Level.WARNING, dbName, WarningMessages.NO_LATEST_OPS);
                 return 0;
             }
 
             if (latestOps.isTime()) {
-                Integer latestAuditRecord = db.selectLatestAuditRecordId(latestOps.getValue());
-                if (latestAuditRecord == 0) {
-                    String wrnMsg = String.format(WarningMessages.LATEST_OPS_TIME_SPANS_ALL, latestOps.getRaw());
-                    Logger.log(Level.INFO, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, wrnMsg);
-                } else if (latestAuditRecord == lastId) {
-                    String wrnMsg = String.format(WarningMessages.LATEST_OPS_TIME_SPANS_NONE, latestOps.getRaw());
-                    Logger.log(Level.INFO, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, wrnMsg);
-                }
-                return latestAuditRecord;
+                return db.selectLatestAuditRecordId(latestOps.getValue());
             } else {
                 int lastIdMinusN = lastId - (int)latestOps.getValue();
                 if (lastIdMinusN <= 0) {
-                    Logger.log(Level.WARNING, dbName, CLIStrings.SHOW_LATEST_OP_FLAG, WarningMessages.LATEST_OPS_NUM_GT_AUDIT_RECORD_COUNT);
+                    Logger.log(Level.WARNING, dbName, WarningMessages.LATEST_OPS_NUM_GT_AUDIT_RECORD_COUNT);
                 }
                 return Math.max(lastIdMinusN, 0);
             }
@@ -151,7 +146,13 @@ public class Watcher implements Runnable {
     public void outputInitialInfo() {
         Logger.log(Level.INFO, dbName, LogMessages.WATCHER_STARTED);
         Logger.log(Level.INFO, dbName, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
+        if (App.options.showLatestOperationsPresentAndGtThanZero() && App.options.getShowLatestOperations().isTime()) {
+            String latestOpMsg = String.format(LogMessages.NUMBER_OF_LATEST_OP, numberOfLatestOp, App.options.getShowLatestOperations().getRaw());
+            Logger.log(numberOfLatestOp > 0 ? Level.INFO : Level.WARNING, dbName, latestOpMsg);
+        }
     }
+
+
 
     private void setLastId(int lastId) {
         this.lastId = lastId;

@@ -24,12 +24,12 @@ public class ClearCacheAction {
         configPaths.forEach(path -> {
             if (!cache.isConfigPresent(path)) {
                 String warnMsg = String.format(WarningMessages.CLEAR_CACHE_NOT_FOUND, path);
-                Logger.logWithFlag(Level.WARNING, CLIStrings.CLEAR_CACHE_FLAG, warnMsg);
+                Logger.log(Level.WARNING, warnMsg);
                 return;
             }
             cache.removeConfig(path);
             String successMsg = String.format(SuccessMessages.CLEAR_CACHE_SUCCESS, path);
-            Logger.logWithFlag(Level.INFO, CLIStrings.CLEAR_CACHE_FLAG, successMsg);
+            Logger.log(Level.INFO, successMsg);
         });
     }
 }

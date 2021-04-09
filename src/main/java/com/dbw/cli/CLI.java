@@ -235,6 +235,10 @@ public class CLI {
             return showLatestOperations;
         }
 
+        public boolean showLatestOperationsPresentAndGtThanZero() {
+            return showLatestOperations != null && showLatestOperations.getValue() > 0;
+        }
+
         public Short getTimeDiffSeparatorMinVal() {
             return timeDiffSeparatorMinVal;
         }
