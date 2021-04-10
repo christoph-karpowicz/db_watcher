@@ -1,8 +1,6 @@
 package com.dbw.db;
 
 import com.dbw.cache.Cache;
-import com.dbw.err.DbConnectionException;
-import com.dbw.err.InitialAuditRecordDeleteException;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.log.*;
 import com.google.common.collect.Maps;
@@ -28,19 +26,19 @@ public class DatabaseManager {
         dbs.put(configPath, db);
     }
 
-    public void connectDbs() throws DbConnectionException {
+    public void connectDbs() throws UnrecoverableException {
         for (Database db : dbs.values()) {
             db.connect();
         }
     }
 
-    public void deleteFirstNRows(String nRows) throws InitialAuditRecordDeleteException {
+    public void deleteFirstNRows(String nRows) throws UnrecoverableException {
         for (Database db : dbs.values()) {
             try {
                 String successMessage = db.deleteFirstNRows(nRows);
                 Logger.log(Level.INFO, db.getDbConfig().getName(), String.format(successMessage, nRows));
             } catch (SQLException e) {
-                throw new InitialAuditRecordDeleteException(e.getMessage(), e);
+                throw new UnrecoverableException("InitialAuditRecordDelete", e.getMessage(), e);
             }
         }
     }

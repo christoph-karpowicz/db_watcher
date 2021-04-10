@@ -3,9 +3,9 @@ package com.dbw.watcher;
 import com.dbw.cache.Cache;
 import com.dbw.cfg.Config;
 import com.dbw.db.DatabaseManager;
-import com.dbw.err.DbConnectionException;
+import com.dbw.err.DbwException;
 import com.dbw.err.PreparationException;
-import com.dbw.err.WatcherStartException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.frame.AuditFrame;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -36,18 +36,18 @@ public class WatcherManager {
         databaseManager.addDatabase(cfg.getPath(), watcher.getDb());
     }
 
-    public void startAll() throws WatcherStartException {
+    public void startAll() throws UnrecoverableException {
         watcherCheckIn.init(watchers);
         for (Watcher watcher : watchers) {
             try {
                 watcher.init();
                 Thread watcherThread = new Thread(watcher);
                 watcherThread.start();
-            } catch (PreparationException | DbConnectionException e) {
+            } catch (DbwException e) {
                 if (e instanceof PreparationException) {
                     cache.removeConfig(watcher.getCfg().getPath());
                 }
-                throw new WatcherStartException(e.getMessage(), e);
+                throw new UnrecoverableException("WatcherStart", e.getMessage(), e);
             }
         }
     }

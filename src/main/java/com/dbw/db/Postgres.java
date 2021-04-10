@@ -9,10 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.dbw.cfg.Config;
-import com.dbw.err.PurgeException;
-import com.dbw.err.UnknownDbOperationException;
-import com.dbw.err.DbConnectionException;
-import com.dbw.err.PreparationException;
+import com.dbw.err.*;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
@@ -37,14 +34,14 @@ public class Postgres extends Database {
         super(config);
     }
 
-    public void connect() throws DbConnectionException {
+    public void connect() throws UnrecoverableException {
         try {
             Class.forName(DRIVER);
             Connection conn = DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
             setConn(conn);
             Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_OPENED);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new DbConnectionException(e.getMessage(), e);
+            throw new UnrecoverableException("DbConnection", e.getMessage(), e);
         }
     }
 
@@ -131,7 +128,7 @@ public class Postgres extends Database {
                 dropAuditTrigger(tableName);
             } catch (SQLException e) {
                 success = false;
-                new PurgeException(e.getMessage(), e).setRecoverable().handle();
+                new RecoverableException("Purge", e.getMessage(), e).setRecoverable().handle();
             }
         }
         try {
@@ -139,7 +136,7 @@ public class Postgres extends Database {
             dropAuditTable();
         } catch (SQLException e) {
             success = false;
-            new PurgeException(e.getMessage(), e).setRecoverable().handle();
+            new RecoverableException("Purge", e.getMessage(), e).setRecoverable().handle();
         }
         return success;
     }

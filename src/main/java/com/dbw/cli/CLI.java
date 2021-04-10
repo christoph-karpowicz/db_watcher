@@ -1,6 +1,6 @@
 package com.dbw.cli;
 
-import com.dbw.err.InvalidCLIOptionInputException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.util.StringUtils;
 import com.google.common.collect.Sets;
@@ -15,7 +15,7 @@ public class CLI {
     private CommandLine cmd;
     private String[] args;
 
-    public void init(String[] args) throws ParseException, InvalidCLIOptionInputException {
+    public void init(String[] args) throws ParseException, UnrecoverableException {
         setArgs(args);
         parser = new DefaultParser();
         options = new Options();
@@ -23,7 +23,7 @@ public class CLI {
         setCmd();
     }
 
-    public ParsedOptions handleArgs() throws InvalidCLIOptionInputException {
+    public ParsedOptions handleArgs() throws UnrecoverableException {
         ParsedOptions parsedOptions = parseArgs();
         if (parsedOptions.getShowHelp()) {
             printHelp();
@@ -60,7 +60,7 @@ public class CLI {
         this.args = args;
     }
 
-    public ParsedOptions parseArgs() throws InvalidCLIOptionInputException {
+    public ParsedOptions parseArgs() throws UnrecoverableException {
         ParsedOptions parsedOptions = new ParsedOptions();
         parsedOptions.clearCache = getClearCache();
         parsedOptions.configPaths = getConfigOption();
@@ -76,7 +76,7 @@ public class CLI {
             parsedOptions.showLatestOperations = getShowLatestOperationsOption();
             parsedOptions.timeDiffSeparatorMinVal = getTimeDiffSeparatorMinVal();
         } catch (NumberFormatException e) {
-            throw new InvalidCLIOptionInputException(e.getMessage(), e, parsedOptions.debug);
+            throw new UnrecoverableException("InvalidCLIOptionInput", e.getMessage(), e, parsedOptions.debug);
         }
         return parsedOptions;
     }

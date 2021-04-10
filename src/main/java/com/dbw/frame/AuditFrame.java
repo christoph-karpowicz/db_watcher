@@ -1,18 +1,18 @@
 package com.dbw.frame;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.diff.Diff;
-import com.dbw.diff.StateDiffService;
-import com.dbw.err.StateDataProcessingException;
 import com.dbw.diff.StateColumn;
+import com.dbw.diff.StateDiffService;
+import com.dbw.err.RecoverableException;
 import com.google.inject.Inject;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class AuditFrame {
     private AuditRecord auditRecord;
@@ -36,7 +36,7 @@ public class AuditFrame {
         this.db = db;
     }
 
-    public void createDiff() throws StateDataProcessingException, SQLException {
+    public void createDiff() throws RecoverableException, SQLException {
         diff = diffService.createDiff(db, auditRecord);
     }
 

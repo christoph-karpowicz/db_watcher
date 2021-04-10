@@ -1,6 +1,6 @@
 package com.dbw.cfg;
 
-import com.dbw.err.ConfigException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
@@ -32,10 +32,10 @@ public class ConfigParser {
         return config;
     }
 
-    public static Set<String> getConfigFileNamesFromInput() throws IOException, ConfigException {
+    public static Set<String> getConfigFileNamesFromInput() throws IOException, UnrecoverableException {
         List<String> configFileList = getYMLFileListFromCurrentDir();
         if (configFileList.size() == 0) {
-            throw new ConfigException(ErrorMessages.CONFIG_NO_YML_FILES);
+            throw new UnrecoverableException("Config", ErrorMessages.CONFIG_NO_YML_FILES);
         }
         System.out.println(LogMessages.CHOOSE_CONFIG);
         outputConfigFileListFromCurrentDir(configFileList);

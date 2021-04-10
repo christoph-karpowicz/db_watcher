@@ -1,10 +1,10 @@
 package com.dbw.db;
 
 import com.dbw.cfg.Config;
-import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
-import com.dbw.err.PurgeException;
+import com.dbw.err.RecoverableException;
 import com.dbw.err.UnknownDbOperationException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
@@ -27,7 +27,7 @@ public class Orcl extends Database {
         super(config);
     }
 
-    public void connect() throws DbConnectionException {
+    public void connect() throws UnrecoverableException {
         try {
             Connection conn;
             if (!Strings.isNullOrEmpty(dbConfig.getDriverPath())) {
@@ -38,10 +38,10 @@ public class Orcl extends Database {
             setConn(conn);
             Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_OPENED);
         } catch (SQLException e) {
-            throw new DbConnectionException(e.getMessage(), e);
+            throw new UnrecoverableException("DbConnection", e.getMessage(), e);
         } catch (ClassNotFoundException | MalformedURLException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
-            throw new DbConnectionException(String.format(ErrorMessages.DB_CONN_FAILED, e.getMessage()), e);
+            throw new UnrecoverableException("DbConnection", String.format(ErrorMessages.DB_CONN_FAILED, e.getMessage()), e);
         }
     }
 
@@ -110,14 +110,14 @@ public class Orcl extends Database {
                 dropAuditTrigger(tableName);
             } catch (SQLException e) {
                 success = false;
-                new PurgeException(e.getMessage(), e).setRecoverable().handle();
+                new RecoverableException("Purge", e.getMessage(), e).setRecoverable().handle();
             }
         }
         try {
             dropAuditTable();
         } catch (SQLException e) {
             success = false;
-            new PurgeException(e.getMessage(), e).setRecoverable().handle();
+            new RecoverableException("Purge", e.getMessage(), e).setRecoverable().handle();
         }
         return success;
     }

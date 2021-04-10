@@ -2,12 +2,10 @@ package com.dbw.diff;
 
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.*;
-import com.dbw.err.StateDataProcessingException;
-import com.dbw.err.StateDataValidationException;
-import com.dbw.log.ErrorMessages;
+import com.dbw.err.RecoverableException;
+import com.dbw.err.RecoverableException;
 import com.dbw.output.OutputBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -28,7 +26,7 @@ public class StateDiffService implements DiffService {
     @Inject
     private ColumnDiffBuilder columnDiffBuilder;
 
-    public Diff createDiff(Database db, AuditRecord auditRecord) throws StateDataProcessingException, SQLException {
+    public Diff createDiff(Database db, AuditRecord auditRecord) throws RecoverableException, SQLException {
         Diff diff;
         if (db instanceof Postgres) {
             String[] tableColumnNames = ((Postgres)db).getWatchedTablesColumnNames().get(auditRecord.getTableName());
@@ -40,19 +38,19 @@ public class StateDiffService implements DiffService {
             validateStateData(auditRecord);
             diff.parseOldData(auditRecord.getOldData());
             diff.parseNewData(auditRecord.getNewData());
-        } catch (StateDataValidationException | JsonProcessingException e) {
-            throw new StateDataProcessingException(e.getMessage(), e);
+        } catch (RecoverableException | JsonProcessingException e) {
+            throw new RecoverableException("StateDataProcessing", e.getMessage(), e);
         }
         return diff;
     }
 
-    private void validateStateData(AuditRecord auditRecord) throws StateDataValidationException {
+    private void validateStateData(AuditRecord auditRecord) throws RecoverableException {
         StateDataValidator.ValidationResult result =
                 StateDataValidator.isOldStateNullOrEmpty()
                 .and(StateDataValidator.isNewStateNullOrEmpty())
                 .apply(auditRecord);
         if (!result.equals(StateDataValidator.ValidationResult.SUCCESS)) {
-            throw new StateDataValidationException(result.getErrorMessage(auditRecord));
+            throw new RecoverableException("StateDataValidation", result.getErrorMessage(auditRecord));
         }
     }
 

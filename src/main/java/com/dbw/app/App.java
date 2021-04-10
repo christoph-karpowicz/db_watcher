@@ -10,10 +10,8 @@ import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cli.CLI;
 import com.dbw.db.DatabaseManager;
-import com.dbw.err.AppInitException;
-import com.dbw.err.ConfigException;
 import com.dbw.err.DbwException;
-import com.dbw.err.WatcherStartException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
@@ -47,7 +45,7 @@ public class App {
         return Optional.ofNullable(App.options.getInterval()).orElse(DEFAULT_RUN_INTERVAL);
     }
 
-    public void init(String[] args) throws AppInitException {
+    public void init(String[] args) throws UnrecoverableException {
         Logger.setWatcherManager(watcherManager);
         CLI cli = new CLI();
         cache.load();
@@ -67,7 +65,7 @@ public class App {
                 watcherManager.addWatcher(cfg);
             }
         } catch (Exception e) {
-            throw new AppInitException(e.getMessage(), e);
+            throw new UnrecoverableException("AppInit", e.getMessage(), e);
         }
     }
 
@@ -88,7 +86,7 @@ public class App {
         return cfg;
     }
 
-    private Set<String> chooseConfigFile() throws IOException, ConfigException {
+    private Set<String> chooseConfigFile() throws IOException, UnrecoverableException {
         return ConfigParser.getConfigFileNamesFromInput();
     }
 
@@ -118,7 +116,7 @@ public class App {
         startWatchers();
     }
 
-    private void startWatchers() throws WatcherStartException {
+    private void startWatchers() throws UnrecoverableException {
         watcherManager.startAll();
         outputManager.pollAndOutput();
     }

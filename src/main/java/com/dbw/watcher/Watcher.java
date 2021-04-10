@@ -3,12 +3,14 @@ package com.dbw.watcher;
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
-import com.dbw.cli.CLIStrings;
 import com.dbw.cli.ShowLatestOperationsOption;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
-import com.dbw.err.*;
+import com.dbw.err.PreparationException;
+import com.dbw.err.RecoverableException;
+import com.dbw.err.UnknownDbOperationException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
@@ -39,7 +41,7 @@ public class Watcher implements Runnable {
         this.db = DatabaseFactory.getDatabase(cfg);
     }
 
-    public void init() throws PreparationException, DbConnectionException {
+    public void init() throws PreparationException, UnrecoverableException {
         Logger.log(Level.INFO, dbName, LogMessages.WATCHER_INIT);
         if (cfg.isChanged()) {
             Logger.log(Level.INFO, dbName, LogMessages.DB_PREPARATION);
@@ -96,8 +98,8 @@ public class Watcher implements Runnable {
                 try {
                     AuditFrame auditFrame = createAuditFrameAndFindDiff(auditRecord);
                     watcherManager.addFrame(auditFrame);
-                } catch (StateDataProcessingException e) {
-                    new RecoverableException("WatcherRunException", e.getMessage(), e).handle();
+                } catch (RecoverableException e) {
+                    e.handle();
                 }
             }
             if (!isAfterInitialRun()) {
@@ -109,7 +111,7 @@ public class Watcher implements Runnable {
     }
 
     private AuditFrame createAuditFrameAndFindDiff(AuditRecord auditRecord)
-            throws StateDataProcessingException, SQLException {
+            throws RecoverableException, SQLException {
         AuditFrame frame = ObjectCreator.create(AuditFrame.class);
         frame.setAuditRecord(auditRecord);
         frame.setDb(db);

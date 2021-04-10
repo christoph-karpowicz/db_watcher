@@ -1,6 +1,6 @@
 package com.dbw.cache;
 
-import com.dbw.err.CachePersistenceException;
+import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
 
 import java.io.FileOutputStream;
@@ -19,7 +19,7 @@ public class CachePersister implements Runnable {
              ObjectOutputStream oos = new ObjectOutputStream(fOut)) {
             oos.writeObject(persistentCache);
         } catch (IOException e) {
-            new CachePersistenceException(ErrorMessages.CACHE_PERSIST_FAILED, e).handle();
+            new UnrecoverableException("CachePersistence", ErrorMessages.CACHE_PERSIST_FAILED, e).handle();
         }
     }
 }

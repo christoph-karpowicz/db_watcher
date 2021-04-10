@@ -7,4 +7,9 @@ public class RecoverableException extends DbwException {
         setChildException(childException);
         setRecoverable();
     }
+
+    public RecoverableException(String name, String errorMessage) {
+        super(errorMessage);
+        setRecoverable();
+    }
 }

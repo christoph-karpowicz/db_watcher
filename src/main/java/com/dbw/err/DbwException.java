@@ -20,18 +20,10 @@ public class DbwException extends Exception {
         return this;
     }
 
-    public Exception getChildException() {
-        return childException;
-    }
-
     protected void setChildException(Exception childException) {
         this.childException = childException;
     }
 
-    public boolean getDebug() {
-        return debug;
-    }
-    
     protected void setDebug(boolean debug) {
         this.debug = debug;
     }

@@ -3,10 +3,13 @@ package com.dbw.db;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cli.CLIStrings;
-import com.dbw.err.DbConnectionException;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnknownDbOperationException;
-import com.dbw.log.*;
+import com.dbw.err.UnrecoverableException;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
+import com.dbw.log.SuccessMessages;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ public abstract class Database {
 
     public abstract int selectMaxId() throws SQLException;
 
-    public abstract void connect() throws DbConnectionException;
+    public abstract void connect() throws UnrecoverableException;
 
     public abstract void prepare() throws PreparationException;
 
