@@ -1,6 +1,6 @@
 package com.dbw.log;
 
-import com.dbw.cli.CLIStrings;
+import com.dbw.cli.Opts;
 
 public class LogMessages extends Messages {
     public final static String DB_OPENED = "Database connection opened successfully.";
@@ -12,7 +12,7 @@ public class LogMessages extends Messages {
     public final static String DB_PREPARATION = "Preparing database objects...";
     public final static String WATCHER_STARTED = "Watcher started.";
     public final static String AUDIT_RECORDS_COUNT = "Audit records count: %d.";
-    public final static String NUMBER_OF_LATEST_OP = addCliFlagInfo(CLIStrings.SHOW_LATEST_OP_FLAG) + "%d database operations found in the last %s.";
+    public final static String NUMBER_OF_LATEST_OP = addCliFlagInfo(Opts.SHOW_LATEST_OP) + "%d database operations found in the last %s.";
     public final static String SHUTDOWN = "Shutting down ...";
     public final static String AUDIT_TABLE_CREATED = "Audit table has been created.";
     public final static String AUDIT_TABLE_DROPPED = "Audit table has been dropped.";

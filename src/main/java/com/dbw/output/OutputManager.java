@@ -1,5 +1,6 @@
 package com.dbw.output;
 
+import com.dbw.app.App;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.watcher.WatcherManager;
 import com.google.inject.Inject;
@@ -21,7 +22,7 @@ public class OutputManager {
         try {
             while (true) {
                 Thread.sleep(INTERVAL);
-                if (watcherManager.areAllCheckedIn()) {
+                if (watcherManager.areAllCheckedIn() || App.options.getOneOff()) {
                     OutputBatch frames = getSortedFrames();
                     frames.output();
                     if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {
@@ -30,6 +31,9 @@ public class OutputManager {
                     }
                     setLastAuditRecordsTime(frames.getPreviousTime());
                     watcherManager.checkOutAll();
+                }
+                if (outputInitialInfoDone && App.options.getOneOff()) {
+                    break;
                 }
             }
         } catch (InterruptedException e) {

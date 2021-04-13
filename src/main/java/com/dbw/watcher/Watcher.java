@@ -68,14 +68,13 @@ public class Watcher implements Runnable {
         try {
             setInitialAuditRecordCount();
             findLastId();
-            setIsRunning(true);
-            while (getIsRunning()) {
+            do {
                 Thread.sleep(App.getInterval());
                 watch();
                 if (!isAfterInitialRun()) {
                     setAfterInitialRun();
                 }
-            }
+            } while (!App.options.getOneOff());
         } catch (InterruptedException | SQLException e) {
             new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
@@ -146,7 +145,9 @@ public class Watcher implements Runnable {
     }
 
     public void outputInitialInfo() {
-        Logger.log(Level.INFO, dbName, LogMessages.WATCHER_STARTED);
+        if (!App.options.getOneOff()) {
+            Logger.log(Level.INFO, dbName, LogMessages.WATCHER_STARTED);
+        }
         Logger.log(Level.INFO, dbName, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
         if (App.options.showLatestOperationsPresentAndGtThanZero() && App.options.getShowLatestOperations().isTime()) {
             String latestOpMsg = String.format(LogMessages.NUMBER_OF_LATEST_OP, numberOfLatestOp, App.options.getShowLatestOperations().getRaw());
@@ -158,14 +159,6 @@ public class Watcher implements Runnable {
 
     private void setLastId(int lastId) {
         this.lastId = lastId;
-    }
-
-    private boolean getIsRunning() {
-        return this.isRunning;
-    }
-    
-    private void setIsRunning(boolean isRunning) {
-        this.isRunning = isRunning;
     }
 
     private void setInitialAuditRecordCount() throws SQLException {

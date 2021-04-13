@@ -1,7 +1,7 @@
 package com.dbw.actions;
 
 import com.dbw.cache.Cache;
-import com.dbw.cli.CLIStrings;
+import com.dbw.cli.Opts;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;

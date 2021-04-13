@@ -12,17 +12,17 @@ public class CLITest {
     private static final String TEST_MAX_ROW_WIDTH_VALUE = "120";
     private static final String OPTIONS_SHOW_LAST_N_CHANGES_VALUE = "6";
     private static final String[] TEST_ARGS = new String[]{
-        prependHyphen(CLIStrings.DEBUG_FLAG),
-        prependHyphen(CLIStrings.DELETE_FIRST_N_ROWS_FLAG),
+        prependHyphen(Opts.DEBUG),
+        prependHyphen(Opts.DELETE_FIRST_N_ROWS),
         OPTIONS_DELETE_FIRST_N_ROWS_VALUE,
-        prependHyphen(CLIStrings.PURGE_FLAG),
-        prependHyphen(CLIStrings.CONFIG_FLAG),
+        prependHyphen(Opts.PURGE),
+        prependHyphen(Opts.CONFIG),
         TEST_CONFIG_VALUE,
-        prependHyphen(CLIStrings.MAX_COL_WIDTH_FLAG),
+        prependHyphen(Opts.MAX_COL_WIDTH),
         TEST_MAX_COLUMN_WIDTH_VALUE,
-        prependHyphen(CLIStrings.MAX_ROW_WIDTH_FLAG),
+        prependHyphen(Opts.MAX_ROW_WIDTH),
         TEST_MAX_ROW_WIDTH_VALUE,
-        prependHyphen(CLIStrings.SHOW_LATEST_OP_FLAG),
+        prependHyphen(Opts.SHOW_LATEST_OP),
         OPTIONS_SHOW_LAST_N_CHANGES_VALUE,
     };
     

@@ -119,6 +119,7 @@ public class App {
     private void startWatchers() throws UnrecoverableException {
         watcherManager.startAll();
         outputManager.pollAndOutput();
+        shutdown();
     }
 
     private void addShutdownHook() {

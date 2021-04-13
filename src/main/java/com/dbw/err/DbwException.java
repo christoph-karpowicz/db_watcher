@@ -36,7 +36,7 @@ public class DbwException extends Exception {
         }
 
         if (!isRecoverable) {
-            System.exit(0);
+            System.exit(1);
         }
     }
 

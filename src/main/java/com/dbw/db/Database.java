@@ -2,7 +2,7 @@ package com.dbw.db;
 
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
-import com.dbw.cli.CLIStrings;
+import com.dbw.cli.Opts;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnknownDbOperationException;
 import com.dbw.err.UnrecoverableException;
@@ -52,7 +52,7 @@ public abstract class Database {
         if (rowCount == 0) {
             return SuccessMessages.CLI_AUDIT_TABLE_EMPTY;
         }
-        if (nRows.equals(CLIStrings.ALL_SYMBOL)) {
+        if (nRows.equals(Opts.ALL_SYMBOL)) {
             executeFormattedQueryUpdate(deleteAllQuery);
             return String.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
