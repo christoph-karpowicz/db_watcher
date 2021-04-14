@@ -173,9 +173,4 @@ public class Postgres extends Database {
     public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException {
         return selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, fromId);
     }
-
-    public void close() throws SQLException {
-        getConn().close();
-        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_CLOSED);
-    }
 }

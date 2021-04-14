@@ -38,14 +38,14 @@ public class ShowLatestOperationsOption {
         this.value = value;
     }
 
-    public static ShowLatestOperationsOption create(String input) throws NumberFormatException {
+    public static ShowLatestOperationsOption create(String input) throws Exception {
         ShowLatestOperationsOption opt = new ShowLatestOperationsOption(input);
         if (StringUtils.isNumeric(input)) {
             opt.setIsTime(false);
             opt.setValue(Short.parseShort(input));
         } else {
             if (!opt.isValid()) {
-                throw new NumberFormatException(ErrorMessages.CLI_INVALID_LATEST_OP);
+                throw new Exception(ErrorMessages.CLI_INVALID_LATEST_OP);
             }
             long minutesMultiplier = input.contains("m") ? MINUTE_IN_SECONDS : 1;
             long hoursMultiplier = input.contains("h") ? HOUR_IN_SECONDS : 1;

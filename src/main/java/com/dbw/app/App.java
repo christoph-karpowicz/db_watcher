@@ -119,14 +119,10 @@ public class App {
     private void startWatchers() throws UnrecoverableException {
         watcherManager.startAll();
         outputManager.pollAndOutput();
-        shutdown();
     }
 
     private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Logger.log(Level.INFO, LogMessages.SHUTDOWN);
-            shutdown();
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
     }
 
     private void shutdown() {

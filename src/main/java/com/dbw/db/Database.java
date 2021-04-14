@@ -45,8 +45,6 @@ public abstract class Database {
 
     public abstract boolean purge(List<String> watchedTables);
 
-    public abstract void close() throws SQLException;
-
     protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
         int rowCount = getAuditRecordCount();
         if (rowCount == 0) {
@@ -178,6 +176,10 @@ public abstract class Database {
         } else {
             return null;
         }
+    }
+
+    public void close() throws SQLException {
+        getConn().close();
     }
 
     public Connection getConn() {

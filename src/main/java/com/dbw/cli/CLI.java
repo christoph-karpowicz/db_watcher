@@ -50,7 +50,6 @@ public class CLI {
         parsedOptions.configPaths = getConfigOption();
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
-        parsedOptions.oneOff = getOneOff();
         parsedOptions.purge = getPurgeOption();
         parsedOptions.verboseDiff = getVerboseDiff();
         try {
@@ -58,9 +57,10 @@ public class CLI {
             parsedOptions.interval = getInterval();
             parsedOptions.maxColumnWidth = getMaxColumnWidthOption();
             parsedOptions.maxRowWidth = getMaxRowWidthOption();
+            parsedOptions.oneOff = getOneOff();
             parsedOptions.showLatestOperations = getShowLatestOperationsOption();
             parsedOptions.timeDiffSeparatorMinVal = getTimeDiffSeparatorMinVal();
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             throw new UnrecoverableException("InvalidCLIOptionInput", e.getMessage(), e, parsedOptions.debug);
         }
         return parsedOptions;
@@ -84,11 +84,11 @@ public class CLI {
         return cmd.hasOption(Opts.DEBUG);
     }
 
-    private String getDeleteFirstNRowsOption() throws NumberFormatException {
+    private String getDeleteFirstNRowsOption() throws Exception {
         if (cmd.hasOption(Opts.DELETE_FIRST_N_ROWS)) {
             String value = cmd.getOptionValue(Opts.DELETE_FIRST_N_ROWS);
             if (!StringUtils.isNumeric(value) && !value.trim().equals(Opts.ALL_SYMBOL)) {
-                throw new NumberFormatException(ErrorMessages.CLI_INVALID_DELETE_N_ROWS);
+                throw new Exception(ErrorMessages.CLI_INVALID_DELETE_N_ROWS);
             }
             return value;
         }
@@ -99,54 +99,58 @@ public class CLI {
         return cmd.hasOption(Opts.SHOW_HELP);
     }
 
-    private Short getInterval() throws NumberFormatException {
+    private Short getInterval() throws Exception {
         if (cmd.hasOption(Opts.INTERVAL)) {
             String optionValue = cmd.getOptionValue(Opts.INTERVAL);
             Short value = Short.parseShort(optionValue);
             if (value < 10) {
-                throw new NumberFormatException(ErrorMessages.CLI_INVALID_INTERVAL_SMALL);
+                throw new Exception(ErrorMessages.CLI_INVALID_INTERVAL_SMALL);
             }
             if (value > 10000) {
-                throw new NumberFormatException(ErrorMessages.CLI_INVALID_INTERVAL_BIG);
+                throw new Exception(ErrorMessages.CLI_INVALID_INTERVAL_BIG);
             }
             return value;
         }
         return null;
     }
 
-    private Short getMaxColumnWidthOption() throws NumberFormatException {
+    private Short getMaxColumnWidthOption() throws Exception {
         if (cmd.hasOption(Opts.MAX_COL_WIDTH)) {
             String optionValue = cmd.getOptionValue(Opts.MAX_COL_WIDTH);
             Short value = Short.parseShort(optionValue);
             if (value <= 3) {
-                throw new NumberFormatException(ErrorMessages.CLI_INVALID_MAX_COLUMN_WIDTH);
+                throw new Exception(ErrorMessages.CLI_INVALID_MAX_COLUMN_WIDTH);
             }
             return value;
         }
         return null;
     }
 
-    private Short getMaxRowWidthOption() throws NumberFormatException {
+    private Short getMaxRowWidthOption() throws Exception {
         if (cmd.hasOption(Opts.MAX_ROW_WIDTH)) {
             String optionValue = cmd.getOptionValue(Opts.MAX_ROW_WIDTH);
             Short value = Short.parseShort(optionValue);
             if (value <= 10) {
-                throw new NumberFormatException(ErrorMessages.CLI_INVALID_MAX_ROW_WIDTH);
+                throw new Exception(ErrorMessages.CLI_INVALID_MAX_ROW_WIDTH);
             }
             return value;
         }
         return null;
     }
 
-    private boolean getOneOff() {
-        return cmd.hasOption(Opts.ONE_OFF);
+    private boolean getOneOff() throws Exception {
+        boolean hasOneOffOption = cmd.hasOption(Opts.ONE_OFF);
+        if (hasOneOffOption && !cmd.hasOption(Opts.SHOW_LATEST_OP)) {
+            throw new Exception(ErrorMessages.CLI_ONE_OFF_NO_LASTEST_OP);
+        }
+        return hasOneOffOption;
     }
 
     private boolean getPurgeOption() {
         return cmd.hasOption(Opts.PURGE);
     }
     
-    private ShowLatestOperationsOption getShowLatestOperationsOption() throws NumberFormatException {
+    private ShowLatestOperationsOption getShowLatestOperationsOption() throws Exception {
         if (cmd.hasOption(Opts.SHOW_LATEST_OP)) {
             String value = cmd.getOptionValue(Opts.SHOW_LATEST_OP);
             return ShowLatestOperationsOption.create(value);
@@ -154,12 +158,12 @@ public class CLI {
         return null;
     }
 
-    private Short getTimeDiffSeparatorMinVal() throws NumberFormatException {
+    private Short getTimeDiffSeparatorMinVal() throws Exception {
         if (cmd.hasOption(Opts.TIME_DIFF_SEPARATOR)) {
             String optionValue = cmd.getOptionValue(Opts.TIME_DIFF_SEPARATOR);
             Short value = Short.parseShort(optionValue);
             if (value < 0) {
-                throw new NumberFormatException(ErrorMessages.CLI_TIME_DIFF_SEP_LT_ZERO);
+                throw new Exception(ErrorMessages.CLI_TIME_DIFF_SEP_LT_ZERO);
             }
             return value;
         }
