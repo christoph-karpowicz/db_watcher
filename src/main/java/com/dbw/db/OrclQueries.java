@@ -81,7 +81,7 @@ public class OrclQueries {
     public static final String SELECT_AUDIT_TRIGGERS = 
         "SELECT TRIGGER_NAME AS \"item\" from sys.all_triggers WHERE TRIGGER_NAME LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
 
-    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT MAX(ID) AS \"" + Common.MAX + "\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
+    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT COALESCE(MAX(ID), 0) AS \"" + Common.MAX + "\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
 
     public static final String SELECT_LATEST_WITH_SECONDS =
         "WITH latest_id AS " +

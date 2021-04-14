@@ -50,7 +50,9 @@ public class Opts extends Options {
             ),
             buildOption(
                     CLEAR_CACHE,
-                    "clear-cache", true, "clear the given config's cache"
+                    "clear-cache",
+                    false,
+                    "clear the given config's cache"
             ),
             buildOption(
                     DEBUG,
@@ -92,7 +94,6 @@ public class Opts extends Options {
                     ONE_OFF,
                     "one-off",
                     false,
-
                     "show the database operations matching with the given --latest-changes flag value and close the application (don't start the watchers)."
             ),
             buildOption(
@@ -106,8 +107,8 @@ public class Opts extends Options {
                     "latest-changes",
                     true,
                     "show the latest operations after the app starts. Accepts a number or a number combined " +
-                            "with the seconds, minutes or hours symbol, where for example 3 means three latest operations " +
-                            "and 3s means all operations from the last 3 seconds - use \"m\" or \"h\" for minutes or hours"
+                        "with the seconds, minutes or hours symbol, where for example 3 means three latest operations " +
+                        "and 3s means all operations from the last 3 seconds - use \"m\" or \"h\" for minutes or hours"
             ),
             buildOption(
                     TIME_DIFF_SEPARATOR,
@@ -119,7 +120,6 @@ public class Opts extends Options {
                     VERBOSE_DIFF,
                     "verbose-diff",
                     false,
-
                     "show verbose output, i.e. with full before and after states of column values that exceeded the maximum column width"
             ));
     }

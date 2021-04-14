@@ -5,7 +5,6 @@ import com.dbw.db.Common;
 
 public class ErrorMessages extends Messages {
     public final static String DB_CONN_FAILED = "Database connection attempt failed. Make sure you've provided the right path for the driver. Error message: %s";
-    public final static String COULDNT_SELECT_MAX = "Couldn't select audit table's max id.";
     public final static String STATE_VALIDATION_NULL_OR_EMPTY = "Audit record ID: %d. Could not parse state data. Provided %s state string is null or empty.";
     public final static String UNKNOWN_DB_OPERATION = "%s: Uknown database operation.";
     public final static String UNKNOWN_DB_TYPE = "%s: Unknown or not supported database type.";
