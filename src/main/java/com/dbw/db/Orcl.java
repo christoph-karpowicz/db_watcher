@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cfg.Config;
+import com.dbw.db.query.SelectAuditRecordsQueryBuilder;
 import com.dbw.err.PreparationException;
 import com.dbw.err.RecoverableException;
 import com.dbw.err.UnknownDbOperationException;
@@ -137,7 +138,7 @@ public class Orcl extends Database {
     }
 
     public Column[] selectTableColumns(String tableName) throws SQLException {
-        List<Column> result = new ArrayList<Column>();
+        List<Column> result = new ArrayList<>();
         PreparedStatement pstmt = getConn().prepareStatement(OrclQueries.SELECT_TABLE_COLUMNS);
         pstmt.setString(1, tableName);
         ResultSet rs = pstmt.executeQuery();
@@ -161,6 +162,8 @@ public class Orcl extends Database {
     }
 
     public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException {
-        return selectAuditRecords(OrclQueries.SELECT_AUDIT_RECORDS, fromId);
+        SelectAuditRecordsQueryBuilder selectAuditRecordsBuilder =
+                new SelectAuditRecordsQueryBuilder(OrclQueries.SELECT_AUDIT_RECORDS);
+        return selectAuditRecords(selectAuditRecordsBuilder.build(), fromId);
     }
 }

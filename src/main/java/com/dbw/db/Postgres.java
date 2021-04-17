@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cfg.Config;
+import com.dbw.db.query.SelectAuditRecordsQueryBuilder;
 import com.dbw.err.PreparationException;
 import com.dbw.err.RecoverableException;
 import com.dbw.err.UnknownDbOperationException;
@@ -166,6 +167,8 @@ public class Postgres extends Database {
     }
 
     public List<AuditRecord> selectAuditRecords(int fromId) throws SQLException, UnknownDbOperationException {
-        return selectAuditRecords(PostgresQueries.SELECT_AUDIT_RECORDS, fromId);
+        SelectAuditRecordsQueryBuilder selectAuditRecordsBuilder =
+                new SelectAuditRecordsQueryBuilder(PostgresQueries.SELECT_AUDIT_RECORDS);
+        return selectAuditRecords(selectAuditRecordsBuilder.build(), fromId);
     }
 }

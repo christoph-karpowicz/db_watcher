@@ -18,6 +18,7 @@ public class ErrorMessages extends Messages {
     public final static String CLI_ONE_OFF_NO_LASTEST_OP = addCliFlagInfo(Opts.ONE_OFF) + "This flag has to be used together with the -" + Opts.SHOW_LATEST_OP + " flag, which specifies the number or time of the latest operations to display.";
     public final static String CLI_PURGE = addCliFlagInfo(Opts.PURGE) + "Errors occured while deleting database objects.";
     public final static String CLI_TABLES_NOT_FOUND = addCliFlagInfo(Opts.TABLES) + "%s tables not found in the config files.";
+    public final static String CLI_TABLES_EMPTY_NAME = addCliFlagInfo(Opts.TABLES) + "An empty table name found.";
     public final static String CLI_TIME_DIFF_SEP_LT_ZERO = addCliFlagInfo(Opts.TIME_DIFF_SEPARATOR) + "Minimal value after which a time difference separator appears must not be less than 0.";
     public final static String INPUT_NAN = "Invalid input. Enter a number from the list.";
     public final static String INPUT_OUT_OF_BOUNDS = "Invalid input. Number out of list bounds.";

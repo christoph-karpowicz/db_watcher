@@ -22,7 +22,7 @@ public class OutputManager {
         try {
             while (true) {
                 Thread.sleep(INTERVAL);
-                if (watcherManager.areAllCheckedIn() || App.options.getOneOff()) {
+                if (watcherManager.areAllCheckedIn() || (watcherManager.areAllAfterInitialRun() && App.options.getOneOff())) {
                     OutputBatch frames = getSortedFrames();
                     frames.output();
                     if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {

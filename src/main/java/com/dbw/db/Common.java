@@ -18,4 +18,6 @@ public class Common {
     public final static String COLNAME_TIMESTAMP = "timestamp";
     public final static String NULL_AS_STRING = "null";
     public final static String COMMA_DELIMITER = ", ";
+    public final static String SPACE_DELIMITER = " ";
+    public final static String SINGLE_QUOTE = "'";
 }

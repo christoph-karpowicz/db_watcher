@@ -7,13 +7,13 @@ public class PostgresQueries {
         "    SELECT FROM information_schema.tables " +
         "    WHERE  table_schema = ?" +
         "    AND    table_name   = ?" +
-        ");";
+        ")";
 
     public static final String FIND_TABLE_COLUMNS = 
         "SELECT column_name as \"item\" FROM information_schema.columns" +
         "    WHERE  table_schema = ?" +
         "    AND    table_name   = ?" +
-        "    ORDER BY ordinal_position;";
+        "    ORDER BY ordinal_position";
     
     public static final String CREATE_AUDIT_TABLE = 
         "CREATE TABLE %s (" +
@@ -30,7 +30,7 @@ public class PostgresQueries {
         "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM pg_proc " +
         "    WHERE  proname = '" + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "'" +
-        ");";
+        ")";
 
     private static final String UPDATE_COL_LIST = QueryBuilder.buildColumNameList(
         Common.COLNAME_OLD_STATE, 
@@ -81,27 +81,28 @@ public class PostgresQueries {
         "    RETURN NEW;" +
         "END;" +
         "$$" +
-        "LANGUAGE plpgsql;";
+        "LANGUAGE plpgsql";
 
-    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + ";";
+    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase();
 
     public static final String FIND_AUDIT_TRIGGER = 
         "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM pg_trigger " +
         "    WHERE  NOT tgisinternal" +
         "    AND    tgname = ?" +
-        ");";
+        ")";
 
     public static final String CREATE_AUDIT_TRIGGER = 
         "CREATE TRIGGER %s" +
         " AFTER INSERT OR UPDATE OR DELETE ON %s" +
-        " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "();";
+        " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "()";
 
-    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s ON %s;";
+    public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s ON %s";
 
-    public static final String SELECT_AUDIT_TRIGGERS = "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
+    public static final String SELECT_AUDIT_TRIGGERS =
+            "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
 
-    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT COALESCE(MAX(id), 0) AS " + Common.MAX + " FROM " + Common.DBW_AUDIT_TABLE_NAME + ";";
+    public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT COALESCE(MAX(id), 0) AS " + Common.MAX + " FROM " + Common.DBW_AUDIT_TABLE_NAME;
 
     public static final String SELECT_LATEST_WITH_SECONDS =
         "WITH latest_id AS " +
@@ -110,7 +111,7 @@ public class PostgresQueries {
         "SELECT COALESCE(max(id), 0) AS " + Common.COLNAME_ID + " FROM " + Common.DBW_AUDIT_TABLE_NAME + " da " +
         "WHERE id < COALESCE((SELECT id FROM latest_id), (SELECT max(id) + 1 FROM " + Common.DBW_AUDIT_TABLE_NAME + "))";
 
-    public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?;";
+    public static final String SELECT_AUDIT_RECORDS = "SELECT * FROM " + Common.DBW_AUDIT_TABLE_NAME + " WHERE id > ?";
 
     public static final String COUNT_AUDIT_RECORDS = "SELECT COUNT(*) AS \"ROW_COUNT\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
 

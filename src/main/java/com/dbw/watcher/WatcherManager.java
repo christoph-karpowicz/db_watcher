@@ -49,7 +49,12 @@ public class WatcherManager {
 
     private void validateTablesOption() throws UnrecoverableException {
         Set<String> allWatcherTables = getWatchedTables();
-        Set<String> optionTablesDiff = App.options.getTables().get();
+        Set<String> optionTables = App.options.getTables().get();
+        if (optionTables.stream().anyMatch(String::isEmpty)) {
+            throw new UnrecoverableException("WatcherInit", ErrorMessages.CLI_TABLES_EMPTY_NAME);
+        }
+
+        Set<String> optionTablesDiff = Sets.newHashSet(optionTables);
         optionTablesDiff.removeAll(allWatcherTables);
         if (optionTablesDiff.size() > 0) {
             String tablesNotFound = String.join(Common.COMMA_DELIMITER, optionTablesDiff);
