@@ -1,13 +1,17 @@
 package com.dbw.watcher;
 
+import com.dbw.app.App;
 import com.dbw.cache.Cache;
 import com.dbw.cfg.Config;
+import com.dbw.db.Common;
 import com.dbw.db.DatabaseManager;
 import com.dbw.err.DbwException;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.frame.AuditFrame;
+import com.dbw.log.ErrorMessages;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -36,8 +40,24 @@ public class WatcherManager {
         databaseManager.addDatabase(cfg.getPath(), watcher.getDb());
     }
 
-    public void startAll() throws UnrecoverableException {
+    public void init() throws UnrecoverableException {
         watcherCheckIn.init(watchers);
+        if (App.options.getTables().isPresent()) {
+            validateTablesOption();
+        }
+    }
+
+    private void validateTablesOption() throws UnrecoverableException {
+        Set<String> allWatcherTables = getWatchedTables();
+        Set<String> optionTablesDiff = App.options.getTables().get();
+        optionTablesDiff.removeAll(allWatcherTables);
+        if (optionTablesDiff.size() > 0) {
+            String tablesNotFound = String.join(Common.COMMA_DELIMITER, optionTablesDiff);
+            throw new UnrecoverableException("WatcherInit", String.format(ErrorMessages.CLI_TABLES_NOT_FOUND, tablesNotFound));
+        }
+    }
+
+    public void startAll() throws UnrecoverableException {
         for (Watcher watcher : watchers) {
             try {
                 watcher.init();
@@ -97,5 +117,11 @@ public class WatcherManager {
                 .stream()
                 .map(watcher -> watcher.getCfg().getPath())
                 .collect(Collectors.toSet());
+    }
+
+    public Set<String> getWatchedTables() {
+        Set<String> watchedTables = Sets.newHashSet();
+        watchers.forEach(watcher -> watchedTables.addAll(watcher.getCfg().getTables()));
+        return watchedTables;
     }
 }

@@ -12,8 +12,6 @@ import com.dbw.cli.CLI;
 import com.dbw.db.DatabaseManager;
 import com.dbw.err.DbwException;
 import com.dbw.err.UnrecoverableException;
-import com.dbw.log.Level;
-import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.output.OutputManager;
 import com.dbw.watcher.WatcherManager;
@@ -92,13 +90,22 @@ public class App {
 
     public void start() throws DbwException {
         databaseManager.connectDbs();
+        boolean shutdownAfter = executeActions();
+        if (shutdownAfter) {
+            shutdown();
+            return;
+        }
+        addShutdownHook();
+        startWatchers();
+    }
+
+    private boolean executeActions() throws DbwException {
         if (options.getClearCache()) {
             ClearCacheAction clearCacheAction = ObjectCreator.create(ClearCacheAction.class);
             Set<String> configPaths = watcherManager.getConfigPaths();
             clearCacheAction.setConfigPaths(configPaths);
             clearCacheAction.execute();
-            shutdown();
-            return;
+            return true;
         }
         String deleteFirstNRowsOption = options.getDeleteFirstNRows();
         if (!Strings.isNullOrEmpty(deleteFirstNRowsOption)) {
@@ -109,14 +116,13 @@ public class App {
         if (options.getPurge()) {
             DbAction purgeAction = ObjectCreator.create(PurgeAction.class);
             purgeAction.execute();
-            shutdown();
-            return;
+            return true;
         }
-        addShutdownHook();
-        startWatchers();
+        return false;
     }
 
     private void startWatchers() throws UnrecoverableException {
+        watcherManager.init();
         watcherManager.startAll();
         outputManager.pollAndOutput();
     }

@@ -17,6 +17,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 public class Orcl extends Database {
     private final String DRIVER = "oracle.jdbc.driver.OracleDriver";
@@ -103,7 +104,7 @@ public class Orcl extends Database {
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
-    public boolean purge(List<String> watchedTables) {
+    public boolean purge(Set<String> watchedTables) {
         boolean success = true;
         for (String tableName : watchedTables) {
             try {

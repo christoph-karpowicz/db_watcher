@@ -14,18 +14,19 @@ import com.dbw.log.SuccessMessages;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Database {
     protected DatabaseConfig dbConfig;
     private Connection conn;
-    private final List<String> watchedTables;
+    private final Set<String> watchedTables;
 
     public Database(Config config) {
         this.dbConfig = config.getDatabase();
         this.watchedTables = config.getTables();
     }
 
-    public List<String> getWatchedTables() {
+    public Set<String> getWatchedTables() {
         return watchedTables;
     }
 
@@ -43,7 +44,7 @@ public abstract class Database {
 
     public abstract void prepare() throws PreparationException;
 
-    public abstract boolean purge(List<String> watchedTables);
+    public abstract boolean purge(Set<String> watchedTables);
 
     protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
         int rowCount = getAuditRecordCount();

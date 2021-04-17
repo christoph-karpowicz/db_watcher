@@ -3,14 +3,14 @@ package com.dbw.cfg;
 import com.dbw.err.UnrecoverableException;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 public class Config {
     public static final String DEFAULT_SCHEMA = "public";
 
     private String path;
     private DatabaseConfig database;
-    private List<String> tables;
+    private Set<String> tables;
     private boolean changed;
 
     public String getPath() {
@@ -25,8 +25,8 @@ public class Config {
         return database;
     }
 
-    public List<String> getTables() {
-        return Collections.unmodifiableList(tables);
+    public Set<String> getTables() {
+        return Collections.unmodifiableSet(tables);
     }
 
     public boolean isChanged() {

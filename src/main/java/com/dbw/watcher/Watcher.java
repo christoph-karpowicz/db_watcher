@@ -25,7 +25,6 @@ public class Watcher implements Runnable {
     private final Config cfg;
     private Database db;
     private final String dbName;
-    private boolean isRunning;
     private int lastId;
     private int initialAuditRecordCount;
     private int numberOfLatestOp;

@@ -28,7 +28,8 @@ public class Opts extends Options {
     public static final String ONE_OFF = "o";
     public static final String PURGE = "p";
     public static final String SHOW_LATEST_OP = "n";
-    public static final String TIME_DIFF_SEPARATOR = "t";
+    public static final String TABLES = "t";
+    public static final String TIME_DIFF_SEPARATOR = "T";
     public static final String VERBOSE_DIFF = "V";
 
     public Opts() {
@@ -109,6 +110,12 @@ public class Opts extends Options {
                     "show the latest operations after the app starts. Accepts a number or a number combined " +
                         "with the seconds, minutes or hours symbol, where for example 3 means three latest operations " +
                         "and 3s means all operations from the last 3 seconds - use \"m\" or \"h\" for minutes or hours"
+            ),
+            buildOption(
+                    TABLES,
+                    "tables",
+                    true,
+                    "narrow down the tables you'd like to watch, accepts a single table or comma separated list of tables"
             ),
             buildOption(
                     TIME_DIFF_SEPARATOR,

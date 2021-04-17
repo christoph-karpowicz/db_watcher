@@ -1,20 +1,19 @@
 package com.dbw.db;
 
+import com.dbw.cfg.Config;
+import com.dbw.err.PreparationException;
+import com.dbw.err.RecoverableException;
+import com.dbw.err.UnknownDbOperationException;
+import com.dbw.err.UnrecoverableException;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
+import com.google.common.collect.ImmutableMap;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import com.dbw.cfg.Config;
-import com.dbw.err.*;
-import com.dbw.log.ErrorMessages;
-import com.dbw.log.Level;
-import com.dbw.log.Logger;
-import com.dbw.log.LogMessages;
-import com.google.common.collect.ImmutableMap;
+import java.util.*;
 
 public class Postgres extends Database {
     public final static String[] COLUMN_NAMES = new String[]{
@@ -121,7 +120,7 @@ public class Postgres extends Database {
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
-    public boolean purge(List<String> watchedTables) {
+    public boolean purge(Set<String> watchedTables) {
         boolean success = true;
         for (String tableName : watchedTables) {
             try {

@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Singleton
 public class DatabaseManager {
@@ -49,7 +50,7 @@ public class DatabaseManager {
             if (!isConfirmed) {
                 continue;
             }
-            List<String> tables = cache.get().getConfigTables(db.getKey());
+            Set<String> tables = cache.get().getConfigTables(db.getKey());
             String dbName = db.getValue().getDbConfig().getName();
             if (db.getValue().purge(tables)) {
                 Logger.log(Level.INFO, dbName, SuccessMessages.CLI_PURGE);

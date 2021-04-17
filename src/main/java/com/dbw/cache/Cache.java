@@ -8,8 +8,8 @@ import com.google.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 public class Cache {
@@ -52,7 +52,7 @@ public class Cache {
         return persistedConfigCache.orElseGet(ConfigCache::new);
     }
 
-    public List<String> getConfigTables(String path) {
+    public Set<String> getConfigTables(String path) {
         return getPersistentCache().get().getConfig(path).get().getTables();
     }
 

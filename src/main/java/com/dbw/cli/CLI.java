@@ -59,6 +59,7 @@ public class CLI {
             parsedOptions.maxRowWidth = getMaxRowWidthOption();
             parsedOptions.oneOff = getOneOff();
             parsedOptions.showLatestOperations = getShowLatestOperationsOption();
+            parsedOptions.tables = getTables();
             parsedOptions.timeDiffSeparatorMinVal = getTimeDiffSeparatorMinVal();
         } catch (Exception e) {
             throw new UnrecoverableException("InvalidCLIOptionInput", e.getMessage(), e, parsedOptions.debug);
@@ -72,10 +73,8 @@ public class CLI {
 
     private Optional<Set<String>> getConfigOption() {
         if (cmd.hasOption(Opts.CONFIG)) {
-            String configOption = cmd.getOptionValue(Opts.CONFIG);
-            String[] configPaths = configOption.split(",");
-            Set<String> configPathsSet = Sets.newHashSet(configPaths);
-            return Optional.of(configPathsSet);
+            Set<String> configPaths = listOptionToSet(Opts.CONFIG);
+            return Optional.of(configPaths);
         }
         return Optional.empty();
     }
@@ -158,6 +157,14 @@ public class CLI {
         return null;
     }
 
+    private Optional<Set<String>> getTables() {
+        if (cmd.hasOption(Opts.TABLES)) {
+            Set<String> tables = listOptionToSet(Opts.TABLES);
+            return Optional.of(tables);
+        }
+        return Optional.empty();
+    }
+
     private Short getTimeDiffSeparatorMinVal() throws Exception {
         if (cmd.hasOption(Opts.TIME_DIFF_SEPARATOR)) {
             String optionValue = cmd.getOptionValue(Opts.TIME_DIFF_SEPARATOR);
@@ -174,6 +181,12 @@ public class CLI {
         return cmd.hasOption(Opts.VERBOSE_DIFF);
     }
 
+    private Set<String> listOptionToSet(String opt) {
+        String option = cmd.getOptionValue(opt);
+        String[] values = option.split(",");
+        return Sets.newHashSet(values);
+    }
+
     public class ParsedOptions {
         private boolean clearCache;
         private Optional<Set<String>> configPaths;
@@ -186,6 +199,7 @@ public class CLI {
         private boolean oneOff;
         private boolean purge;
         private ShowLatestOperationsOption showLatestOperations;
+        private Optional<Set<String>> tables;
         private Short timeDiffSeparatorMinVal;
         private boolean verboseDiff;
 
@@ -235,6 +249,10 @@ public class CLI {
 
         public boolean showLatestOperationsPresentAndGtThanZero() {
             return showLatestOperations != null && showLatestOperations.getValue() > 0;
+        }
+
+        public Optional<Set<String>> getTables() {
+            return tables;
         }
 
         public Short getTimeDiffSeparatorMinVal() {
