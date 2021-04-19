@@ -11,7 +11,7 @@ public class DatabaseFactory {
         } else if (config.getDatabase().getType().equals(DatabaseType.ORCL.type)) {
             return new Orcl(config);
         }
-        throw new RuntimeException(ErrorMessages.UNKNOWN_DB_TYPE);
+        throw new RuntimeException(ErrorMessages.CFG_UNKNOWN_DB_TYPE);
     }
     
 }

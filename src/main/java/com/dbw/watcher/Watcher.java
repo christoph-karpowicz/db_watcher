@@ -1,5 +1,6 @@
 package com.dbw.watcher;
 
+import com.dbw.actions.DeleteFirstNRowsAction;
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
@@ -7,10 +8,7 @@ import com.dbw.cli.ShowLatestOperationsOption;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
-import com.dbw.err.PreparationException;
-import com.dbw.err.RecoverableException;
-import com.dbw.err.UnknownDbOperationException;
-import com.dbw.err.UnrecoverableException;
+import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
@@ -19,14 +17,15 @@ import com.dbw.log.WarningMessages;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
     private final Config cfg;
     private Database db;
     private final String dbName;
-    private int lastId;
-    private int initialAuditRecordCount;
+    private int maxId;
+    private int auditRecordCount;
     private int numberOfLatestOp;
     private boolean isAfterInitialRun;
 
@@ -65,8 +64,7 @@ public class Watcher implements Runnable {
     @Override
     public void run() {
         try {
-            setInitialAuditRecordCount();
-            findLastId();
+            findMaxId();
             do {
                 Thread.sleep(App.getInterval());
                 watch();
@@ -74,16 +72,20 @@ public class Watcher implements Runnable {
                     setAfterInitialRun();
                 }
             } while (!App.options.getOneOff());
-        } catch (InterruptedException | SQLException e) {
+        } catch (InterruptedException | SQLException | DbwException e) {
             new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
     }
 
-    private void watch() {
+    private void watch() throws DbwException {
         try {
-            selectAndProcessAuditRecords();
+            boolean auditRecordCountChanged = setAndCompareAuditRecordCount();
+            if (auditRecordCountChanged) {
+                selectAndProcessAuditRecords();
+                findMaxId();
+                evaluateOperationsLimit();
+            }
             watcherManager.checkIn(this);
-            findLastId();
         } catch (SQLException e) {
             new UnrecoverableException("WatcherRunException", e.getMessage(), e).handle();
         }
@@ -91,7 +93,7 @@ public class Watcher implements Runnable {
 
     private void selectAndProcessAuditRecords() {
         try {
-            List<AuditRecord> auditRecords = db.selectAuditRecords(getLastId());
+            List<AuditRecord> auditRecords = db.selectAuditRecords(getMaxId());
             for (AuditRecord auditRecord : auditRecords) {
                 try {
                     AuditFrame auditFrame = createAuditFrameAndFindDiff(auditRecord);
@@ -118,14 +120,14 @@ public class Watcher implements Runnable {
         return frame;
     }
 
-    private void findLastId() throws SQLException {
-        setLastId(db.selectMaxId());
+    private void findMaxId() throws SQLException {
+        setMaxId(db.selectMaxId());
     }
 
-    private int getLastId() throws SQLException {
+    private int getMaxId() throws SQLException {
         if (!isAfterInitialRun() && App.options.showLatestOperationsPresentAndGtThanZero()) {
             ShowLatestOperationsOption latestOps = App.options.getShowLatestOperations();
-            if (initialAuditRecordCount == 0) {
+            if (auditRecordCount == 0) {
                 Logger.log(Level.WARNING, dbName, WarningMessages.NO_LATEST_OPS);
                 return 0;
             }
@@ -133,35 +135,51 @@ public class Watcher implements Runnable {
             if (latestOps.isTime()) {
                 return db.selectLatestAuditRecordId(latestOps.getValue());
             } else {
-                int lastIdMinusN = lastId - (int)latestOps.getValue();
+                int lastIdMinusN = maxId - (int)latestOps.getValue();
                 if (lastIdMinusN <= 0) {
                     Logger.log(Level.WARNING, dbName, WarningMessages.LATEST_OPS_NUM_GT_AUDIT_RECORD_COUNT);
                 }
                 return Math.max(lastIdMinusN, 0);
             }
         }
-        return lastId;
+        return maxId;
     }
 
     public void outputInitialInfo() {
         if (!App.options.getOneOff()) {
             Logger.log(Level.INFO, dbName, LogMessages.WATCHER_STARTED);
         }
-        Logger.log(Level.INFO, dbName, String.format(LogMessages.AUDIT_RECORDS_COUNT, initialAuditRecordCount));
+        Logger.log(Level.INFO, dbName, String.format(LogMessages.AUDIT_RECORDS_COUNT, auditRecordCount));
         if (App.options.showLatestOperationsPresentAndGtThanZero() && App.options.getShowLatestOperations().isTime()) {
             String latestOpMsg = String.format(LogMessages.NUMBER_OF_LATEST_OP, numberOfLatestOp, App.options.getShowLatestOperations().getRaw());
             Logger.log(numberOfLatestOp > 0 ? Level.INFO : Level.WARNING, dbName, latestOpMsg);
         }
     }
 
-
-
-    private void setLastId(int lastId) {
-        this.lastId = lastId;
+    private void setMaxId(int maxId) {
+        this.maxId = maxId;
     }
 
-    private void setInitialAuditRecordCount() throws SQLException {
-        this.initialAuditRecordCount = db.getAuditRecordCount();
+    private boolean setAndCompareAuditRecordCount() throws SQLException {
+        int previousAuditRecordCount = auditRecordCount;
+        setAuditRecordCount();
+        return previousAuditRecordCount != auditRecordCount;
+    }
+
+    private void evaluateOperationsLimit() throws DbwException {
+        Optional<Integer> opMin = getCfg().getOperationsMinimum();
+        Optional<Integer> opLim = getCfg().getOperationsLimit();
+        if (getCfg().areOperationsSettingsPresent() && auditRecordCount + opMin.get() > opLim.get()) {
+            System.out.println(auditRecordCount);
+            System.out.println(opLim);
+            DeleteFirstNRowsAction deleteFirstNRowsAction = ObjectCreator.create(DeleteFirstNRowsAction.class);
+            deleteFirstNRowsAction.setNumberOfRowsToDelete(String.valueOf(opLim.get()));
+            deleteFirstNRowsAction.execute();
+        }
+    }
+
+    private void setAuditRecordCount() throws SQLException {
+        this.auditRecordCount = db.getAuditRecordCount();
     }
 
     public boolean isAfterInitialRun() {

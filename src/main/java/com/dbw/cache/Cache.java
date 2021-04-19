@@ -6,6 +6,7 @@ import com.dbw.log.WarningMessages;
 import com.google.inject.Singleton;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Optional;
@@ -23,9 +24,11 @@ public class Cache {
     public void load() {
         try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(CACHE_FILE_PATH))) {
             persistentCache = Optional.of((PersistentCache) input.readObject());
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (FileNotFoundException e) {
             persistentCache = Optional.empty();
             Logger.log(Level.WARNING, WarningMessages.NO_CACHE_FILE);
+        } catch (IOException | ClassNotFoundException e) {
+            persistentCache = Optional.empty();
         }
     }
 

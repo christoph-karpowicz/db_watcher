@@ -3,6 +3,7 @@ package com.dbw.cfg;
 import com.dbw.err.UnrecoverableException;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 public class Config {
@@ -10,6 +11,7 @@ public class Config {
 
     private String path;
     private DatabaseConfig database;
+    private SettingsConfig settings;
     private Set<String> tables;
     private boolean changed;
 
@@ -23,6 +25,22 @@ public class Config {
 
     public DatabaseConfig getDatabase() {
         return database;
+    }
+
+    public SettingsConfig getSettings() {
+        return settings;
+    }
+
+    public Optional<Integer> getOperationsMinimum() {
+        return Optional.ofNullable(settings).map(SettingsConfig::getOperationsMinimum);
+    }
+
+    public Optional<Integer> getOperationsLimit() {
+        return Optional.ofNullable(settings).map(SettingsConfig::getOperationsLimit);
+    }
+
+    public boolean areOperationsSettingsPresent() {
+        return settings != null && settings.getOperationsMinimum() != null && settings.getOperationsLimit() != null;
     }
 
     public Set<String> getTables() {
@@ -41,6 +59,8 @@ public class Config {
         ConfigValidator.ValidationResult result =
                 ConfigValidator.isAuditTableOnWatchList()
                 .and(ConfigValidator.isDbTypeKnown())
+                .and(ConfigValidator.areOperationsSettingsBothDeclared())
+                .and(ConfigValidator.areOperationsSettingsGtThanZero())
                 .apply(this);
         if (!result.equals(ConfigValidator.ValidationResult.SUCCESS)) {
             throw new UnrecoverableException("ConfigValidationException", String.format(result.msg, path));

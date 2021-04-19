@@ -7,8 +7,10 @@ public class ErrorMessages extends Messages {
     public final static String DB_CONN_FAILED = "Database connection attempt failed. Make sure you've provided the right path for the driver. Error message: %s";
     public final static String STATE_VALIDATION_NULL_OR_EMPTY = "Audit record ID: %d. Could not parse state data. Provided %s state string is null or empty.";
     public final static String UNKNOWN_DB_OPERATION = "%s: Uknown database operation.";
-    public final static String UNKNOWN_DB_TYPE = "%s: Unknown or not supported database type.";
-    public final static String AUDIT_TABLE_WATCH_ATTEMPT = Common.DBW_AUDIT_TABLE_NAME + " table name found on tables list. An audit trigger must not be created on the audit table.";
+    public final static String CFG_UNKNOWN_DB_TYPE = "Config error. %s: Unknown or not supported database type.";
+    public final static String CFG_AUDIT_TABLE_WATCH_ATTEMPT = "Config error. " + Common.DBW_AUDIT_TABLE_NAME + " table name found on tables list. An audit trigger must not be created on the audit table.";
+    public final static String CFG_BOTH_OP_SETTINGS_NOT_DECLARED = "Config error. Operations minimum and limit have to both be declared.";
+    public final static String CFG_OP_SETTINGS_LT_ZERO = "Config error. Operations minimum and limit have to greater than zero.";
     public final static String CLI_INVALID_DELETE_N_ROWS = addCliFlagInfo(Opts.DELETE_FIRST_N_ROWS) + "Invalid value. It has to be either a number or an asterisk.";
     public final static String CLI_INVALID_INTERVAL_SMALL = addCliFlagInfo(Opts.INTERVAL) + "The interval is too small. It cannot be less than 10 milliseconds.";
     public final static String CLI_INVALID_INTERVAL_BIG = addCliFlagInfo(Opts.INTERVAL) + "The interval is too big. You probably don't want it to be bigger than 10 seconds.";
