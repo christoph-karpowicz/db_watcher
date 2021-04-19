@@ -100,6 +100,10 @@ public class Orcl extends Database {
         return deleteFirstNRows(nRows, OrclQueries.DELETE_ALL_AUDIT_RECORDS, OrclQueries.DELETE_FIRST_N_AUDIT_RECORDS);
     }
 
+    public void deleteFirstNRows(int nRows) throws SQLException {
+        deleteFirstNRows(OrclQueries.DELETE_FIRST_N_AUDIT_RECORDS, nRows);
+    }
+
     public void dropAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName));
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));

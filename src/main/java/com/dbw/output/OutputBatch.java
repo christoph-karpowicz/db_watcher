@@ -50,8 +50,8 @@ public class OutputBatch extends ArrayList<AuditFrame> {
         Timestamp currentRecordsTime = frame.getAuditRecord().getTimestamp();
         Optional<TimeDiffSeparator> timeSeparator =
                 TimeDiffSeparator.create(previousTime, currentRecordsTime);
-        timeSeparator.ifPresent(separator -> System.out.println(separator.toString()));
-        System.out.println(frame.toString());
+        timeSeparator.ifPresent(System.out::println);
+        System.out.println(frame);
         previousTime = currentRecordsTime;
     }
 }

@@ -18,7 +18,7 @@ public class ErrorMessages extends Messages {
     public final static String CLI_INVALID_MAX_ROW_WIDTH = addCliFlagInfo(Opts.MAX_ROW_WIDTH) + "Maximum row width has to be greater than 10.";
     public final static String CLI_INVALID_LATEST_OP = addCliFlagInfo(Opts.SHOW_LATEST_OP) + "Latest operations option value is invalid.";
     public final static String CLI_ONE_OFF_NO_LASTEST_OP = addCliFlagInfo(Opts.ONE_OFF) + "This flag has to be used together with the -" + Opts.SHOW_LATEST_OP + " flag, which specifies the number or time of the latest operations to display.";
-    public final static String CLI_PURGE = addCliFlagInfo(Opts.PURGE) + "Errors occured while deleting database objects.";
+    public final static String CLI_PURGE = addCliFlagInfo(Opts.PURGE) + "Errors occurred while deleting database objects.";
     public final static String CLI_TABLES_NOT_FOUND = addCliFlagInfo(Opts.TABLES) + "%s tables not found in the config files.";
     public final static String CLI_TABLES_EMPTY_NAME = addCliFlagInfo(Opts.TABLES) + "An empty table name found.";
     public final static String CLI_TIME_DIFF_SEP_LT_ZERO = addCliFlagInfo(Opts.TIME_DIFF_SEPARATOR) + "Minimal value after which a time difference separator appears must not be less than 0.";
@@ -28,4 +28,5 @@ public class ErrorMessages extends Messages {
     public final static String CREATE_AUDIT_TABLE = "Failed to create an audit table. (%s)";
     public final static String CREATE_AUDIT_TRIGGER = "Failed to create an audit trigger for \"%s\" table. (%s)";
     public final static String CACHE_PERSIST_FAILED = "Saving cache to dbw.cache file failed.";
+    public final static String OP_LIMIT_REACHED_DELETE_ATTEMPT = "An SQL error occurred when attempting to delete the first %d rows in the audit table after the limit has been reached.";
 }

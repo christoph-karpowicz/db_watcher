@@ -116,6 +116,10 @@ public class Postgres extends Database {
         return deleteFirstNRows(nRows, PostgresQueries.DELETE_ALL_AUDIT_RECORDS, PostgresQueries.DELETE_FIRST_N_AUDIT_RECORDS);
     }
 
+    public void deleteFirstNRows(int nRows) throws SQLException {
+        deleteFirstNRows(PostgresQueries.DELETE_FIRST_N_AUDIT_RECORDS, nRows);
+    }
+
     public void dropAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));

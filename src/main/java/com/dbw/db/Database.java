@@ -32,6 +32,8 @@ public abstract class Database {
 
     public abstract String deleteFirstNRows(String nRows) throws SQLException;
 
+    public abstract void deleteFirstNRows(int nRows) throws SQLException;
+
     public abstract int getAuditRecordCount() throws SQLException;
 
     public abstract Integer selectLatestAuditRecordId(long seconds) throws SQLException;
@@ -60,8 +62,12 @@ public abstract class Database {
             executeFormattedQueryUpdate(deleteAllQuery);
             return String.format(SuccessMessages.CLI_ALL_ROWS_DELETED, rowCount);
         }
-        executePreparedStatementUpdateWithSingleInt(deleteAllLteQuery, nRowsNum);
+        deleteFirstNRows(deleteAllLteQuery, nRowsNum);
         return String.format(SuccessMessages.CLI_N_ROWS_DELETED, nRowsNum);
+    }
+
+    protected void deleteFirstNRows(String deleteAllLteQuery, int nRows) throws SQLException {
+        executePreparedStatementUpdateWithSingleInt(deleteAllLteQuery, nRows);
     }
 
     public void dropAuditTable() throws SQLException {
@@ -69,7 +75,7 @@ public abstract class Database {
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_DROPPED);
     }
 
-    protected void executePreparedStatementUpdateWithSingleInt(String query, int param) throws SQLException {
+    private void executePreparedStatementUpdateWithSingleInt(String query, int param) throws SQLException {
         PreparedStatement pstmt = conn.prepareStatement(query);
         pstmt.setInt(1, param);
         pstmt.executeUpdate();

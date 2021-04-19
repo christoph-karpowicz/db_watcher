@@ -10,10 +10,7 @@ import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
 import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
-import com.dbw.log.Level;
-import com.dbw.log.LogMessages;
-import com.dbw.log.Logger;
-import com.dbw.log.WarningMessages;
+import com.dbw.log.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -161,20 +158,25 @@ public class Watcher implements Runnable {
     }
 
     private boolean setAndCompareAuditRecordCount() throws SQLException {
-        int previousAuditRecordCount = auditRecordCount;
+        final int previousAuditRecordCount = auditRecordCount;
         setAuditRecordCount();
         return previousAuditRecordCount != auditRecordCount;
     }
 
-    private void evaluateOperationsLimit() throws DbwException {
+    private void evaluateOperationsLimit() throws SQLException {
         Optional<Integer> opMin = getCfg().getOperationsMinimum();
         Optional<Integer> opLim = getCfg().getOperationsLimit();
-        if (getCfg().areOperationsSettingsPresent() && auditRecordCount + opMin.get() > opLim.get()) {
-            System.out.println(auditRecordCount);
-            System.out.println(opLim);
-            DeleteFirstNRowsAction deleteFirstNRowsAction = ObjectCreator.create(DeleteFirstNRowsAction.class);
-            deleteFirstNRowsAction.setNumberOfRowsToDelete(String.valueOf(opLim.get()));
-            deleteFirstNRowsAction.execute();
+        if (getCfg().areOperationsSettingsPresent() && auditRecordCount >= opLim.get() + opMin.get()) {
+            new Thread(() -> {
+                try {
+                    getDb().deleteFirstNRows(opLim.get());
+                } catch (SQLException e) {
+                    String errMsg = String.format(ErrorMessages.OP_LIMIT_REACHED_DELETE_ATTEMPT, opLim.get());
+                    Logger.log(Level.ERROR, getDb().getDbConfig().getName(), errMsg);
+                }
+                String warnMsg = String.format(WarningMessages.OP_LIMIT_REACHED, opLim.get(), opMin.get());
+                Logger.log(Level.WARNING, getDb().getDbConfig().getName(), warnMsg);
+            }).start();
         }
     }
 

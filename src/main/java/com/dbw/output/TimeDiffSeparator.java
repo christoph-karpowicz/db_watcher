@@ -9,13 +9,6 @@ import java.util.Optional;
 
 public class TimeDiffSeparator implements OutputBuilder {
     private static final Short DEFAULT_TIME_DIFF_SEP_MIN_VAL = 5000;
-    private static final short INTERNAL_PADDING_LENGTH = 2;
-
-    private final String timeDiff;
-
-    public TimeDiffSeparator(String timeDiff) {
-        this.timeDiff = timeDiff;
-    }
 
     public static Optional<TimeDiffSeparator> create(Timestamp lastAuditRecordsTime, Timestamp currentAuditRecordsTime) {
         if (lastAuditRecordsTime == null) {
@@ -25,8 +18,7 @@ public class TimeDiffSeparator implements OutputBuilder {
         short timeDiffSepMinVal =
                 App.options.getTimeDiffSeparatorMinVal() != null ? App.options.getTimeDiffSeparatorMinVal() : DEFAULT_TIME_DIFF_SEP_MIN_VAL;
         if (timeDiffInMillis > timeDiffSepMinVal) {
-            String formattedTimeDiff = TimeDiffUtils.getTimeFormattedDiff(timeDiffInMillis);
-            TimeDiffSeparator ts = new TimeDiffSeparator(formattedTimeDiff);
+            TimeDiffSeparator ts = new TimeDiffSeparator();
             return Optional.of(ts);
         }
         return Optional.empty();
@@ -36,39 +28,18 @@ public class TimeDiffSeparator implements OutputBuilder {
     public String toString() {
         String separatorRow = createSeparatorRow();
         StringBuilder builder = new StringBuilder();
-        builder.append(separatorRow);
-        builder.append(separatorRow);
-        builder.append(separatorRow);
-        builder.append(createTimeDiffRow());
-        builder.append(separatorRow);
-        builder.append(separatorRow);
-        builder.append(separatorRow);
+        for (short i = 0; i < 6; i++) {
+            builder.append(separatorRow);
+        }
         return builder.toString();
     }
 
     private String createSeparatorRow() {
         StringBuilder builder = new StringBuilder();
-        builder.append(createInternalPadding());
-        builder.append(NEW_LINE);
-        return builder.toString();
-    }
-
-    private String createInternalPadding() {
-        int timeDiffLength = timeDiff.length();
-        int totalLength = timeDiffLength + INTERNAL_PADDING_LENGTH * 2;
-        int dotPosition = Math.floorDiv(totalLength, 2);
-        StringBuilder builder = new StringBuilder();
-        builder.append(StringUtils.multiplyNTimes(dotPosition, PADDING));
+        for (short i = 0; i < 3; i++) {
+            builder.append(PADDING);
+        }
         builder.append(DOT);
-        builder.append(StringUtils.multiplyNTimes(totalLength - dotPosition - 1, PADDING));
-        return builder.toString();
-    }
-
-    private String createTimeDiffRow() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(StringUtils.multiplyNTimes(INTERNAL_PADDING_LENGTH, PADDING));
-        builder.append(timeDiff);
-        builder.append(StringUtils.multiplyNTimes(INTERNAL_PADDING_LENGTH, PADDING));
         builder.append(NEW_LINE);
         return builder.toString();
     }
