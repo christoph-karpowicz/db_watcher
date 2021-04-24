@@ -49,13 +49,13 @@ public class TableDiffBuilder implements OutputBuilder {
     private void addHorizontalBorders(List<StateColumn> stateColumns) {
         stateColumns.forEach(stateColumn -> {
             builder.append(PADDING);
-            builder.append(stateColumn.hasDiff() ? DIFF_EDGE_BORDER : PADDING);
-            String filler = stateColumn.hasDiff() ? DIFF_HORIZONTAL_BORDER : PADDING;
+            builder.append(stateColumn.hasDiff() ? EDGE_BORDER : PADDING);
+            String filler = stateColumn.hasDiff() ? HORIZONTAL_BORDER : PADDING;
             int maxWidth = getFinalMaxColumnWidth(stateColumn);
             for (short i = 0; i < maxWidth; i++) {
                 builder.append(filler);
             }
-            builder.append(stateColumn.hasDiff() ? DIFF_EDGE_BORDER : PADDING);
+            builder.append(stateColumn.hasDiff() ? EDGE_BORDER : PADDING);
             builder.append(PADDING);
         });
         builder.append(NEW_LINE);

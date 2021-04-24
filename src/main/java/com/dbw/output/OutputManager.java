@@ -16,6 +16,7 @@ public class OutputManager {
     private WatcherManager watcherManager;
 
     private Timestamp lastAuditRecordsTime;
+    private int frameCounter = 1;
 
     public void pollAndOutput() {
         boolean outputInitialInfoDone = false;
@@ -25,6 +26,7 @@ public class OutputManager {
                 if (watcherManager.areAllCheckedIn() || (watcherManager.areAllAfterInitialRun() && App.options.getOneOff())) {
                     OutputBatch frames = getSortedFrames();
                     frames.output();
+                    frameCounter += frames.size();
                     if (!outputInitialInfoDone && watcherManager.areAllAfterInitialRun()) {
                         outputInitialInfo();
                         outputInitialInfoDone = true;
@@ -42,7 +44,7 @@ public class OutputManager {
     }
 
     private OutputBatch getSortedFrames() {
-        OutputBatch frames = new OutputBatch(lastAuditRecordsTime);
+        OutputBatch frames = new OutputBatch(lastAuditRecordsTime, frameCounter);
         watcherManager.getFrameQueue().drainTo(frames);
         frames.sort();
         frames.calculateTimes();

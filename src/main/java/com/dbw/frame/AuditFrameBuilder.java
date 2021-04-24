@@ -1,7 +1,5 @@
 package com.dbw.frame;
 
-import java.util.List;
-
 import com.dbw.app.App;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.db.AuditRecord;
@@ -11,19 +9,21 @@ import com.dbw.diff.StateDiffService;
 import com.dbw.diff.TableDiffBuilder;
 import com.dbw.output.OutputBuilder;
 import com.dbw.util.StringUtils;
-import com.dbw.watcher.WatcherManager;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
+import java.util.List;
+
 public class AuditFrameBuilder implements OutputBuilder {
     @Inject
-    private WatcherManager watcherManager;
+    private AuditFrameHeaderBuilder headerBuilder;
 
+    private StringBuilder builder;
     private DatabaseConfig dbConfig;
     private AuditRecord auditRecord;
     private List<StateColumn> stateColumns;
     private String timeSincePrevious;
-    private StringBuilder builder;
+    private String frameNo;
 
     @Inject
     private StateDiffService diffService;
@@ -44,24 +44,19 @@ public class AuditFrameBuilder implements OutputBuilder {
         this.timeSincePrevious = timeSincePrevious;
     }
 
+    public void setFrameNo(int frameNo) {
+        this.frameNo = String.valueOf(frameNo);
+    }
+
     public void init() {
         builder = new StringBuilder();
     }
     
     public void build() {
-        builder.append(buildSeparator());
-        builder.append(VERTICAL_BORDER);
+        String headerTable = buildHeaderTable();
+        builder.append(buildSeparator(headerTable.length()));
         builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_ID + auditRecord.getId());
-        if (watcherManager.getWatchersSize() > 1) {
-            addDatabaseInfo();
-        }
-        builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_TABLE + auditRecord.getTableName());
-        builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_OPERATION + auditRecord.getOperation());
-        builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_TIMESTAMP + auditRecord.getFormattedTimestamp());
+        builder.append(headerTable);
         builder.append(NEW_LINE);
         builder.append(findTableDiff());
         if (Operation.UPDATE.equals(auditRecord.getOperation()) && App.options.getVerboseDiff()) {
@@ -69,36 +64,33 @@ public class AuditFrameBuilder implements OutputBuilder {
         }
     }
 
-    private String buildSeparator() {
+    private String buildSeparator(int headerTableLength) {
         int lineLength;
-        StringBuilder builder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (!Strings.isNullOrEmpty(timeSincePrevious)) {
             String front = buildSeparatorFrontWithTime();
             lineLength = TableDiffBuilder.getMaxRowWidth() - front.length();
-            builder.append(front);
+            sb.append(front);
         } else {
             lineLength = TableDiffBuilder.getMaxRowWidth();
         }
-        builder.append(StringUtils.multiplyNTimes(lineLength, HR));
-        return builder.toString();
+        sb.append(StringUtils.multiplyNTimes(lineLength, HR));
+        sb.append(VERTICAL_BORDER);
+        sb.setCharAt((headerTableLength / 4) - 2, EDGE_BORDER.charAt(0));
+        return sb.toString();
     }
 
     private String buildSeparatorFrontWithTime() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(HR);
-        builder.append(PADDING);
-        builder.append(timeSincePrevious);
-        builder.append(PADDING);
-        return builder.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(HR);
+        sb.append(PADDING);
+        sb.append(timeSincePrevious);
+        sb.append(PADDING);
+        return sb.toString();
     }
 
-    private void addDatabaseInfo() {
-        builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_DB);
-        builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_DB_TYPE + dbConfig.getType());
-        builder.append(NEW_LINE);
-        builder.append(FRAME_HEADER_DB_NAME + dbConfig.getName());
+    private String buildHeaderTable() {
+        return headerBuilder.build(auditRecord, frameNo, dbConfig);
     }
 
     private String findTableDiff() {
@@ -121,5 +113,4 @@ public class AuditFrameBuilder implements OutputBuilder {
     public String toString() {
         return builder.toString();
     }
-    
 }

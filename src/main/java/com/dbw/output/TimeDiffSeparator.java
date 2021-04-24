@@ -43,5 +43,4 @@ public class TimeDiffSeparator implements OutputBuilder {
         builder.append(NEW_LINE);
         return builder.toString();
     }
-
 }

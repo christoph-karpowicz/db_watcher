@@ -1,6 +1,5 @@
 package com.dbw.watcher;
 
-import com.dbw.actions.DeleteFirstNRowsAction;
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;

@@ -20,6 +20,7 @@ public class AuditFrame {
     private Database db;
     private List<StateColumn> stateColumns;
     private String timeSincePrevious;
+    private int frameNo;
 
     @Inject
     private StateDiffService diffService;
@@ -34,6 +35,10 @@ public class AuditFrame {
 
     public void setDb(Database db) {
         this.db = db;
+    }
+
+    public void setFrameNo(int frameNo) {
+        this.frameNo = frameNo;
     }
 
     public void createDiff() throws RecoverableException, SQLException {
@@ -68,6 +73,7 @@ public class AuditFrame {
         builder.setAuditRecord(auditRecord);
         builder.setStateColumns(stateColumns);
         builder.setTimeSincePrevious(timeSincePrevious);
+        builder.setFrameNo(frameNo);
         builder.init();
         builder.build();
         return builder.toString();

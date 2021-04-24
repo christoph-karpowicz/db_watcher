@@ -10,9 +10,11 @@ import java.util.Optional;
 
 public class OutputBatch extends ArrayList<AuditFrame> {
     private Timestamp previousTime;
+    private int frameCount;
 
-    public OutputBatch(Timestamp previousTime) {
+    public OutputBatch(Timestamp previousTime, int frameCount) {
         this.previousTime = previousTime;
+        this.frameCount = frameCount;
     }
 
     public Timestamp getPreviousTime() {
@@ -47,6 +49,7 @@ public class OutputBatch extends ArrayList<AuditFrame> {
     }
 
     private void outputFrame(AuditFrame frame) {
+        frame.setFrameNo(frameCount++);
         Timestamp currentRecordsTime = frame.getAuditRecord().getTimestamp();
         Optional<TimeDiffSeparator> timeSeparator =
                 TimeDiffSeparator.create(previousTime, currentRecordsTime);
