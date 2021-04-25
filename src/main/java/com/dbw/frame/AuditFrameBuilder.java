@@ -53,8 +53,8 @@ public class AuditFrameBuilder implements OutputBuilder {
     }
     
     public void build() {
-        String headerTable = buildHeaderTable();
-        builder.append(buildSeparator(headerTable.length()));
+        AuditFrameHeader headerTable = buildHeaderTable();
+        builder.append(buildSeparator(headerTable.getRowWidth()));
         builder.append(NEW_LINE);
         builder.append(headerTable);
         builder.append(NEW_LINE);
@@ -76,7 +76,9 @@ public class AuditFrameBuilder implements OutputBuilder {
         }
         sb.append(StringUtils.multiplyNTimes(lineLength, HR));
         sb.append(VERTICAL_BORDER);
-        sb.setCharAt((headerTableLength / 4) - 2, EDGE_BORDER.charAt(0));
+        if (headerTableLength - 1 < TableDiffBuilder.getMaxRowWidth()) {
+            sb.setCharAt(headerTableLength - 1, EDGE_BORDER.charAt(0));
+        }
         return sb.toString();
     }
 
@@ -89,7 +91,7 @@ public class AuditFrameBuilder implements OutputBuilder {
         return sb.toString();
     }
 
-    private String buildHeaderTable() {
+    private AuditFrameHeader buildHeaderTable() {
         return headerBuilder.build(auditRecord, frameNo, dbConfig);
     }
 
