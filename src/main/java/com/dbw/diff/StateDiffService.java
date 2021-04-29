@@ -4,6 +4,8 @@ import com.dbw.app.ObjectCreator;
 import com.dbw.db.*;
 import com.dbw.err.RecoverableException;
 import com.dbw.err.RecoverableException;
+import com.dbw.err.UnrecoverableException;
+import com.dbw.log.ErrorMessages;
 import com.dbw.output.OutputBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
@@ -30,6 +32,10 @@ public class StateDiffService implements DiffService {
         Diff diff;
         if (db instanceof Postgres) {
             String[] tableColumnNames = ((Postgres)db).getWatchedTablesColumnNames().get(auditRecord.getTableName());
+            if (tableColumnNames.length == 0) {
+                String errMsg = String.format(ErrorMessages.TABLE_NOT_FOUND_IN_SCHEMA, auditRecord.getTableName(), db.getDbConfig().getSchema());
+                new UnrecoverableException("StateDataProcessing", errMsg).handle();
+            }
             diff = new JsonDiff(tableColumnNames);
         } else {
             diff = ObjectCreator.create(XmlDiff.class);

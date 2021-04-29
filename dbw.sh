@@ -7,5 +7,5 @@ elif [ $1 = "test-postgres" ]; then
 elif [ $1 = "compile" ]; then
     mvn package shade:shade -DskipTests=true
 else
-    java -Xmx25m -cp target/dbw-1.0.0.jar com.dbw.app.Dbw "$@"
+    java -Xmx25m -cp target/dbw-1.1.0.jar com.dbw.app.Dbw "$@"
 fi

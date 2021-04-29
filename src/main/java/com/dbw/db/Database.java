@@ -70,8 +70,8 @@ public abstract class Database {
         executePreparedStatementUpdateWithSingleInt(deleteAllLteQuery, nRows);
     }
 
-    public void dropAuditTable() throws SQLException {
-        executeFormattedQueryUpdate("DROP TABLE " + Common.DBW_AUDIT_TABLE_NAME);
+    public void dropAuditTable(String tableName) throws SQLException {
+        executeFormattedQueryUpdate("DROP TABLE " + tableName);
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_DROPPED);
     }
 

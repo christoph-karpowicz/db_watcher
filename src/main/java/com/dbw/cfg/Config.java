@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public class Config {
-    public static final String DEFAULT_SCHEMA = "public";
-
     private String path;
     private DatabaseConfig database;
     private SettingsConfig settings;

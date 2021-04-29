@@ -29,4 +29,5 @@ public class ErrorMessages extends Messages {
     public final static String CREATE_AUDIT_TRIGGER = "Failed to create an audit trigger for \"%s\" table. (%s)";
     public final static String CACHE_PERSIST_FAILED = "Saving cache to dbw.cache file failed.";
     public final static String OP_LIMIT_REACHED_DELETE_ATTEMPT = "An SQL error occurred when attempting to delete the first %d rows in the audit table after the limit has been reached.";
+    public final static String TABLE_NOT_FOUND_IN_SCHEMA = "Table %s doesn't exist in schema %s.";
 }

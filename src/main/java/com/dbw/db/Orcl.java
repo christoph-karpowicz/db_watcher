@@ -120,7 +120,7 @@ public class Orcl extends Database {
             }
         }
         try {
-            dropAuditTable();
+            dropAuditTable(Common.DBW_AUDIT_TABLE_NAME);
         } catch (SQLException e) {
             success = false;
             new RecoverableException("Purge", e.getMessage(), e).setRecoverable().handle();

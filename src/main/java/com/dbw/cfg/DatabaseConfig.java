@@ -1,7 +1,12 @@
 package com.dbw.cfg;
 
+import com.google.common.base.Strings;
+
 public class DatabaseConfig {
+    public static final String DEFAULT_SCHEMA = "public";
+
     private String name;
+    private String schema;
     private String type;
     private String host;
     private int port;
@@ -12,6 +17,10 @@ public class DatabaseConfig {
 
     public String getName() {
         return name;
+    }
+
+    public String getSchema() {
+        return Strings.isNullOrEmpty(schema) ? DEFAULT_SCHEMA : schema;
     }
 
     public String getType() {

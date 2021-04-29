@@ -28,9 +28,12 @@ public class PostgresQueries {
 
     public static final String FIND_AUDIT_FUNCTION = 
         "SELECT " + Common.EXISTS + " (" +
-        "    SELECT FROM pg_proc " +
-        "    WHERE  proname = '" + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "'" +
-        ")";
+        "        SELECT routine_name" +
+        "            FROM information_schema.routines" +
+        "            WHERE routine_type='FUNCTION'" +
+        "            AND specific_schema = ?" +
+        "            AND routine_name = '" + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() +
+        "')";
 
     private static final String UPDATE_COL_LIST = QueryBuilder.buildColumNameList(
         Common.COLNAME_OLD_STATE, 
@@ -55,7 +58,7 @@ public class PostgresQueries {
     );
 
     public static final String CREATE_AUDIT_FUNCTION = 
-        "CREATE FUNCTION " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "() RETURNS trigger AS " +
+        "CREATE FUNCTION %s() RETURNS trigger AS " +
         "$$" +
         "DECLARE" +
         "    v_old TEXT;" +
@@ -83,7 +86,7 @@ public class PostgresQueries {
         "$$" +
         "LANGUAGE plpgsql";
 
-    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase();
+    public static final String DROP_AUDIT_FUNCTION = "DROP FUNCTION %s";
 
     public static final String FIND_AUDIT_TRIGGER = 
         "SELECT " + Common.EXISTS + " (" +
@@ -95,7 +98,7 @@ public class PostgresQueries {
     public static final String CREATE_AUDIT_TRIGGER = 
         "CREATE TRIGGER %s" +
         " AFTER INSERT OR UPDATE OR DELETE ON %s" +
-        " FOR EACH ROW EXECUTE PROCEDURE " + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() + "()";
+        " FOR EACH ROW EXECUTE PROCEDURE %s()";
 
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s ON %s";
 

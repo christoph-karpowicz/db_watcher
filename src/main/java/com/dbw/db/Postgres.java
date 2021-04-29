@@ -74,12 +74,12 @@ public class Postgres extends Database {
     }
 
     public boolean auditTableExists() throws SQLException {
-        String[] stringArgs = {Config.DEFAULT_SCHEMA, Common.DBW_AUDIT_TABLE_NAME.toLowerCase()};
+        String[] stringArgs = {getDbConfig().getSchema(), Common.DBW_AUDIT_TABLE_NAME.toLowerCase()};
         return objectExists(PostgresQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 
     public void createAuditTable() throws SQLException {
-        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME.toLowerCase());
+        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TABLE, getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME));
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
@@ -88,17 +88,17 @@ public class Postgres extends Database {
     }
 
     public boolean auditFunctionExists() throws SQLException {
-        String[] stringArgs = {};
+        String[] stringArgs = {getDbConfig().getSchema()};
         return objectExists(PostgresQueries.FIND_AUDIT_FUNCTION, stringArgs);
     }
 
     public void createAuditFunction() throws SQLException {
-        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION);
+        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION, getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_CREATED);
     }
 
     public void dropAuditFunction() throws SQLException {
-        executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_FUNCTION);
+        executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_FUNCTION, getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_DROPPED);
     }
 
@@ -108,7 +108,8 @@ public class Postgres extends Database {
     }
 
     public void createAuditTrigger(String tableName) throws SQLException {
-        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
+        String triggerName = QueryBuilder.buildAuditTriggerName(tableName);
+        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, triggerName, getObjectNameWithSchema(tableName), getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
@@ -121,7 +122,8 @@ public class Postgres extends Database {
     }
 
     public void dropAuditTrigger(String tableName) throws SQLException {
-        executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName), tableName);
+        String triggerName = QueryBuilder.buildAuditTriggerName(tableName);
+        executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, triggerName, getObjectNameWithSchema(tableName));
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
@@ -137,7 +139,7 @@ public class Postgres extends Database {
         }
         try {
             dropAuditFunction();
-            dropAuditTable();
+            dropAuditTable(getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME));
         } catch (SQLException e) {
             success = false;
             new RecoverableException("Purge", e.getMessage(), e).setRecoverable().handle();
@@ -157,7 +159,7 @@ public class Postgres extends Database {
     }
 
     public String[] selectTableColumnNames(String tableName) throws SQLException {
-        String[] stringArgs = {Config.DEFAULT_SCHEMA, tableName};
+        String[] stringArgs = {getDbConfig().getSchema(), tableName};
         List<String> tableColumnNames = selectStringArray(PostgresQueries.FIND_TABLE_COLUMNS, stringArgs);
         return tableColumnNames.toArray(new String[0]);
     }
@@ -174,5 +176,9 @@ public class Postgres extends Database {
         SelectAuditRecordsQueryBuilder selectAuditRecordsBuilder =
                 new SelectAuditRecordsQueryBuilder(PostgresQueries.SELECT_AUDIT_RECORDS);
         return selectAuditRecords(selectAuditRecordsBuilder.build(), fromId);
+    }
+
+    private String getObjectNameWithSchema(String objectName) {
+        return String.join(".", getDbConfig().getSchema(), objectName.toLowerCase());
     }
 }
