@@ -67,17 +67,17 @@ public class PostgresQueries {
         "    IF (TG_OP = 'UPDATE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
-        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + UPDATE_COL_LIST + ") " +
+        "        INSERT INTO %s(" + UPDATE_COL_LIST + ") " +
         "            VALUES (v_old, v_new, TG_TABLE_NAME::TEXT , 'U', current_query());" +
         "        RETURN NEW;" +
         "    ELSIF (TG_OP = 'DELETE') THEN" +
         "        v_old := ROW_TO_JSON(ROW(OLD.*));" +
-        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + DELETE_COL_LIST + ")" +
+        "        INSERT INTO %s(" + DELETE_COL_LIST + ")" +
         "            VALUES (v_old, TG_TABLE_NAME::TEXT, 'D', current_query());" +
         "        RETURN OLD;" +
         "    ELSIF (TG_OP = 'INSERT') THEN" +
         "        v_new := ROW_TO_JSON(ROW(NEW.*));" +
-        "        INSERT INTO " + Common.DBW_AUDIT_TABLE_NAME + "(" + INSERT_COL_LIST + ")" +
+        "        INSERT INTO %s(" + INSERT_COL_LIST + ")" +
         "            VALUES (v_new, TG_TABLE_NAME::TEXT, 'I', current_query());" +
         "        RETURN NEW;" +
         "    END IF;" +

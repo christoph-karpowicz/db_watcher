@@ -93,7 +93,13 @@ public class Postgres extends Database {
     }
 
     public void createAuditFunction() throws SQLException {
-        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_FUNCTION, getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
+        executeFormattedQueryUpdate(
+                PostgresQueries.CREATE_AUDIT_FUNCTION,
+                getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME),
+                getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME),
+                getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME),
+                getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME)
+        );
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_CREATED);
     }
 
