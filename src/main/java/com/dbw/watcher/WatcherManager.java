@@ -10,6 +10,9 @@ import com.dbw.err.PreparationException;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.ErrorMessages;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -110,6 +113,9 @@ public class WatcherManager {
     public void outputInitialInfo() {
         for (Watcher watcher : watchers) {
             watcher.outputInitialInfo();
+        }
+        if (App.options.getOneOff()) {
+            Logger.log(Level.INFO, LogMessages.ONE_OFF_DONE);
         }
     }
 

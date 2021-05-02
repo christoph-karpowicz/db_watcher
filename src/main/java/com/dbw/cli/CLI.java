@@ -51,6 +51,7 @@ public class CLI {
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
         parsedOptions.purge = getPurgeOption();
+        parsedOptions.showQuery = getQueryOption();
         parsedOptions.verboseDiff = getVerboseDiff();
         try {
             parsedOptions.deleteFirstNRows = getDeleteFirstNRowsOption();
@@ -148,7 +149,11 @@ public class CLI {
     private boolean getPurgeOption() {
         return cmd.hasOption(Opts.PURGE);
     }
-    
+
+    private boolean getQueryOption() {
+        return cmd.hasOption(Opts.QUERY);
+    }
+
     private ShowLatestOperationsOption getShowLatestOperationsOption() throws Exception {
         if (cmd.hasOption(Opts.SHOW_LATEST_OP)) {
             String value = cmd.getOptionValue(Opts.SHOW_LATEST_OP);
@@ -198,6 +203,7 @@ public class CLI {
         private Short maxRowWidth;
         private boolean oneOff;
         private boolean purge;
+        private boolean showQuery;
         private ShowLatestOperationsOption showLatestOperations;
         private Optional<Set<String>> tables;
         private Short timeDiffSeparatorMinVal;
@@ -241,6 +247,10 @@ public class CLI {
 
         public boolean getPurge() {
             return purge;
+        }
+
+        public boolean getShowQuery() {
+            return showQuery;
         }
 
         public ShowLatestOperationsOption getShowLatestOperations() {

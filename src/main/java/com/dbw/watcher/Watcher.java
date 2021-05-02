@@ -7,6 +7,7 @@ import com.dbw.cli.ShowLatestOperationsOption;
 import com.dbw.db.AuditRecord;
 import com.dbw.db.Database;
 import com.dbw.db.DatabaseFactory;
+import com.dbw.db.Postgres;
 import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.*;
@@ -149,6 +150,9 @@ public class Watcher implements Runnable {
         if (App.options.showLatestOperationsPresentAndGtThanZero() && App.options.getShowLatestOperations().isTime()) {
             String latestOpMsg = String.format(LogMessages.NUMBER_OF_LATEST_OP, numberOfLatestOp, App.options.getShowLatestOperations().getRaw());
             Logger.log(numberOfLatestOp > 0 ? Level.INFO : Level.WARNING, dbName, latestOpMsg);
+        }
+        if (App.options.getShowQuery() && !(getDb() instanceof Postgres)) {
+            Logger.log(Level.WARNING, dbName, WarningMessages.QUERY_FLAG_FOR_NON_POSTGRES);
         }
     }
 

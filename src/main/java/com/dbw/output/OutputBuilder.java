@@ -16,6 +16,7 @@ public interface OutputBuilder {
     String FRAME_HEADER_TABLE = "Table";
     String FRAME_HEADER_OPERATION = "Operation";
     String FRAME_HEADER_TIMESTAMP = "Timestamp";
+    String FRAME_HEADER_QUERY = "Query: ";
     String VERBOSE_DIFF_DIFF = " diff: ";
     String VERBOSE_DIFF_BEFORE = "Before: ";
     String VERBOSE_DIFF_AFTER = "After: ";

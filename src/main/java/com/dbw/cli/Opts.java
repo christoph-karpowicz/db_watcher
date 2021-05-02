@@ -23,11 +23,12 @@ public class Opts extends Options {
     public static final String DELETE_FIRST_N_ROWS = "D";
     public static final String SHOW_HELP = "h";
     public static final String INTERVAL = "i";
+    public static final String SHOW_LATEST_OP = "l";
     public static final String MAX_COL_WIDTH = "w";
     public static final String MAX_ROW_WIDTH = "W";
     public static final String ONE_OFF = "o";
     public static final String PURGE = "p";
-    public static final String SHOW_LATEST_OP = "n";
+    public static final String QUERY = "q";
     public static final String TABLES = "t";
     public static final String TIME_DIFF_SEPARATOR = "T";
     public static final String VERBOSE_DIFF = "V";
@@ -80,6 +81,14 @@ public class Opts extends Options {
                     "set the interval in milliseconds in which the application checks whether there were changes in the watched database (default: 500ms)"
             ),
             buildOption(
+                    SHOW_LATEST_OP,
+                    "latest-changes",
+                    true,
+                    "show the latest operations after the app starts. Accepts a number or a number combined " +
+                            "with the seconds, minutes or hours symbol, where for example 3 means three latest operations " +
+                            "and 3s means all operations from the last 3 seconds - use \"m\" or \"h\" for minutes or hours"
+            ),
+            buildOption(
                     MAX_COL_WIDTH,
                     "max-column-width",
                     true,
@@ -104,12 +113,10 @@ public class Opts extends Options {
                     "remove database audit table, functions and triggers"
             ),
             buildOption(
-                    SHOW_LATEST_OP,
-                    "latest-changes",
-                    true,
-                    "show the latest operations after the app starts. Accepts a number or a number combined " +
-                        "with the seconds, minutes or hours symbol, where for example 3 means three latest operations " +
-                        "and 3s means all operations from the last 3 seconds - use \"m\" or \"h\" for minutes or hours"
+                    QUERY,
+                    "query",
+                    false,
+                    "show the SQL query for each operation (PostgreSQL only)"
             ),
             buildOption(
                     TABLES,

@@ -57,6 +57,11 @@ public class AuditFrameBuilder implements OutputBuilder {
         builder.append(buildSeparator(headerTable.getRowWidth()));
         builder.append(NEW_LINE);
         builder.append(headerTable);
+        if (App.options.getShowQuery() && auditRecord.getQuery() != null) {
+            builder.append(FRAME_HEADER_QUERY);
+            builder.append(auditRecord.getQuery());
+            builder.append(NEW_LINE);
+        }
         builder.append(NEW_LINE);
         builder.append(findTableDiff());
         if (Operation.UPDATE.equals(auditRecord.getOperation()) && App.options.getVerboseDiff()) {

@@ -87,7 +87,6 @@ public class XmlStateBuilder {
 
     private String generateToVarcharFunctionCall(String columnNameWithStatePrefix, String dataType) {
         StringBuilder toVarcharFunctionCall = new StringBuilder();
-
         switch (dataType) {
             case OrclSpec.TYPE_BLOB:
                 toVarcharFunctionCall
