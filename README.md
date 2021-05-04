@@ -2,9 +2,9 @@
 
 ![Example](docs/operation_output.png)
 
-Dbw is a console application that displays changes in real time in a given Oracle or PostgreSQL database. It does that by creating triggers on tables that were specified in a YML config file and an audit table in which every record represents an individual insert, update or delete operation. When it comes to detecting and keeping track of said operations, the database does all the work. The application merely frequently checks if new records were added to the audit table and outputs them in the console in a readable form. 
+Dbw is a console application that displays changes in real time in any number of Oracle or PostgreSQL databases. It does that by creating triggers on tables that were specified in a YML config file and an audit table in which every record represents an individual insert, update or delete operation. When it comes to detecting and keeping track of said operations, the database does all the work. The application merely frequently checks if new records were added to the audit table and outputs them in the console in a readable form. 
 
-This application has been written to help developers in their daily work on large systems, in which a single action can result in changes to many different tables in the database. Dbw instantly displays before and after states of an updated row and contents of insterted or deleted rows saving the developer the trouble of querying the database with tools that he or she might use or analyzing the applications code to find out what happens after a given action. 
+This application has been written to help developers in their daily work on large systems, in which a single action can result in changes to many different tables in the database. Dbw instantly displays before and after states of an updated row and contents of insterted or deleted rows, saving the developer the trouble of querying the database with tools that he or she might use or analyzing the applications code to find out what happens after a given action. 
 
 ## Configuration
 
@@ -12,11 +12,15 @@ An example PostgreSQL configuration file:
 ```
 database:
     name      : example
+    schema    : example_schema
     type      : postgresql
     host      : "127.0.0.1"
     port      : 5432
     user      : christoph
     password  : pwd1234
+settings:
+    operationsLimit: 10000
+    operationsMinimum: 100
 tables:
     - film
     - actor
@@ -35,6 +39,9 @@ database:
     user                : christoph
     password            : pwd1234
     driverPath          : /home/christoph/dbw/lib/ojdbc7.jar
+settings:
+    operationsLimit: 10000
+    operationsMinimum: 100
 tables:
     - FILM
     - ACTOR
@@ -45,9 +52,16 @@ tables:
 ```
 
 In the `database` dictionary, `host` and `port` mappings can be replaced with a `connectionString` for a PostgreSQL configuration, whereas for an Oracle DB there can be only a `connectionString` mapping. 
-`tables` is a collection of table names that will be watched.
+`tables` is a collection of table names that will be watched. 
+
+The `schema` is specific for PostgreSQL and is set to `public` by default. 
 
 The `driverPath` mapping is optional and is an easier way of adding a JDBC driver to the classpath; when specified, the relevant driver class will be loaded at runtime, without the need of using the `cp` flag in the `java` command. The provided value has to be an absolute path. 
+
+There are two available mappings in the `settings` dictionary:  
+`operationsLimit` - the maximum number of operations stored in the audit table. When this limit is reached, Dbw will automatically delete the given number of records from the audit table.  
+`operationsMinimum` - the number of operations that will remain in the audit table after deletion caused by the exceeded limit.  
+To further explain the mappings described above, if for example `operationsLimit` is set to 10,000 and the `operationsMinimum` is 100, the operations count in the audit table will have to reach 10,100 until Dbw deletes 10,000 first records specified in `operationsLimit`. Effectively the limit is 10,100, because we're taking into account the minimum number of records that must remain in the audit table. 
 
 ## Usage
 
@@ -63,74 +77,140 @@ An example application start for Oracle configuration:
 java -cp lib/ojdbc7.jar:./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml
 ```
 
+An example application start for both PostgreSQL and Oracle configurations:
+```
+java -cp lib/ojdbc7.jar:./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml,./postgres-example-config.yml
+```
+
 Note that in order to use Dbw with an Oracle database, you will have to add an Oracle JDBC driver to the classpath as shown above (`lib/ojdbc7.jar` for example) or by adding a `driverPath` mapping to the configuration file.
 
-To close the application, use Ctrl+C.
+To close the application, press Ctrl+C.
 
 ### CLI
 
 ```
- -c,--config <arg>             provide a path to the configuration file
- -d,--debug                    show exception classes and stack traces
- -D,--deleteFirstNRows <arg>   delete the first n rows from the audit
-                               table (* if all)
- -h,--help                     show help
- -i,--interval <arg>           set the interval in milliseconds in which
-                               the application checks whether there were
-                               changes in the watched database (default:
-                               500ms)
- -n,--lastNChanges <arg>       specify the number of last changes to
-                               display after the app starts
- -p,--purge                    remove database audit table, functions and
-                               triggers
- -V,--verboseDiff              show verbose output, i.e. with full before
-                               and after states of column values that
-                               exceeded the maximum column width
- -w,--maxColumnWidth <arg>     specify the maximum width of a column
-                               (default: 17)
- -W,--maxRowWidth <arg>        specify the maximum width of a row
-                               (default: 120)
+ -c,--config <arg>                        provide one or more comma-separated
+                                          paths to configuration files
+ -C,--clear-cache                         clear the given config's cache
+ -d,--debug                               show exception classes and stack
+                                          traces
+ -D,--delete-first-n-rows <arg>           delete the first n rows from the
+                                          audit table (* if all)
+ -h,--help                                show help
+ -i,--interval <arg>                      set the interval in milliseconds
+                                          in which the application checks
+                                          whether there were changes in
+                                          the watched databases (default:
+                                          500ms)
+ -l,--latest-changes <arg>                show the latest operations after
+                                          the app starts. Accepts a number
+                                          or a number combined with the
+                                          seconds, minutes or hours
+                                          symbol, where for example 3
+                                          means three latest operations
+                                          and 3s means all operations from
+                                          the last 3 seconds - use "m" or
+                                          "h" for minutes or hours
+ -o,--one-off                             show the database operations
+                                          matching with the given
+                                          --latest-changes flag value and
+                                          close the application (don't
+                                          start the watchers)
+ -p,--purge                               remove database audit table,
+                                          functions and triggers
+ -q,--query                               show the SQL query for each
+                                          operation (PostgreSQL only)
+ -t,--tables <arg>                        narrow down the tables you'd
+                                          like to watch, accepts a single
+                                          table or comma-separated list of
+                                          tables
+ -T,--time-diff-separator-min-val <arg>   specify the time in milliseconds
+                                          after which a time difference
+                                          separator will appear between
+                                          two operation outputs (default: 5000)
+ -V,--verbose-diff                        show verbose output, i.e. with
+                                          full before and after states of
+                                          column values that exceeded the
+                                          maximum column width
+ -w,--max-column-width <arg>              specify the maximum width of a
+                                          column (default: 17)
+ -W,--max-row-width <arg>                 specify the maximum width of a
+                                          row (default: 120)
 ```
 
-#### Config file
+#### Config files
 
-If a path to a config file hasn't been specified with the `-c,--config` flag, Dbw will list all YML files from the current directory and ask the user to choose one of them. 
+The `-c,--config` flag accepts comma-separated paths to config files like so: `/example/path/to/config1.yml,/example/path/to/config2.yml`. If paths to config files haven't been specified with the `-c,--config` flag, Dbw will list all YML files from the current directory and ask the user to choose one or more.
 ![ConfigChoice](docs/config_choice.png)  
-To use one of the displayed config files, insert its number from the list and press Enter.
+To load one config file, insert its number from the list and press Enter.
+To load multiple config files, insert their numbers from the list and press Enter (e.g. `2,4,5`).
 
 #### Cleanup
 
 Purge (`-p, --purge` flag) will remove any trace of Dbw from the database by removing all previously created database objects.
 
+#### One-off output
+
+An example of the `-o,--one-off` flag's usage:  
+```
+java -cp ./dbw.jar com.dbw.app.Dbw -c ./postgres-example-config.yml -l30m -o
+```
+The combination of `-l,--latest-changes` and `-o,--one-off` will cause the application to display all operations from the last 30 minutes and shutdown. `-o,--one-off` has to be used together with `-l,--latest-changes`, because otherwise Dbw wouldn't know how many operations to display in the single requested iteration. This option is meant to be used when the user wants to have a brief look at a given number of operations or all operations from a given period. 
+
 #### Output width
 
 Because of the variety of terminal window widths, there are options to customize the widths of displayed columns and rows. Specified widths are maximum values, which means that if the `w` flag is set to 50 and the actual column value's character count is 20, the displayed column's width will be 20. Column name is also taken into account, so if the column's name is `description` and its value is `2006`, the displayed column's width will be 11 (length of the word `description`).
 
-Default 120 row width:  
+Default 120 row width (-W):  
 ![DefaultColumnWidth](docs/120_row_width.png)
 
-60 row width:  
+40 row width (-W):  
 ![40ColumnWidth](docs/40_row_width.png)
 
-Default 17 column width:  
+Default 17 column width (-w):  
 ![DefaultRowWidth](docs/17_column_width.png)
 
-100 column width:  
+100 column width (-w):  
 ![100RowWidth](docs/100_column_width.png)
 
-Too short or too long widths can cause the output to be unreadable so some adjustments may be necessary. 
+Some adjustments may be necessary as too short or too long widths can cause the output to be unreadable. 
+
+### Multiple watchers
+
+As mentioned in the "Config files" paragraph, it's possible to watch multiple databases at once. When multiple databases are being watched, Dbw will mesh the operations from all data sources during each iteration and sort them by their timestamps - this means that if operations A and B have been carried out at `00:00:00` and `00:00:05` in database A and operation C has been carried out at `00:00:02` in database B, then the order in which the corresponding operation outputs are displayed will be A,C,B.
 
 ### Output
 
-Operation outputs are separated by hyphens. An individual operation output starts with a header with the audit record's ID number, name of the table on which the operation has been carried out, operation type and a timestamp.
+The paragraphs below describe every part of the operation's output from top to bottom. 
 
-Next are the modified table's columns with their values. In case of an update:  
+#### Separator with time between operations
+
+Operation outputs are separated by hyphen lines, which incorporate the time that has passed since the last operation.  
+![timeBetweenOperations](docs/time_between_operations.png)  
+The time between operations is represented by days, hours, minutes, seconds and milliseconds. In the example above: 2 hours, 1 minute, 39 seconds and 963 milliseconds passed since the last operation. This information can be used to measure the watched application's performance and identify bottlenecks. For example, when watching a shopping application's database, a user buys a product and the time between an update operation in the `Products` table and an update operation in the `Basket` table is 5 seconds (`5s`) - this means that the code between these two operations needs optimization. 
+
+#### Header
+
+An individual operation output starts with a header table that contains: audit record's number, name of the table on which the operation has been carried out, operation type and a timestamp. If more than one database is being watched, there also the database name and type.  
+![header](docs/header.png)  
+The header above describes the eighth update operation carried out on a PostgreSQL database named `dvdrental`, on the table `city`, at `04-05-2021 07:58:51`.
+
+#### Query
+
+![query](docs/query.png)  
+The SQL query that caused the given operation is shown below the header table when the `-q,--query` flag is used. This feature works only for PostgreSQL databases.
+
+#### Body
+
+Next are the modified table's columns with their values, organized into rows. In case of an update:  
 ![updatedColumn](docs/updated_column.png)  
 From top to bottom there's the column name, value before, value after. 
 
 Updated columns are bordered:  
 ![updatedVsNotUpdatedColumns](docs/updated_vs_not_updated_columns.png)  
-`release_year` column has been updated, and `description` hasn't.
+`release_year` column has been updated, and `description` has not.
+
+#### Verbose diff
 
 In many cases the column's value is too long to be displayed in the columns part of the output. If the value exceeds the maximum length of a column, it will get truncated and ended with an ellipsis.  
 With the `-v,--verboseDiff` flag, values that got truncated and were updated in the given operation, are fully displayed below the columns section. For example, if the date in `last_update` column was too long:  
@@ -142,7 +222,7 @@ Dbw saves the config file's checksum in the `dbw.cache` file, which is created i
 
 ## Requirements
 
-Java 8 or above
+JRE 8 or above
 
 ## Tested on
 
@@ -151,7 +231,7 @@ OS:
   - Windows 10
 
 DBs:  
-  - PostgreSQL 12.1,
+  - PostgreSQL 12.1, 
   - Oracle Database 18c Express Edition (XE)
 
 ## License

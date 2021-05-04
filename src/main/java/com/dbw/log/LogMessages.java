@@ -4,7 +4,7 @@ import com.dbw.cli.Opts;
 
 public class LogMessages extends Messages {
     public final static String DB_OPENED = "Database connection opened successfully.";
-    public final static String CHOOSE_CONFIG = "Choose the config file by entering its number from the list:";
+    public final static String CHOOSE_CONFIG = "Choose one or more config files by entering comma-separated numbers from the list:";
     public final static String CONFIG_UNCHANGED = "Config file hasn't changed. Database preparation will be omitted.";
     public final static String CONFIRM_PURGE = "Are you sure you want to remove all \"%s\" database objects related to this application? (y/n)";
     public final static String WATCHER_INIT = "Initializing ...";

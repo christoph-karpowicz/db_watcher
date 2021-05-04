@@ -48,7 +48,7 @@ public class Opts extends Options {
                     CONFIG,
                     "config",
                     true,
-                    "provide a path to the configuration file"
+                    "provide one or more comma-separated paths to configuration files"
             ),
             buildOption(
                     CLEAR_CACHE,
@@ -78,7 +78,7 @@ public class Opts extends Options {
                     INTERVAL,
                     "interval",
                     true,
-                    "set the interval in milliseconds in which the application checks whether there were changes in the watched database (default: 500ms)"
+                    "set the interval in milliseconds in which the application checks whether there were changes in the watched databases (default: 500ms)"
             ),
             buildOption(
                     SHOW_LATEST_OP,
@@ -104,7 +104,7 @@ public class Opts extends Options {
                     ONE_OFF,
                     "one-off",
                     false,
-                    "show the database operations matching with the given --latest-changes flag value and close the application (don't start the watchers)."
+                    "show the database operations matching with the given --latest-changes flag value and close the application (don't start the watchers)"
             ),
             buildOption(
                     PURGE,
@@ -122,13 +122,13 @@ public class Opts extends Options {
                     TABLES,
                     "tables",
                     true,
-                    "narrow down the tables you'd like to watch, accepts a single table or comma separated list of tables"
+                    "narrow down the tables you'd like to watch, accepts a single table or comma-separated list of tables"
             ),
             buildOption(
                     TIME_DIFF_SEPARATOR,
                     "time-diff-separator-min-val",
                     true,
-                    "specify the time in milliseconds after which a time difference separator will appear between two frames (default: 5000)"
+                    "specify the time in milliseconds after which a time difference separator will appear between operation outputs (default: 5000)"
             ),
             buildOption(
                     VERBOSE_DIFF,
