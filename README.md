@@ -140,9 +140,10 @@ To close the application, press Ctrl+C.
 
 #### Config files
 
-The `-c,--config` flag accepts comma-separated paths to config files like so: `/example/path/to/config1.yml,/example/path/to/config2.yml`. If paths to config files haven't been specified with the `-c,--config` flag, Dbw will list all YML files from the current directory and ask the user to choose one or more.
+The `-c,--config` flag accepts comma-separated paths to config files like so: `/example/path/to/config1.yml,/example/path/to/config2.yml`.  
+If paths to config files haven't been specified with the `-c,--config` flag, Dbw will list all YML files from the current directory and ask the user to choose one or more.
 ![ConfigChoice](docs/config_choice.png)  
-To load one config file, insert its number from the list and press Enter.
+To load one config file, insert its number from the list and press Enter.  
 To load multiple config files, insert their numbers from the list and press Enter (e.g. `2,4,5`).
 
 #### Cleanup
@@ -159,7 +160,7 @@ The combination of `-l,--latest-changes` and `-o,--one-off` will cause the appli
 
 #### Output width
 
-Because of the variety of terminal window widths, there are options to customize the widths of displayed columns and rows. Specified widths are maximum values, which means that if the `w` flag is set to 50 and the actual column value's character count is 20, the displayed column's width will be 20. Column name is also taken into account, so if the column's name is `description` and its value is `2006`, the displayed column's width will be 11 (length of the word `description`).
+Because of the variety of terminal window widths, there are options to customize the widths of displayed columns and rows. Specified widths are maximum values, which means that if the `w` flag is set to 50 and the actual column value's character count is 20, the displayed column's width will be 20. Column name is also taken into account, so if the column's name is `release_year` and its value is `2006`, the displayed column's width will be 12 (length of `release_year`).
 
 Default 120 row width (-W):  
 ![DefaultColumnWidth](docs/120_row_width.png)
@@ -191,7 +192,7 @@ The time between operations is represented by days, hours, minutes, seconds and 
 
 #### Header
 
-An individual operation output starts with a header table that contains: audit record's number, name of the table on which the operation has been carried out, operation type and a timestamp. If more than one database is being watched, there also the database name and type.  
+An individual operation output starts with a header table that contains: audit record's number, name of the table on which the operation has been carried out, operation type and a timestamp. If more than one database is being watched, there's also the database name and type.  
 ![header](docs/header.png)  
 The header above describes the eighth update operation carried out on a PostgreSQL database named `dvdrental`, on the table `city`, at `04-05-2021 07:58:51`.
 
@@ -213,8 +214,13 @@ Updated columns are bordered:
 #### Verbose diff
 
 In many cases the column's value is too long to be displayed in the columns part of the output. If the value exceeds the maximum length of a column, it will get truncated and ended with an ellipsis.  
-With the `-v,--verboseDiff` flag, values that got truncated and were updated in the given operation, are fully displayed below the columns section. For example, if the date in `last_update` column was too long:  
+With the `-V,--verboseDiff` flag, values that got truncated and were updated in the given operation, are fully displayed below the columns section. For example, if the date in `last_update` column was too long:  
 ![fullColumnDiff](docs/full_column_diff.png)
+
+#### Time separator
+
+![timeSeparator](docs/time_separator.png)  
+The time separator can be used for better readability. The minimum time for it to be displayed is specified by the `-T,--time-diff-separator-min-val` flag and is set to 5 seconds by default. For example, to display the time separator when the time between operations exceeds 15 seconds, use the `-T` like so: `-T15000`.
 
 ### Caching
 
