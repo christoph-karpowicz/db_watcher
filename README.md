@@ -188,7 +188,7 @@ The paragraphs below describe every part of the operation's output from top to b
 
 Operation outputs are separated by hyphen lines, which incorporate the time that has passed since the last operation.  
 ![timeBetweenOperations](docs/time_between_operations.png)  
-The time between operations is represented by days, hours, minutes, seconds and milliseconds. In the example above: 2 hours, 1 minute, 39 seconds and 963 milliseconds passed since the last operation. This information can be used to measure the watched application's performance and identify bottlenecks. For example, when watching a shopping application's database, a user buys a product and the time between an update operation in the `Products` table and an update operation in the `Basket` table is 5 seconds (`5s`) - this means that the code between these two operations needs optimization. 
+The time between operations is represented by days, hours, minutes, seconds and milliseconds. In the example above: 1 day, 22 hours, 28 minutes, 52 seconds and 443 milliseconds passed since the last operation. This information can be used to measure the watched application's performance and identify bottlenecks. For example, when watching a shopping application's database, a user buys a product and the time between an update operation in the `Products` table and an update operation in the `Basket` table is 5 seconds (`5s`) - this means that the code between these two operations needs optimization. 
 
 #### Header
 
@@ -220,7 +220,7 @@ With the `-V,--verboseDiff` flag, values that got truncated and were updated in 
 #### Time separator
 
 ![timeSeparator](docs/time_separator.png)  
-The time separator can be used for better readability. The minimum time for it to be displayed is specified by the `-T,--time-diff-separator-min-val` flag and is set to 5 seconds by default. For example, to display the time separator when the time between operations exceeds 15 seconds, use the `-T` like so: `-T15000`.
+The time separator can be used for better readability. The minimum time for it to be displayed is specified by the `-T,--time-diff-separator-min-val` flag and is set to 5 seconds by default. For example, to display the time separator when the time between operations exceeds 15 seconds, use the `-T` flag like so: `-T15000`.
 
 ### Caching
 
