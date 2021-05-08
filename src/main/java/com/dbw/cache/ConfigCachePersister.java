@@ -19,6 +19,7 @@ public class ConfigCachePersister implements Runnable {
         this.configFileChecksum = configFileChecksum;
     }
 
+    @Override
     public void run() {
         cache.createPersistentCacheIfDoesntExist();
         ConfigCache configCache = cache.createOrGetConfigCache(config.getPath());

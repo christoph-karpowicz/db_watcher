@@ -35,21 +35,19 @@ public class TimeDiffUtils {
             builder.append(days + DAYS_SYMBOL);
             builder.append(SPACE);
         }
-        if (hours > 0) {
+        if (hours > 0 || builder.length() > 0) {
             builder.append(hours + HOURS_SYMBOL);
             builder.append(SPACE);
         }
-        if (minutes > 0) {
+        if (minutes > 0 || builder.length() > 0) {
             builder.append(minutes + MINUTES_SYMBOL);
             builder.append(SPACE);
         }
-        if (seconds > 0) {
+        if (seconds > 0 || builder.length() > 0) {
             builder.append(seconds + SECONDS_SYMBOL);
             builder.append(SPACE);
         }
-        if (millis > 0) {
-            builder.append(millis + MILLIS_SYMBOL);
-        }
+        builder.append(millis + MILLIS_SYMBOL);
         return builder.toString();
     }
 }

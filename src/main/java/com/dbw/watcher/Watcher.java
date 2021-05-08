@@ -1,5 +1,6 @@
 package com.dbw.watcher;
 
+import com.dbw.actions.TruncateBasedOnLimitAction;
 import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
@@ -14,7 +15,6 @@ import com.dbw.log.*;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
@@ -25,6 +25,7 @@ public class Watcher implements Runnable {
     private int auditRecordCount;
     private int numberOfLatestOp;
     private boolean isAfterInitialRun;
+    private boolean removingAuditRecords;
 
     public Watcher(WatcherManager watcherManager, Config cfg) {
         this.watcherManager = watcherManager;
@@ -167,19 +168,13 @@ public class Watcher implements Runnable {
     }
 
     private void evaluateOperationsLimit() throws SQLException {
-        Optional<Integer> opMin = getCfg().getOperationsMinimum();
-        Optional<Integer> opLim = getCfg().getOperationsLimit();
-        if (getCfg().areOperationsSettingsPresent() && auditRecordCount >= opLim.get() + opMin.get()) {
-            new Thread(() -> {
-                try {
-                    getDb().deleteFirstNRows(opLim.get());
-                } catch (SQLException e) {
-                    String errMsg = String.format(ErrorMessages.OP_LIMIT_REACHED_DELETE_ATTEMPT, opLim.get());
-                    Logger.log(Level.ERROR, getDb().getDbConfig().getName(), errMsg);
-                }
-                String warnMsg = String.format(WarningMessages.OP_LIMIT_REACHED, opLim.get(), opMin.get());
-                Logger.log(Level.WARNING, getDb().getDbConfig().getName(), warnMsg);
-            }).start();
+        Integer opMin = getCfg().getOperationsMinimum().get();
+        Integer opLim = getCfg().getOperationsLimit().get();
+        if (getCfg().areOperationsSettingsPresent() && auditRecordCount >= opLim + opMin) {
+            TruncateBasedOnLimitAction truncateBasedOnLimitAction =
+                    new TruncateBasedOnLimitAction(this, auditRecordCount, opMin);
+            Thread truncateBasedOnLimitThread = new Thread(truncateBasedOnLimitAction);
+            truncateBasedOnLimitThread.start();
         }
     }
 
@@ -191,7 +186,15 @@ public class Watcher implements Runnable {
         return isAfterInitialRun;
     }
 
-    public void setAfterInitialRun() {
+    private void setAfterInitialRun() {
         isAfterInitialRun = true;
+    }
+
+    public boolean isRemovingAuditRecords() {
+        return removingAuditRecords;
+    }
+
+    public synchronized void setRemovingAuditRecords(boolean removingAuditRecords) {
+        this.removingAuditRecords = removingAuditRecords;
     }
 }
