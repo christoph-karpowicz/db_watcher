@@ -20,4 +20,6 @@ public interface OutputBuilder {
     String VERBOSE_DIFF_DIFF = " diff: ";
     String VERBOSE_DIFF_BEFORE = "Before: ";
     String VERBOSE_DIFF_AFTER = "After: ";
+    String OLD_STATE_PREFIX = "-";
+    String NEW_STATE_PREFIX = "+";
 }
