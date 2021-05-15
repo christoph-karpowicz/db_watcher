@@ -10,10 +10,9 @@ import java.util.List;
 public class Opts extends Options {
     public static final String HELP_USAGE =
             "\nAn example application start for PostgreSQL configuration:" +
-                    "\njava -cp ./dbw.jar com.dbw.app.Dbw -c ./postgres-example-config.yml" +
-                    "\nAn example application start for Oracle configuration:" +
-                    "\njava -cp ./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml"
-            ;
+            "\njava -cp ./dbw.jar com.dbw.app.Dbw -c ./postgres-example-config.yml" +
+            "\nAn example application start for Oracle configuration:" +
+            "\njava -cp ./dbw.jar com.dbw.app.Dbw -c ./oracle-example-config.yml";
 
     public static final String ALL_SYMBOL = "*";
 
@@ -110,7 +109,7 @@ public class Opts extends Options {
                     PURGE,
                     "purge",
                     false,
-                    "remove database audit table, functions and triggers"
+                    "remove all database objects created by the application"
             ),
             buildOption(
                     QUERY,

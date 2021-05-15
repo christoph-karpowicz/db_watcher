@@ -1,5 +1,7 @@
 package com.dbw.db;
 
+import com.dbw.db.query.QueryHelper;
+
 public class OrclQueries {
 
     public static final String SELECT_TABLE_COLUMNS =
@@ -19,7 +21,7 @@ public class OrclQueries {
 
     public static final String FIND_AUDIT_TRIGGER = "SELECT COUNT(*) AS \"" + Common.EXISTS + "\" from sys.all_triggers WHERE TRIGGER_NAME = ?";
 
-    private static final String UPDATE_COL_LIST = QueryBuilder.buildColumNameList(
+    private static final String UPDATE_COL_LIST = QueryHelper.buildColumnNameList(
         Common.COLNAME_ID, 
         Common.COLNAME_TABLE_NAME, 
         Common.COLNAME_OLD_STATE, 
@@ -27,14 +29,14 @@ public class OrclQueries {
         Common.COLNAME_OPERATION
     );
 
-    private static final String INSERT_COL_LIST = QueryBuilder.buildColumNameList(
+    private static final String INSERT_COL_LIST = QueryHelper.buildColumnNameList(
         Common.COLNAME_ID, 
         Common.COLNAME_TABLE_NAME, 
         Common.COLNAME_NEW_STATE, 
         Common.COLNAME_OPERATION
     );
 
-    private static final String DELETE_COL_LIST = QueryBuilder.buildColumNameList(
+    private static final String DELETE_COL_LIST = QueryHelper.buildColumnNameList(
         Common.COLNAME_ID, 
         Common.COLNAME_TABLE_NAME, 
         Common.COLNAME_OLD_STATE, 

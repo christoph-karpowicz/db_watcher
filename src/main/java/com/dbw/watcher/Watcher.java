@@ -33,6 +33,18 @@ public class Watcher implements Runnable {
         this.dbName = cfg.getDatabase().getName();
     }
 
+    public void closeDb() throws SQLException {
+        db.close();
+    }
+
+    public Config getCfg() {
+        return cfg;
+    }
+
+    public Database getDb() {
+        return db;
+    }
+
     public void setDb() {
         this.db = DatabaseFactory.getDatabase(cfg);
     }
@@ -45,18 +57,6 @@ public class Watcher implements Runnable {
         } else {
             Logger.log(Level.INFO, dbName, LogMessages.CONFIG_UNCHANGED);
         }
-    }
-
-    public void closeDb() throws SQLException {
-        db.close();
-    }
-
-    public Config getCfg() {
-        return cfg;
-    }
-
-    public Database getDb() {
-        return db;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cfg.Config;
+import com.dbw.db.query.QueryHelper;
 import com.dbw.db.query.SelectAuditRecordsQueryBuilder;
 import com.dbw.err.PreparationException;
 import com.dbw.err.RecoverableException;
@@ -114,7 +115,7 @@ public class Postgres extends Database {
     }
 
     public void createAuditTrigger(String tableName) throws SQLException {
-        String triggerName = QueryBuilder.buildAuditTriggerName(tableName);
+        String triggerName = QueryHelper.buildAuditTriggerName(tableName);
         executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, triggerName, getObjectNameWithSchema(tableName), getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
@@ -128,7 +129,7 @@ public class Postgres extends Database {
     }
 
     public void dropAuditTrigger(String tableName) throws SQLException {
-        String triggerName = QueryBuilder.buildAuditTriggerName(tableName);
+        String triggerName = QueryHelper.buildAuditTriggerName(tableName);
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, triggerName, getObjectNameWithSchema(tableName));
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }

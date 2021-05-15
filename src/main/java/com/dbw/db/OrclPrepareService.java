@@ -1,11 +1,11 @@
 package com.dbw.db;
 
-import java.sql.SQLException;
-import java.util.List;
-
+import com.dbw.db.query.QueryHelper;
 import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.state.XmlStateBuilder;
+
+import java.sql.SQLException;
 
 public class OrclPrepareService {
     private final XmlStateBuilder xmlStateBuilder;
@@ -59,7 +59,7 @@ public class OrclPrepareService {
                 Column[] tableColumns = db.selectTableColumns(tableName);
                 String newStateConcat = xmlStateBuilder.build(OrclSpec.NEW_STATE_PREFIX, tableColumns);
                 String oldStateConcat = xmlStateBuilder.build(OrclSpec.OLD_STATE_PREFIX, tableColumns);
-                String auditTriggerName = QueryBuilder.buildAuditTriggerName(tableName);
+                String auditTriggerName = QueryHelper.buildAuditTriggerName(tableName);
                 String auditTriggerQuery = db.formatQuery(
                     OrclQueries.CREATE_AUDIT_TRIGGER,
                     auditTriggerName,

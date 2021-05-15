@@ -1,8 +1,10 @@
-package com.dbw.db;
+package com.dbw.db.query;
 
-public class QueryBuilder {
+import com.dbw.db.Common;
 
-    public static String buildColumNameList(String... columnNames) {
+public class QueryHelper {
+
+    public static String buildColumnNameList(String... columnNames) {
         return String.join(Common.COMMA_DELIMITER, columnNames);
     }
 

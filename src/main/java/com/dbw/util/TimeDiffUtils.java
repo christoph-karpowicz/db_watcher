@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 public class TimeDiffUtils {
-    private static String DAYS_SYMBOL = "d";
-    private static String HOURS_SYMBOL = "h";
-    private static String MINUTES_SYMBOL = "m";
-    private static String SECONDS_SYMBOL = "s";
-    private static String MILLIS_SYMBOL = "ms";
-    private static String SPACE = " ";
+    private static final String DAYS_SYMBOL = "d";
+    private static final String HOURS_SYMBOL = "h";
+    private static final String MINUTES_SYMBOL = "m";
+    private static final String SECONDS_SYMBOL = "s";
+    private static final String MILLIS_SYMBOL = "ms";
+    private static final String SPACE = " ";
 
     public static long getTimeDiffInMillis(Timestamp lastAuditRecordsTime, Timestamp currentAuditRecordsTime) {
         LocalDateTime lastAuditRecordsLocalDateTime = lastAuditRecordsTime.toLocalDateTime();

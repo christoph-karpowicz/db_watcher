@@ -1,5 +1,7 @@
 package com.dbw.db;
 
+import com.dbw.db.query.QueryHelper;
+
 public class PostgresQueries {
 
     public static final String FIND_AUDIT_TABLE = 
@@ -35,7 +37,7 @@ public class PostgresQueries {
         "            AND routine_name = '" + Common.DBW_AUDIT_FUNC_NAME.toLowerCase() +
         "')";
 
-    private static final String UPDATE_COL_LIST = QueryBuilder.buildColumNameList(
+    private static final String UPDATE_COL_LIST = QueryHelper.buildColumnNameList(
         Common.COLNAME_OLD_STATE, 
         Common.COLNAME_NEW_STATE, 
         Common.COLNAME_TABLE_NAME, 
@@ -43,14 +45,14 @@ public class PostgresQueries {
         Common.COLNAME_QUERY
     );
 
-    private static final String DELETE_COL_LIST = QueryBuilder.buildColumNameList(
+    private static final String DELETE_COL_LIST = QueryHelper.buildColumnNameList(
         Common.COLNAME_OLD_STATE, 
         Common.COLNAME_TABLE_NAME, 
         Common.COLNAME_OPERATION, 
         Common.COLNAME_QUERY
     );
 
-    private static final String INSERT_COL_LIST = QueryBuilder.buildColumNameList(
+    private static final String INSERT_COL_LIST = QueryHelper.buildColumnNameList(
         Common.COLNAME_NEW_STATE, 
         Common.COLNAME_TABLE_NAME, 
         Common.COLNAME_OPERATION, 

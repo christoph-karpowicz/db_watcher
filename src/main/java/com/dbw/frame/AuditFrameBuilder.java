@@ -17,6 +17,8 @@ import java.util.List;
 public class AuditFrameBuilder implements OutputBuilder {
     @Inject
     private AuditFrameHeaderBuilder headerBuilder;
+    @Inject
+    private StateDiffService diffService;
 
     private StringBuilder builder;
     private DatabaseConfig dbConfig;
@@ -24,9 +26,6 @@ public class AuditFrameBuilder implements OutputBuilder {
     private List<StateColumn> stateColumns;
     private String timeSincePrevious;
     private String frameNo;
-
-    @Inject
-    private StateDiffService diffService;
 
     public void setDbConfig(DatabaseConfig dbConfig) {
         this.dbConfig = dbConfig;

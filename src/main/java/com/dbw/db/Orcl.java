@@ -1,6 +1,7 @@
 package com.dbw.db;
 
 import com.dbw.cfg.Config;
+import com.dbw.db.query.QueryHelper;
 import com.dbw.db.query.SelectAuditRecordsQueryBuilder;
 import com.dbw.err.PreparationException;
 import com.dbw.err.RecoverableException;
@@ -105,7 +106,7 @@ public class Orcl extends Database {
     }
 
     public void dropAuditTrigger(String tableName) throws SQLException {
-        executeFormattedQueryUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryBuilder.buildAuditTriggerName(tableName));
+        executeFormattedQueryUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryHelper.buildAuditTriggerName(tableName));
         Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
