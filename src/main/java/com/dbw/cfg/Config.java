@@ -12,6 +12,7 @@ public class Config {
     private SettingsConfig settings;
     private Set<String> tables;
     private boolean changed;
+    private String checkSum;
 
     public String getPath() {
         return path;
@@ -51,6 +52,14 @@ public class Config {
 
     public void setChanged(boolean changed) {
         this.changed = changed;
+    }
+
+    public String getCheckSum() {
+        return checkSum;
+    }
+
+    public void setCheckSum(String checkSum) {
+        this.checkSum = checkSum;
     }
 
     public void validate() throws UnrecoverableException {

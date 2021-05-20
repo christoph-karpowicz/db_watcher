@@ -22,7 +22,7 @@ public class CLITest {
         TEST_MAX_COLUMN_WIDTH_VALUE,
         prependHyphen(Opts.MAX_ROW_WIDTH),
         TEST_MAX_ROW_WIDTH_VALUE,
-        prependHyphen(Opts.SHOW_LATEST_OP),
+        prependHyphen(Opts.LATEST),
         OPTIONS_SHOW_LAST_N_CHANGES_VALUE,
     };
     

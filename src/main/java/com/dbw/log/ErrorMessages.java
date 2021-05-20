@@ -16,9 +16,10 @@ public class ErrorMessages extends Messages {
     public final static String CLI_INVALID_INTERVAL_BIG = addCliFlagInfo(Opts.INTERVAL) + "The interval is too big. You probably don't want it to be bigger than 10 seconds.";
     public final static String CLI_INVALID_MAX_COLUMN_WIDTH = addCliFlagInfo(Opts.MAX_COL_WIDTH) + "Maximum column width has to be greater than 3.";
     public final static String CLI_INVALID_MAX_ROW_WIDTH = addCliFlagInfo(Opts.MAX_ROW_WIDTH) + "Maximum row width has to be greater than 10.";
-    public final static String CLI_INVALID_LATEST_OP = addCliFlagInfo(Opts.SHOW_LATEST_OP) + "Latest operations option value is invalid.";
-    public final static String CLI_ONE_OFF_NO_LASTEST_OP = addCliFlagInfo(Opts.ONE_OFF) + "This flag has to be used together with the -" + Opts.SHOW_LATEST_OP + " flag, which specifies the number or time of the latest operations to display.";
+    public final static String CLI_INVALID_LATEST_OP = addCliFlagInfo(Opts.LATEST) + "Latest operations option value is invalid.";
+    public final static String CLI_ONE_OFF_NO_LASTEST_OP = addCliFlagInfo(Opts.ONE_OFF) + "This flag has to be used together with the -" + Opts.LATEST + " flag, which specifies the number or time of the latest operations to display.";
     public final static String CLI_PURGE = addCliFlagInfo(Opts.PURGE) + "Errors occurred while deleting database objects.";
+    public final static String CLI_REUSE_CONFIG = addCliFlagInfo(Opts.REUSE_CONFIG) + "No config file paths found in cache. This flag can be used only after the application previously launched with specified config paths.";
     public final static String CLI_TABLES_NOT_FOUND = addCliFlagInfo(Opts.TABLES) + "%s tables not found in the config files.";
     public final static String CLI_TABLES_EMPTY_NAME = addCliFlagInfo(Opts.TABLES) + "An empty table name found.";
     public final static String CLI_TIME_DIFF_SEP_LT_ZERO = addCliFlagInfo(Opts.TIME_DIFF_SEPARATOR) + "Minimal value after which a time difference separator appears must not be less than 0.";

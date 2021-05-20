@@ -11,8 +11,9 @@ public class LogMessages extends Messages {
     public final static String DB_PREPARATION = "Preparing database objects...";
     public final static String WATCHER_STARTED = "Watcher started.";
     public final static String ONE_OFF_DONE = addCliFlagInfo(Opts.ONE_OFF) + "One-off output done. Remove this flag to watch operations in real time.";
+    public final static String REUSED_CONFIG = addCliFlagInfo(Opts.REUSE_CONFIG) + "Reused config file paths: %s.";
     public final static String AUDIT_RECORDS_COUNT = "Audit records count: %d.";
-    public final static String NUMBER_OF_LATEST_OP = addCliFlagInfo(Opts.SHOW_LATEST_OP) + "%d database operations found in the last %s.";
+    public final static String NUMBER_OF_LATEST_OP = addCliFlagInfo(Opts.LATEST) + "%d database operations found in the last %s.";
     public final static String AUDIT_TABLE_CREATED = "Audit table has been created.";
     public final static String AUDIT_TABLE_DROPPED = "Audit table has been dropped.";
     public final static String AUDIT_FUNCTION_CREATED = "Audit function has been created.";

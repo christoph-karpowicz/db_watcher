@@ -59,6 +59,22 @@ public class Cache {
         return getPersistentCache().get().getConfig(path).get().getTables();
     }
 
+    public boolean haveLastUsedConfigPathsChanged(Set<String> newPaths) {
+        Set<String> oldPaths = getLastUsedConfigPaths();
+        return newPaths == null ||
+                oldPaths == null ||
+                newPaths.size() != oldPaths.size() ||
+                !newPaths.containsAll(oldPaths);
+    }
+
+    public Set<String> getLastUsedConfigPaths() {
+        return getPersistentCache().get().getLastUsedConfigPaths();
+    }
+
+    public void setLastUsedConfigPaths(Set<String> lastUsedConfigPaths) {
+        getPersistentCache().get().setLastUsedConfigPaths(lastUsedConfigPaths);
+    }
+
     public void persist() {
         if (!persistentCache.isPresent()) {
             return;

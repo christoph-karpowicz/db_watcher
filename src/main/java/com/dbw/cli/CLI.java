@@ -51,6 +51,7 @@ public class CLI {
         parsedOptions.debug = getDebugOption();
         parsedOptions.showHelp = getShowHelpOption();
         parsedOptions.purge = getPurgeOption();
+        parsedOptions.reuseConfig = getReuseConfigOption();
         parsedOptions.showQuery = getQueryOption();
         parsedOptions.verboseDiff = getVerboseDiff();
         try {
@@ -140,7 +141,7 @@ public class CLI {
 
     private boolean getOneOff() throws Exception {
         boolean hasOneOffOption = cmd.hasOption(Opts.ONE_OFF);
-        if (hasOneOffOption && !cmd.hasOption(Opts.SHOW_LATEST_OP)) {
+        if (hasOneOffOption && !cmd.hasOption(Opts.LATEST)) {
             throw new Exception(ErrorMessages.CLI_ONE_OFF_NO_LASTEST_OP);
         }
         return hasOneOffOption;
@@ -150,13 +151,17 @@ public class CLI {
         return cmd.hasOption(Opts.PURGE);
     }
 
+    private boolean getReuseConfigOption() {
+        return cmd.hasOption(Opts.REUSE_CONFIG);
+    }
+
     private boolean getQueryOption() {
         return cmd.hasOption(Opts.QUERY);
     }
 
     private ShowLatestOperationsOption getShowLatestOperationsOption() throws Exception {
-        if (cmd.hasOption(Opts.SHOW_LATEST_OP)) {
-            String value = cmd.getOptionValue(Opts.SHOW_LATEST_OP);
+        if (cmd.hasOption(Opts.LATEST)) {
+            String value = cmd.getOptionValue(Opts.LATEST);
             return ShowLatestOperationsOption.create(value);
         }
         return null;
@@ -203,6 +208,7 @@ public class CLI {
         private Short maxRowWidth;
         private boolean oneOff;
         private boolean purge;
+        private boolean reuseConfig;
         private boolean showQuery;
         private ShowLatestOperationsOption showLatestOperations;
         private Optional<Set<String>> tables;
@@ -247,6 +253,10 @@ public class CLI {
 
         public boolean getPurge() {
             return purge;
+        }
+
+        public boolean getReuseConfig() {
+            return reuseConfig;
         }
 
         public boolean getShowQuery() {
