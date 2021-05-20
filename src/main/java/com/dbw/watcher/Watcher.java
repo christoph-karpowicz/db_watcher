@@ -168,9 +168,12 @@ public class Watcher implements Runnable {
     }
 
     private void evaluateOperationsLimit() throws SQLException {
+        if (!getCfg().areOperationsSettingsPresent()) {
+            return;
+        }
         Integer opMin = getCfg().getOperationsMinimum().get();
         Integer opLim = getCfg().getOperationsLimit().get();
-        if (getCfg().areOperationsSettingsPresent() && auditRecordCount >= opLim + opMin) {
+        if (auditRecordCount >= opLim) {
             TruncateBasedOnLimitAction truncateBasedOnLimitAction =
                     new TruncateBasedOnLimitAction(this, auditRecordCount, opMin);
             Thread truncateBasedOnLimitThread = new Thread(truncateBasedOnLimitAction);

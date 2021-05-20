@@ -67,7 +67,8 @@ public class Config {
                 ConfigValidator.isAuditTableOnWatchList()
                 .and(ConfigValidator.isDbTypeKnown())
                 .and(ConfigValidator.areOperationsSettingsBothDeclared())
-                .and(ConfigValidator.areOperationsSettingsGtThanZero())
+                .and(ConfigValidator.areOperationsSettingsGtZero())
+                .and(ConfigValidator.isOperationsLimitGtMinimum())
                 .apply(this);
         if (!result.equals(ConfigValidator.ValidationResult.SUCCESS)) {
             throw new UnrecoverableException("ConfigValidationException", String.format(result.msg, path));

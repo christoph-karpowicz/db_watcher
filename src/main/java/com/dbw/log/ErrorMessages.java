@@ -11,6 +11,7 @@ public class ErrorMessages extends Messages {
     public final static String CFG_AUDIT_TABLE_WATCH_ATTEMPT = "Config error. " + Common.DBW_AUDIT_TABLE_NAME + " table name found on tables list. An audit trigger must not be created on the audit table.";
     public final static String CFG_BOTH_OP_SETTINGS_NOT_DECLARED = "Config error. Operations minimum and limit have to both be declared.";
     public final static String CFG_OP_SETTINGS_LT_ZERO = "Config error. Operations minimum and limit have to greater than zero.";
+    public final static String CFG_OP_SETTINGS_MIN_GT_LIMIT = "Config error. Operations limit has to be greater than the minimum.";
     public final static String CLI_INVALID_DELETE_N_ROWS = addCliFlagInfo(Opts.DELETE_FIRST_N_ROWS) + "Invalid value. It has to be either a number or an asterisk.";
     public final static String CLI_INVALID_INTERVAL_SMALL = addCliFlagInfo(Opts.INTERVAL) + "The interval is too small. It cannot be less than 10 milliseconds.";
     public final static String CLI_INVALID_INTERVAL_BIG = addCliFlagInfo(Opts.INTERVAL) + "The interval is too big. You probably don't want it to be bigger than 10 seconds.";

@@ -12,7 +12,8 @@ interface ConfigValidator extends Function<Config, ConfigValidator.ValidationRes
         UNKNOWN_DB_TYPE(ErrorMessages.CFG_UNKNOWN_DB_TYPE),
         AUDIT_TABLE_WATCH_ATTEMPT(ErrorMessages.CFG_AUDIT_TABLE_WATCH_ATTEMPT),
         CFG_BOTH_OP_SETTINGS_NOT_DECLARED(ErrorMessages.CFG_BOTH_OP_SETTINGS_NOT_DECLARED),
-        CFG_OP_SETTINGS_LT_ZERO(ErrorMessages.CFG_OP_SETTINGS_LT_ZERO);
+        CFG_OP_SETTINGS_LT_ZERO(ErrorMessages.CFG_OP_SETTINGS_LT_ZERO),
+        CFG_OP_SETTINGS_MIN_GT_LIMIT(ErrorMessages.CFG_OP_SETTINGS_MIN_GT_LIMIT);
 
         public final String msg;
 
@@ -42,12 +43,19 @@ interface ConfigValidator extends Function<Config, ConfigValidator.ValidationRes
                         ValidationResult.SUCCESS : ValidationResult.CFG_BOTH_OP_SETTINGS_NOT_DECLARED;
     }
 
-    static ConfigValidator areOperationsSettingsGtThanZero() {
+    static ConfigValidator areOperationsSettingsGtZero() {
         return config ->
                 config.areOperationsSettingsPresent() &&
                         ((config.getOperationsMinimum().isPresent() && config.getOperationsMinimum().get() < 0) ||
                         (config.getOperationsLimit().isPresent() && config.getOperationsLimit().get() < 0)) ?
                         ValidationResult.CFG_OP_SETTINGS_LT_ZERO : ValidationResult.SUCCESS;
+    }
+
+    static ConfigValidator isOperationsLimitGtMinimum() {
+        return config ->
+                !config.areOperationsSettingsPresent() ||
+                        (config.getOperationsMinimum().get() < config.getOperationsLimit().get()) ?
+                        ValidationResult.SUCCESS : ValidationResult.CFG_OP_SETTINGS_MIN_GT_LIMIT;
     }
 
     default ConfigValidator and(ConfigValidator other) {
