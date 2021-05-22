@@ -15,7 +15,7 @@ public class TimeDiffSeparator implements OutputBuilder {
             return Optional.empty();
         }
         long timeDiffInMillis = TimeDiffUtils.getTimeDiffInMillis(lastAuditRecordsTime, currentAuditRecordsTime);
-        short timeDiffSepMinVal =
+        int timeDiffSepMinVal =
                 App.options.getTimeDiffSeparatorMinVal() != null ? App.options.getTimeDiffSeparatorMinVal() : DEFAULT_TIME_DIFF_SEP_MIN_VAL;
         if (timeDiffInMillis > timeDiffSepMinVal) {
             TimeDiffSeparator ts = new TimeDiffSeparator();

@@ -175,10 +175,10 @@ public class CLI {
         return Optional.empty();
     }
 
-    private Short getTimeDiffSeparatorMinVal() throws Exception {
+    private Integer getTimeDiffSeparatorMinVal() throws Exception {
         if (cmd.hasOption(Opts.TIME_DIFF_SEPARATOR)) {
             String optionValue = cmd.getOptionValue(Opts.TIME_DIFF_SEPARATOR);
-            Short value = Short.parseShort(optionValue);
+            Integer value = Integer.parseInt(optionValue);
             if (value < 0) {
                 throw new Exception(ErrorMessages.CLI_TIME_DIFF_SEP_LT_ZERO);
             }
@@ -212,7 +212,7 @@ public class CLI {
         private boolean showQuery;
         private ShowLatestOperationsOption showLatestOperations;
         private Optional<Set<String>> tables;
-        private Short timeDiffSeparatorMinVal;
+        private Integer timeDiffSeparatorMinVal;
         private boolean verboseDiff;
 
         public boolean getClearCache() {
@@ -275,7 +275,7 @@ public class CLI {
             return tables;
         }
 
-        public Short getTimeDiffSeparatorMinVal() {
+        public Integer getTimeDiffSeparatorMinVal() {
             return timeDiffSeparatorMinVal;
         }
 
