@@ -1,0 +1,13 @@
+database:
+    name      : example
+    type      : postgresql
+    host      : "127.0.0.1"
+    port      : 5432
+    user      : christoph
+    password  : secret
+tables:
+    - tableName1
+    - tableName2
+    - tableName3
+    - tableName4
+    - tableName5
