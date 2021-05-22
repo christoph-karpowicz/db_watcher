@@ -1,0 +1,17 @@
+database:
+    name                : christoph
+    type                : oracle
+    connectionString    : jdbc:oracle:thin:@localhost:32118:XE
+    user                : christoph
+    password            : pwd1234
+    driverPath          : /home/christoph/dbw/lib/ojdbc7.jar
+settings:
+    operationsMinimum: 100
+    operationsLimit: 10000
+tables:
+    - FILM
+    - ACTOR
+    - ADDRESS
+    - INVENTORY
+    - LANGUAGE
+    - STAFF

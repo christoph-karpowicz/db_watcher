@@ -8,7 +8,8 @@ target/
 *.iml
 config/*
 !config/test-config.yml
-!config/example-config.yml
+!config/example-postgres-config.yml
+!config/example-orcl-config.yml
 lib/
 data/
 release/

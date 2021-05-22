@@ -1,0 +1,18 @@
+database:
+    name      : example
+    schema    : example_schema
+    type      : postgresql
+    host      : "127.0.0.1"
+    port      : 5432
+    user      : christoph
+    password  : pwd1234
+settings:
+    operationsMinimum: 100
+    operationsLimit: 10000
+tables:
+    - film
+    - actor
+    - address
+    - inventory
+    - language
+    - staff
