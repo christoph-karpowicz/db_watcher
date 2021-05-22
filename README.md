@@ -19,8 +19,8 @@ database:
     user      : christoph
     password  : pwd1234
 settings:
-    operationsLimit: 10000
     operationsMinimum: 100
+    operationsLimit: 10000
 tables:
     - film
     - actor
@@ -40,8 +40,8 @@ database:
     password            : pwd1234
     driverPath          : /home/christoph/dbw/lib/ojdbc7.jar
 settings:
-    operationsLimit: 10000
     operationsMinimum: 100
+    operationsLimit: 10000
 tables:
     - FILM
     - ACTOR
@@ -59,9 +59,9 @@ The `schema` is specific for PostgreSQL and is set to `public` by default.
 The `driverPath` mapping is optional and is an easier way of adding a JDBC driver to the classpath; when specified, the relevant driver class will be loaded at runtime, without the need of using the `cp` flag in the `java` command. The provided value has to be an absolute path. 
 
 There are two available mappings in the `settings` dictionary:  
-`operationsLimit` - the maximum number of operations stored in the audit table. When this limit is reached, Dbw will automatically delete the given number of records from the audit table.  
-`operationsMinimum` - the number of operations that will remain in the audit table after deletion caused by the exceeded limit.  
-To further explain the mappings described above, if for example `operationsLimit` is set to 10,000 and the `operationsMinimum` is 100, the operations count in the audit table will have to reach 10,100 until Dbw deletes 10,000 first records specified in `operationsLimit`. Effectively the limit is 10,100, because we're taking into account the minimum number of records that must remain in the audit table. 
+`operationsMinimum` - the number of operations that will remain in the audit table after the deletion caused by the exceeded limit.  
+`operationsLimit` - the maximum number of operations stored in the audit table. When this limit is reached, Dbw will automatically delete the given number of records reduced by the `operationsMinimum` value the from the audit table.  
+To further explain the mappings described above, if for example `operationsLimit` is set to 10 000, the `operationsMinimum` is 100 and the registered operations count reaches 10 000, then 9 900 operations will be deleted from the audit table.   
 
 ## Usage
 
@@ -89,8 +89,9 @@ To close the application, press Ctrl+C.
 ### CLI
 
 ```
- -c,--config <arg>                        provide one or more comma-separated
-                                          paths to configuration files
+ -c,--config <arg>                        provide one or more
+                                          comma-separated paths to
+                                          configuration files
  -C,--clear-cache                         clear the given config's cache
  -d,--debug                               show exception classes and stack
                                           traces
@@ -102,7 +103,7 @@ To close the application, press Ctrl+C.
                                           whether there were changes in
                                           the watched databases (default:
                                           500ms)
- -l,--latest-changes <arg>                show the latest operations after
+ -l,--latest <arg>                        show the latest operations after
                                           the app starts. Accepts a number
                                           or a number combined with the
                                           seconds, minutes or hours
@@ -116,10 +117,12 @@ To close the application, press Ctrl+C.
                                           --latest-changes flag value and
                                           close the application (don't
                                           start the watchers)
- -p,--purge                               remove database audit table,
-                                          functions and triggers
+ -p,--purge                               remove all database objects
+                                          created by the application
  -q,--query                               show the SQL query for each
                                           operation (PostgreSQL only)
+ -R,--reuse-config                        reuse the last chosen config
+                                          file paths
  -t,--tables <arg>                        narrow down the tables you'd
                                           like to watch, accepts a single
                                           table or comma-separated list of
@@ -127,7 +130,8 @@ To close the application, press Ctrl+C.
  -T,--time-diff-separator-min-val <arg>   specify the time in milliseconds
                                           after which a time difference
                                           separator will appear between
-                                          two operation outputs (default: 5000)
+                                          operation outputs (default:
+                                          5000)
  -V,--verbose-diff                        show verbose output, i.e. with
                                           full before and after states of
                                           column values that exceeded the
@@ -205,11 +209,11 @@ The SQL query that caused the given operation is shown below the header table wh
 
 Next are the modified table's columns with their values, organized into rows. In case of an update:  
 ![updatedColumn](docs/updated_column.png)  
-From top to bottom there's the column name, value before, value after. 
+From top to bottom there's the column name, value before (`-` prefix), value after (`+` prefix). 
 
 Updated columns are bordered:  
 ![updatedVsNotUpdatedColumns](docs/updated_vs_not_updated_columns.png)  
-`release_year` column has been updated, and `description` has not.
+`replacement_cost` column has been updated, whereas the values of `length` and `rating` remained the same.
 
 #### Verbose diff
 
