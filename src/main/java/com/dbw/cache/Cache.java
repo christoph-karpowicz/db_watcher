@@ -30,6 +30,13 @@ public class Cache {
         } catch (IOException | ClassNotFoundException e) {
             persistentCache = Optional.empty();
         }
+        createPersistentCacheIfDoesntExist();
+    }
+
+    public void createPersistentCacheIfDoesntExist() {
+        if (!exists()) {
+            persistentCache = Optional.of(new PersistentCache());
+        }
     }
 
     public boolean compareConfigFileChecksums(String path, String currentChecksum) {
@@ -44,12 +51,6 @@ public class Cache {
         return areNotEqual;
     }
 
-    public void createPersistentCacheIfDoesntExist() {
-        if (!persistentCache.isPresent()) {
-            persistentCache = Optional.of(new PersistentCache());
-        }
-    }
-
     public ConfigCache createOrGetConfigCache(String path) {
         Optional<ConfigCache> persistedConfigCache = getPersistentCache().get().getConfig(path);
         return persistedConfigCache.orElseGet(ConfigCache::new);
@@ -60,6 +61,9 @@ public class Cache {
     }
 
     public boolean haveLastUsedConfigPathsChanged(Set<String> newPaths) {
+        if (!exists()) {
+            return true;
+        }
         Set<String> oldPaths = getLastUsedConfigPaths();
         return newPaths == null ||
                 oldPaths == null ||
@@ -76,13 +80,17 @@ public class Cache {
     }
 
     public void persist() {
-        if (!persistentCache.isPresent()) {
+        if (!exists()) {
             return;
         }
         CachePersister cachePersister = new CachePersister();
         cachePersister.setPersistentCache(persistentCache.get());
         Thread cachePersisterThread = new Thread(cachePersister);
         cachePersisterThread.start();
+    }
+
+    public boolean exists() {
+        return persistentCache.isPresent();
     }
 
     public boolean isConfigPresent(String path) {

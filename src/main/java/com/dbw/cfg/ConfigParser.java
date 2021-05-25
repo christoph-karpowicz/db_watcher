@@ -54,12 +54,14 @@ public class ConfigParser {
                     }
                     configFileIndices.add(fileNameIndex);
                 }
+                inputComplete = true;
             } catch (NumberFormatException e) {
+                inputComplete = false;
                 Logger.log(Level.ERROR, ErrorMessages.INPUT_NAN);
             } catch (Exception e) {
+                inputComplete = false;
                 Logger.log(Level.ERROR, e.getMessage());
             }
-            inputComplete = true;
         }
         return configFileIndices
                 .stream()

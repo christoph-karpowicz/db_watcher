@@ -57,7 +57,7 @@ public class App {
             options = cli.handleArgs();
             Optional<Set<String>> configPathsArg = options.getConfigPaths();
             Set<String> configPaths;
-            if (options.getReuseConfig()) {
+            if (cache.exists() && options.getReuseConfig()) {
                 configPaths = cache.getLastUsedConfigPaths();
                 if (configPaths == null || configPaths.isEmpty()) {
                     throw new UnrecoverableException("AppInit", ErrorMessages.CLI_REUSE_CONFIG);
