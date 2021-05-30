@@ -61,9 +61,10 @@ public class StateDiffService implements DiffService {
     }
 
     public String findTableDiff(List<StateColumn> stateColumns, Operation dbOperation) {
-        tableDiffBuilder.init();
-        tableDiffBuilder.build(getStateColumnsDividedIntoRows(stateColumns), dbOperation);
-        return tableDiffBuilder.toString();
+        TableDiffBuilder tdb = new TableDiffBuilder();
+        tdb.init();
+        tdb.build(getStateColumnsDividedIntoRows(stateColumns), dbOperation);
+        return tdb.toString();
     }
 
     private List<List<StateColumn>> getStateColumnsDividedIntoRows(List<StateColumn> stateColumns) {
@@ -89,9 +90,7 @@ public class StateDiffService implements DiffService {
     } 
 
     public String findColumnDiff(StateColumn stateColumn) {
-        columnDiffBuilder.init();
-        columnDiffBuilder.build(stateColumn);
-        return columnDiffBuilder.toString();
+        return columnDiffBuilder.build(stateColumn);
     }
 
     public String stateValueToString(Object value) {

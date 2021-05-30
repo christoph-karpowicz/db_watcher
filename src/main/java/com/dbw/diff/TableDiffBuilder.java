@@ -4,12 +4,10 @@ import com.dbw.app.App;
 import com.dbw.db.Operation;
 import com.dbw.output.OutputBuilder;
 import com.dbw.util.StringUtils;
-import com.google.inject.Singleton;
 
 import java.util.List;
 import java.util.Objects;
 
-@Singleton
 public class TableDiffBuilder implements OutputBuilder {
     public static final short DEFAULT_MAX_COL_WIDTH = 17;
     public static final short DEFAULT_MAX_ROW_WIDTH = 120;

@@ -1,5 +1,7 @@
 package com.dbw.watcher;
 
+import com.dbw.err.UnrecoverableException;
+import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.google.inject.Singleton;
@@ -18,7 +20,7 @@ public class WatcherCheckIn extends Hashtable<Watcher, Boolean> {
         try {
             this.wait();
         } catch (InterruptedException e) {
-            Logger.log(Level.ERROR, e.getMessage());
+            new UnrecoverableException("WatcherCheckIn", ErrorMessages.WATCHER_INTERRUPT).handle();
         }
     }
 

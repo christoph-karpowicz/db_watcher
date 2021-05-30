@@ -22,6 +22,9 @@ public class Logger {
     }
 
     private static String removeNewLines(String msg) {
+        if (msg == null) {
+            return "";
+        }
         return msg.replace("\n", "");
     }
     
