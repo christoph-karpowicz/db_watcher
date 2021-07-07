@@ -2,6 +2,7 @@ package com.dbw.state;
 
 import com.dbw.db.Column;
 import com.dbw.db.OrclSpec;
+import com.dbw.db.Plsql;
 import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
@@ -17,16 +18,6 @@ public class XmlStateBuilder {
     public final static String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     public final static String XML_COLUMN_STATE_NAME_ATTRIBUTE = "name";
     private final String XML_ROOT_TAG = "dbw-root";
-    private final String PLSQL_TO_CHAR_FUNCTION_START = "TO_CHAR(";
-    private final String RIGHT_PARENTHESIS = ")";
-    private final String PLSQL_CAST_TO_VARCHAR_FUNCTION_START = "utl_raw.cast_to_varchar2(UTL_ENCODE.BASE64_ENCODE(";
-    private final String PLSQL_CAST_TO_VARCHAR_FUNCTION_END = "))";
-    private final String PLSQL_LOB_TO_VARCHAR_FUNCTION_START = "DBMS_LOB.substr(";
-    private final String PLSQL_LOB_TO_VARCHAR_FUNCTION_END = ",4000)";
-    private final String PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START =
-            "UTL_RAW.CAST_TO_VARCHAR2(UTL_ENCODE.BASE64_ENCODE(UTL_RAW.CAST_TO_RAW(UTL_RAW.CAST_TO_VARCHAR2(DBMS_LOB.SUBSTR(";
-    private final String PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END = ")))))";
-    private final String PLSQL_STRING_CONCAT_OPERATOR = "||";
 
     XmlStateTag xmlRootTag;
     XmlStateTag columnStatesTag;
@@ -56,7 +47,7 @@ public class XmlStateBuilder {
         }
         stateConcat.add(columnStatesTag.endTag());
         stateConcat.add(xmlRootTag.endTag());
-        return String.join(PLSQL_STRING_CONCAT_OPERATOR, stateConcat);
+        return String.join(Plsql.PLSQL_STRING_CONCAT_OPERATOR, stateConcat);
     }
 
     private boolean isDataTypeSupported(Column tableColumn) {
@@ -71,9 +62,9 @@ public class XmlStateBuilder {
         StringBuilder columnValueToStringInvocation = new StringBuilder();
         columnValueToStringInvocation
             .append(columnStateTag.startTag())
-            .append(PLSQL_STRING_CONCAT_OPERATOR)
+            .append(Plsql.PLSQL_STRING_CONCAT_OPERATOR)
             .append(generateToVarcharFunctionCall(columnNameWithStatePrefix, tableColumn.getDataType()))
-            .append(PLSQL_STRING_CONCAT_OPERATOR)
+            .append(Plsql.PLSQL_STRING_CONCAT_OPERATOR)
             .append(columnStateTag.endTag());
 
         return columnValueToStringInvocation.toString();
@@ -87,30 +78,44 @@ public class XmlStateBuilder {
 
     private String generateToVarcharFunctionCall(String columnNameWithStatePrefix, String dataType) {
         StringBuilder toVarcharFunctionCall = new StringBuilder();
+        boolean isDefault = false;
         switch (dataType) {
             case OrclSpec.TYPE_BLOB:
                 toVarcharFunctionCall
-                        .append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START)
+                        .append(Plsql.PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_START)
                         .append(columnNameWithStatePrefix)
-                        .append(PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END);
-            break;
+                        .append(Plsql.PLSQL_RAW_CAST_TO_VARCHAR_FUNCTION_END);
+                break;
             case OrclSpec.TYPE_CLOB:
                 toVarcharFunctionCall
-                        .append(PLSQL_LOB_TO_VARCHAR_FUNCTION_START)
+                        .append(Plsql.PLSQL_LOB_TO_VARCHAR_FUNCTION_START)
                         .append(columnNameWithStatePrefix)
-                        .append(PLSQL_LOB_TO_VARCHAR_FUNCTION_END);
+                        .append(Plsql.PLSQL_LOB_TO_VARCHAR_FUNCTION_END);
                 break;
             case OrclSpec.TYPE_RAW:
                 toVarcharFunctionCall
-                        .append(PLSQL_CAST_TO_VARCHAR_FUNCTION_START)
+                        .append(Plsql.PLSQL_CAST_TO_VARCHAR_FUNCTION_START)
                         .append(columnNameWithStatePrefix)
-                        .append(PLSQL_CAST_TO_VARCHAR_FUNCTION_END);
+                        .append(Plsql.PLSQL_CAST_TO_VARCHAR_FUNCTION_END);
                 break;
             default:
                 toVarcharFunctionCall
-                        .append(PLSQL_TO_CHAR_FUNCTION_START)
+                        .append(Plsql.PLSQL_TO_CHAR_FUNCTION_START)
                         .append(columnNameWithStatePrefix)
-                        .append(RIGHT_PARENTHESIS);
+                        .append(Plsql.RIGHT_PARENTHESIS);
+                isDefault = true;
+        }
+
+        if (!isDefault) {
+            toVarcharFunctionCall
+                    .insert(0, Plsql.PLSQL_CASE_THEN)
+                    .insert(0, Plsql.PLSQL_IS_NOT_NULL)
+                    .insert(0, columnNameWithStatePrefix)
+                    .insert(0, Plsql.PLSQL_CASE_START);
+            toVarcharFunctionCall
+                    .append(Plsql.PLSQL_CASE_ELSE)
+                    .append(Plsql.PLSQL_NULL)
+                    .append(Plsql.PLSQL_CASE_END);
         }
         return toVarcharFunctionCall.toString();
     }
