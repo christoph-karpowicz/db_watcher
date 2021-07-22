@@ -48,6 +48,8 @@ public abstract class Database {
 
     public abstract boolean purge(Set<String> watchedTables);
 
+    public abstract List<String> selectAllTables() throws SQLException;
+
     protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
         int rowCount = getAuditRecordCount();
         if (rowCount == 0) {

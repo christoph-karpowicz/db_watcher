@@ -4,6 +4,9 @@ import com.dbw.db.query.QueryHelper;
 
 public class OrclQueries {
 
+    public static final String FIND_ALL_TABLES =
+        "SELECT TABLE_NAME as \"item\" FROM all_tables WHERE OWNER = ?";
+
     public static final String SELECT_TABLE_COLUMNS =
         "SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLS WHERE TABLE_NAME = ? AND HIDDEN_COLUMN='NO' AND VIRTUAL_COLUMN='NO' ORDER BY COLUMN_ID";
 

@@ -4,6 +4,9 @@ import com.dbw.db.query.QueryHelper;
 
 public class PostgresQueries {
 
+    public static final String FIND_ALL_TABLES =
+        "SELECT table_name as \"item\" FROM information_schema.TABLES WHERE table_catalog = ? AND table_schema = ?";
+
     public static final String FIND_AUDIT_TABLE = 
         "SELECT " + Common.EXISTS + " (" +
         "    SELECT FROM information_schema.tables " +

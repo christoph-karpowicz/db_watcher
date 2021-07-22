@@ -142,6 +142,11 @@ public class Orcl extends Database {
         return auditTriggerNames;
     }
 
+    public List<String> selectAllTables() throws SQLException {
+        String[] stringArgs = {dbConfig.getUser()};
+        return selectStringArray(OrclQueries.FIND_ALL_TABLES, stringArgs);
+    }
+
     public Column[] selectTableColumns(String tableName) throws SQLException {
         List<Column> result = new ArrayList<>();
         PreparedStatement pstmt = getConn().prepareStatement(OrclQueries.SELECT_TABLE_COLUMNS);
