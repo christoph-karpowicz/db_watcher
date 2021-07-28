@@ -43,6 +43,13 @@ public class WatcherManager {
         databaseManager.addDatabase(cfg.getPath(), watcher.getDb());
     }
 
+    public void findAndAssignWatchedTables() throws SQLException {
+        for (Watcher watcher : watchers) {
+            watcher.findWatchedTables();
+            watcher.assignWatchedTablesToDb();
+        }
+    }
+
     public void init() throws UnrecoverableException {
         watcherCheckIn.init(watchers);
         if (App.options.getTables().isPresent()) {
@@ -132,7 +139,7 @@ public class WatcherManager {
 
     public Set<String> getWatchedTables() {
         Set<String> watchedTables = Sets.newHashSet();
-        watchers.forEach(watcher -> watchedTables.addAll(watcher.getCfg().getTables()));
+        watchers.forEach(watcher -> watchedTables.addAll(watcher.getWatchedTables()));
         return watchedTables;
     }
 }

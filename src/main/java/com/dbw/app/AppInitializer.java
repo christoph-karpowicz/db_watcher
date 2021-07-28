@@ -5,6 +5,7 @@ import com.dbw.cache.ConfigCachePersister;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.ConfigParser;
 import com.dbw.cli.CLI;
+import com.dbw.db.DatabaseManager;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
@@ -25,6 +26,8 @@ public class AppInitializer {
     @Inject
     private WatcherManager watcherManager;
     @Inject
+    private DatabaseManager databaseManager;
+    @Inject
     private Cache cache;
 
     private String[] commandLineArgs;
@@ -40,9 +43,13 @@ public class AppInitializer {
             getAppOptions();
             Set<String> configPaths = getConfigPaths();
             List<Config> configs = getConfigs(configPaths);
+            validateConfigs(configs);
+            createWatchers(configs);
+            databaseManager.connectDbs();
+            watcherManager.findAndAssignWatchedTables();
             persistConfigsInCacheIfChangedOrAbsent(configPaths, configs);
         } catch (Exception e) {
-            throw new UnrecoverableException("AppInit", e.getMessage(), e);
+            throw new UnrecoverableException(this.getClass().getName(), e.getMessage(), e);
         }
     }
 
@@ -58,7 +65,7 @@ public class AppInitializer {
         if (cache.exists() && App.options.getReuseConfig()) {
             configPaths = cache.getLastUsedConfigPaths();
             if (configPaths == null || configPaths.isEmpty()) {
-                throw new UnrecoverableException("AppInit", ErrorMessages.CLI_REUSE_CONFIG);
+                throw new UnrecoverableException(this.getClass().getName(), ErrorMessages.CLI_REUSE_CONFIG);
             } else {
                 Logger.log(Level.INFO, String.format(LogMessages.REUSED_CONFIG, String.join(", ", configPaths)));
             }
@@ -78,8 +85,6 @@ public class AppInitializer {
         List<Config> configs = Lists.newArrayList();
         for (String configPath : configPaths) {
             Config cfg = loadConfig(configPath);
-            cfg.validate();
-            watcherManager.addWatcher(cfg);
             configs.add(cfg);
         }
         return configs;
@@ -93,6 +98,18 @@ public class AppInitializer {
         cfg.setChanged(configChanged);
         cfg.setCheckSum(configFileChecksum);
         return cfg;
+    }
+
+    private void validateConfigs(List<Config> configs) throws UnrecoverableException {
+        for (Config cfg : configs) {
+            cfg.validate();
+        }
+    }
+
+    private void createWatchers(List<Config> configs) {
+        for (Config cfg : configs) {
+            watcherManager.addWatcher(cfg);
+        }
     }
 
     private void persistConfigsInCacheIfChangedOrAbsent(Set<String> configPaths, List<Config> configs) {

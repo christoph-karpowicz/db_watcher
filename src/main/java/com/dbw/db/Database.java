@@ -19,15 +19,18 @@ import java.util.Set;
 public abstract class Database {
     protected DatabaseConfig dbConfig;
     private Connection conn;
-    private final Set<String> watchedTables;
+    private Set<String> watchedTables;
 
     public Database(Config config) {
         this.dbConfig = config.getDatabase();
-        this.watchedTables = config.getTables();
     }
 
     public Set<String> getWatchedTables() {
         return watchedTables;
+    }
+
+    public void setWatchedTables(Set<String> watchedTables) {
+        this.watchedTables = watchedTables;
     }
 
     public abstract String deleteFirstNRows(String nRows) throws SQLException;

@@ -12,13 +12,21 @@ import com.dbw.db.Postgres;
 import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.*;
+import com.dbw.state.XmlStateBuilder;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
     private final Config cfg;
+    private Set<String> watchedTables;
     private Database db;
     private final String dbName;
     private int maxId;
@@ -47,6 +55,49 @@ public class Watcher implements Runnable {
 
     public void setDb() {
         this.db = DatabaseFactory.getDatabase(cfg);
+    }
+
+    public void findWatchedTables() throws SQLException {
+        if (cfg.getSettings().getTableNamesRegex()) {
+            List<String> allTables = db.selectAllTables();
+            List<List<String>> allMatches = Lists.newArrayList();
+            for (String tableRegex : cfg.getTables()) {
+                System.out.println(tableRegex);
+                if (tableRegex.length() == 0) {
+                    continue;
+                }
+
+                List<String> matches = Lists.newArrayList();
+                boolean exclude = tableRegex.charAt(0) == '!';
+                if (exclude) {
+                    System.out.println(tableRegex);
+                    tableRegex = tableRegex.substring(1);
+                }
+                Pattern pattern = Pattern.compile(tableRegex);
+                for (String tableName : allTables) {
+                    Matcher matcher = pattern.matcher(tableName);
+                    if (exclude && !matcher.matches()) {
+                        matches.add(tableName);
+                    }
+                    if (!exclude && matcher.matches()) {
+                        matches.add(tableName);
+                    }
+                }
+                allMatches.add(matches);
+            }
+            System.out.println(allTables);
+
+        } else {
+            this.watchedTables = cfg.getTables();
+        }
+    }
+
+    public void assignWatchedTablesToDb() {
+        db.setWatchedTables(this.watchedTables);
+    }
+
+    public Set<String> getWatchedTables() {
+        return ImmutableSet.copyOf(watchedTables);
     }
 
     public void init() throws PreparationException, UnrecoverableException {

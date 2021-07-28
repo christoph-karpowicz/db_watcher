@@ -5,7 +5,6 @@ import com.dbw.actions.DbAction;
 import com.dbw.actions.DeleteFirstNRowsAction;
 import com.dbw.actions.PurgeAction;
 import com.dbw.cli.CLI;
-import com.dbw.db.DatabaseManager;
 import com.dbw.err.DbwException;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.output.OutputManager;
@@ -23,8 +22,6 @@ public class App {
     @Inject
     private WatcherManager watcherManager;
     @Inject
-    private DatabaseManager databaseManager;
-    @Inject
     private OutputManager outputManager;
 
     public static CLI.ParsedOptions options;
@@ -40,7 +37,6 @@ public class App {
     }
 
     public void start() throws DbwException {
-        databaseManager.connectDbs();
         boolean shutdownAfter = executeActions();
         if (shutdownAfter) {
             shutdown();
