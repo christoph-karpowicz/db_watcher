@@ -30,7 +30,8 @@ public class Postgres extends Database {
 
     private Map<String, String[]> watchedTablesColumnNames;
     private final String DRIVER = "org.postgresql.Driver";
-    
+    private final String REGEX_CASE_INSENSITIVE = "(?i)";
+
     public Postgres(Config config) {
         super(config);
     }
@@ -159,7 +160,9 @@ public class Postgres extends Database {
         List<String> auditTriggers = selectStringArray(PostgresQueries.SELECT_AUDIT_TRIGGERS, stringArgs);
         String[] auditTriggerNames = new String[auditTriggers.size()];
         for (short i = 0; i < auditTriggers.size(); i++) {
-            String auditTriggerName = auditTriggers.get(i).split("_")[1];
+            String auditTriggerName = auditTriggers.get(i)
+                    .replaceAll(REGEX_CASE_INSENSITIVE + Common.DBW_PREFIX, "")
+                    .replaceAll(REGEX_CASE_INSENSITIVE + Common.AUDIT_POSTFIX, "");
             auditTriggerNames[i] = auditTriggerName;
         }
         return auditTriggerNames;

@@ -5,7 +5,7 @@ import com.dbw.db.query.QueryHelper;
 public class PostgresQueries {
 
     public static final String FIND_ALL_TABLES =
-        "SELECT table_name as \"item\" FROM information_schema.TABLES WHERE table_catalog = ? AND table_schema = ?";
+        "SELECT table_name as \"item\" FROM information_schema.TABLES WHERE table_catalog = ? AND table_schema = ? AND table_type = 'BASE TABLE'";
 
     public static final String FIND_AUDIT_TABLE = 
         "SELECT " + Common.EXISTS + " (" +
@@ -108,7 +108,8 @@ public class PostgresQueries {
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s ON %s";
 
     public static final String SELECT_AUDIT_TRIGGERS =
-            "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
+            "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname ILIKE '" +
+            Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
 
     public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT COALESCE(MAX(id), 0) AS " + Common.MAX + " FROM " + Common.DBW_AUDIT_TABLE_NAME;
 

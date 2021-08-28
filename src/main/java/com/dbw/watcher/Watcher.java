@@ -5,23 +5,22 @@ import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
 import com.dbw.cli.ShowLatestOperationsOption;
-import com.dbw.db.AuditRecord;
-import com.dbw.db.Database;
-import com.dbw.db.DatabaseFactory;
-import com.dbw.db.Postgres;
+import com.dbw.db.*;
 import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
-import com.dbw.log.*;
-import com.dbw.state.XmlStateBuilder;
+import com.dbw.log.Level;
+import com.dbw.log.LogMessages;
+import com.dbw.log.Logger;
+import com.dbw.log.WarningMessages;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
@@ -60,36 +59,45 @@ public class Watcher implements Runnable {
     public void findWatchedTables() throws SQLException {
         if (cfg.getSettings().getTableNamesRegex()) {
             List<String> allTables = db.selectAllTables();
-            List<List<String>> allMatches = Lists.newArrayList();
-            for (String tableRegex : cfg.getTables()) {
-                System.out.println(tableRegex);
-                if (tableRegex.length() == 0) {
-                    continue;
-                }
-
-                List<String> matches = Lists.newArrayList();
-                boolean exclude = tableRegex.charAt(0) == '!';
-                if (exclude) {
-                    System.out.println(tableRegex);
-                    tableRegex = tableRegex.substring(1);
-                }
-                Pattern pattern = Pattern.compile(tableRegex);
-                for (String tableName : allTables) {
-                    Matcher matcher = pattern.matcher(tableName);
-                    if (exclude && !matcher.matches()) {
-                        matches.add(tableName);
-                    }
-                    if (!exclude && matcher.matches()) {
-                        matches.add(tableName);
-                    }
-                }
-                allMatches.add(matches);
-            }
+            Set<String> excludeRegex = cfg.getTables()
+                    .stream()
+                    .filter(regex -> regex.charAt(0) == '~')
+                    .map(regex -> regex.substring(1))
+                    .collect(Collectors.toSet());
+            Set<String> includeRegex = cfg.getTables()
+                    .stream()
+                    .filter(regex -> !excludeRegex.contains(regex))
+                    .collect(Collectors.toSet());
+            Set<String> exclude = findTableNameMatches(allTables, excludeRegex);
+            Set<String> include = findTableNameMatches(allTables, includeRegex)
+                    .stream()
+                    .filter(tableName -> !tableName.equalsIgnoreCase(Common.DBW_AUDIT_TABLE_NAME))
+                    .collect(Collectors.toSet());
+            include.removeAll(exclude);
+            this.watchedTables = include;
             System.out.println(allTables);
+            System.out.println(this.watchedTables);
 
         } else {
             this.watchedTables = cfg.getTables();
         }
+    }
+
+    private Set<String> findTableNameMatches(List<String> allTables, Set<String> regexes) {
+        Set<String> matches = Sets.newHashSet();
+        for (String regex : regexes) {
+            if (regex.length() == 0) {
+                continue;
+            }
+            Pattern pattern = Pattern.compile(regex);
+            for (String tableName : allTables) {
+                Matcher matcher = pattern.matcher(tableName);
+                if (matcher.matches()) {
+                    matches.add(tableName);
+                }
+            }
+        }
+        return matches;
     }
 
     public void assignWatchedTablesToDb() {
