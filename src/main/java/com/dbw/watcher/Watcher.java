@@ -14,6 +14,8 @@ import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -24,14 +26,18 @@ import java.util.stream.Collectors;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
+    @Getter
     private final Config cfg;
     private Set<String> watchedTables;
+    @Getter
     private Database db;
     private final String dbName;
     private int maxId;
     private int auditRecordCount;
     private int numberOfLatestOp;
+    @Getter
     private boolean isAfterInitialRun;
+    @Getter @Setter
     private boolean removingAuditRecords;
 
     public Watcher(WatcherManager watcherManager, Config cfg) {
@@ -42,14 +48,6 @@ public class Watcher implements Runnable {
 
     public void closeDb() throws SQLException {
         db.close();
-    }
-
-    public Config getCfg() {
-        return cfg;
-    }
-
-    public Database getDb() {
-        return db;
     }
 
     public void setDb() {
@@ -244,19 +242,7 @@ public class Watcher implements Runnable {
         this.auditRecordCount = db.getAuditRecordCount();
     }
 
-    public boolean isAfterInitialRun() {
-        return isAfterInitialRun;
-    }
-
     private void setAfterInitialRun() {
         isAfterInitialRun = true;
-    }
-
-    public boolean isRemovingAuditRecords() {
-        return removingAuditRecords;
-    }
-
-    public synchronized void setRemovingAuditRecords(boolean removingAuditRecords) {
-        this.removingAuditRecords = removingAuditRecords;
     }
 }

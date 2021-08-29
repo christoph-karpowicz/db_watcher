@@ -2,20 +2,17 @@ package com.dbw.output;
 
 import com.dbw.frame.AuditFrame;
 import com.dbw.util.TimeDiffUtils;
+import lombok.AllArgsConstructor;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class OutputBatch extends ArrayList<AuditFrame> {
     private Timestamp previousTime;
     private int frameCount;
-
-    public OutputBatch(Timestamp previousTime, int frameCount) {
-        this.previousTime = previousTime;
-        this.frameCount = frameCount;
-    }
 
     public Timestamp getPreviousTime() {
         return previousTime;

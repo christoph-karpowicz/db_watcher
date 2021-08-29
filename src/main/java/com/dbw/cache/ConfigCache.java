@@ -1,26 +1,19 @@
 package com.dbw.cache;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 public class ConfigCache implements Serializable {
     private static final long serialVersionUID = 2L;
     private String checksum;
     private Set<String> tables;
-
-    public String getChecksum() {
-        return checksum;
-    }
-
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
-
-    public Set<String> getTables() {
-        return tables;
-    }
 
     public void setTables(Set<String> newTables) {
         LinkedHashSet<String> newTablesSet = new LinkedHashSet<>(newTables);

@@ -5,19 +5,15 @@ import com.dbw.log.Level;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 import com.dbw.watcher.Watcher;
+import lombok.AllArgsConstructor;
 
 import java.sql.SQLException;
 
+@AllArgsConstructor
 public class TruncateBasedOnLimitAction implements Runnable {
     private final Watcher watcher;
     private final int auditRecordCount;
     private final int opMin;
-
-    public TruncateBasedOnLimitAction(Watcher watcher, int auditRecordCount, int opMin) {
-        this.watcher = watcher;
-        this.auditRecordCount = auditRecordCount;
-        this.opMin = opMin;
-    }
 
     @Override
     public void run() {

@@ -5,15 +5,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import lombok.AllArgsConstructor;
 
 import java.util.*;
 
+@AllArgsConstructor
 public class JsonDiff extends Diff {
     private final String[] tableColumnNames;
-
-    public JsonDiff(String[] tableColumnNames) {
-        this.tableColumnNames = tableColumnNames;
-    }
 
     protected Map<String, Object> parseData(String data) throws JsonProcessingException {
         Map<String, Object> parsedData = new LinkedHashMap<>();

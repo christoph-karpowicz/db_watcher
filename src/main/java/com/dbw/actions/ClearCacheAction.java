@@ -7,6 +7,7 @@ import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
 import com.dbw.log.WarningMessages;
 import com.google.inject.Inject;
+import lombok.Setter;
 
 import java.util.Set;
 
@@ -14,11 +15,8 @@ public class ClearCacheAction {
     @Inject
     private Cache cache;
 
+    @Setter
     private Set<String> configPaths;
-
-    public void setConfigPaths(Set<String> configPath) {
-        this.configPaths = configPath;
-    }
 
     public void execute() {
         configPaths.forEach(path -> {

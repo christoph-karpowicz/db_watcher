@@ -1,25 +1,19 @@
 package com.dbw.state;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class XmlStateTagAttribute {
     private final String EQUALS_START = "=\"";
     private final String EQUALS_END = "\"";
     private final String REGEX_EQUALS_START = "=\\\"";
     private final String REGEX_EQUALS_END = "\\\"";
     
-    private String name;
-    private String value;
+    private final String name;
+    private final String value;
     private boolean isRegex = false;
-
-    public XmlStateTagAttribute(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public XmlStateTagAttribute(String name, String value, boolean isRegex) {
-        this.name = name;
-        this.value = value;
-        this.isRegex = isRegex;
-    }
 
     @Override
     public String toString() {

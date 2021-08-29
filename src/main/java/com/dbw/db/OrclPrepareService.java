@@ -4,17 +4,14 @@ import com.dbw.db.query.QueryHelper;
 import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.state.XmlStateBuilder;
+import lombok.AllArgsConstructor;
 
 import java.sql.SQLException;
 
+@AllArgsConstructor
 public class OrclPrepareService {
-    private final XmlStateBuilder xmlStateBuilder;
+    private final XmlStateBuilder xmlStateBuilder = new XmlStateBuilder();
     private final Orcl db;
-
-    public OrclPrepareService(Orcl db) {
-        this.db = db;
-        this.xmlStateBuilder = new XmlStateBuilder();
-    }
 
     public void prepare() throws PreparationException {
         try {

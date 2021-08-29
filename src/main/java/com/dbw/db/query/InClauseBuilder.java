@@ -2,11 +2,13 @@ package com.dbw.db.query;
 
 import com.dbw.db.Common;
 import com.google.common.collect.Lists;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 public class InClauseBuilder {
     private final String AND = "AND ";
     private final String IN_START = " IN (";
@@ -14,11 +16,6 @@ public class InClauseBuilder {
 
     private final String columnName;
     private final Set<String> values;
-
-    public InClauseBuilder(String columnName, Set<String> values) {
-        this.columnName = columnName;
-        this.values = values;
-    }
 
     public String build() {
         List<String> parts = Lists.newArrayList();

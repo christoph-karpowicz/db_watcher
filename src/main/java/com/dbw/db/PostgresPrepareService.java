@@ -2,15 +2,13 @@ package com.dbw.db;
 
 import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
+import lombok.AllArgsConstructor;
 
 import java.sql.SQLException;
 
+@AllArgsConstructor
 public class PostgresPrepareService {
     private final Postgres db;
-
-    public PostgresPrepareService(Postgres db) {
-        this.db = db;
-    }
 
     public void prepare() throws PreparationException {
         try {

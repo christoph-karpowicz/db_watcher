@@ -12,7 +12,7 @@ public class XmlStateTag {
     private final static String REGEX_TAG_START = "<";
     private final static String REGEX_TAG_END = ">";
     
-    private String name;
+    private final String name;
     List<XmlStateTagAttribute> attributes = new ArrayList<XmlStateTagAttribute>();
     List<String> baseTagComponents;
     private boolean isRegex = false;

@@ -2,17 +2,15 @@ package com.dbw.cache;
 
 import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
+import lombok.Setter;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 public class CachePersister implements Runnable {
+    @Setter
     private PersistentCache persistentCache;
-
-    public void setPersistentCache(PersistentCache persistentCache) {
-        this.persistentCache = persistentCache;
-    }
 
     @Override
     public void run() {

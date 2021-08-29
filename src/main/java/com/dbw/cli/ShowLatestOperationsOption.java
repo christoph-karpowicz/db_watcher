@@ -2,10 +2,14 @@ package com.dbw.cli;
 
 import com.dbw.log.ErrorMessages;
 import com.dbw.util.StringUtils;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Getter
+@RequiredArgsConstructor
 public class ShowLatestOperationsOption {
     private static final long MINUTE_IN_SECONDS = 60;
     private static final long HOUR_IN_SECONDS = MINUTE_IN_SECONDS * 60;
@@ -14,24 +18,8 @@ public class ShowLatestOperationsOption {
     private boolean isTime;
     private long value;
 
-    private ShowLatestOperationsOption(String raw) {
-        this.raw = raw;
-    }
-
-    public String getRaw() {
-        return raw;
-    }
-
-    public boolean isTime() {
-        return isTime;
-    }
-
     public void setIsTime(boolean isTime) {
         this.isTime = isTime;
-    }
-
-    public long getValue() {
-        return value;
     }
 
     public void setValue(long value) {

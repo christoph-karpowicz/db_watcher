@@ -1,34 +1,25 @@
 package com.dbw.cfg;
 
 import com.dbw.err.UnrecoverableException;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+@Getter
+@Setter
 public class Config {
     private String path;
+    @Setter(AccessLevel.NONE)
     private DatabaseConfig database;
+    @Setter(AccessLevel.NONE)
     private SettingsConfig settings;
+    @Setter(AccessLevel.NONE)
     private Set<String> tables;
     private boolean changed;
     private String checkSum;
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public DatabaseConfig getDatabase() {
-        return database;
-    }
-
-    public SettingsConfig getSettings() {
-        return settings;
-    }
 
     public Optional<Integer> getOperationsMinimum() {
         return Optional.ofNullable(settings).map(SettingsConfig::getOperationsMinimum);
@@ -40,26 +31,6 @@ public class Config {
 
     public boolean areOperationsSettingsPresent() {
         return settings != null && settings.getOperationsMinimum() != null && settings.getOperationsLimit() != null;
-    }
-
-    public Set<String> getTables() {
-        return Collections.unmodifiableSet(tables);
-    }
-
-    public boolean isChanged() {
-        return changed;
-    }
-
-    public void setChanged(boolean changed) {
-        this.changed = changed;
-    }
-
-    public String getCheckSum() {
-        return checkSum;
-    }
-
-    public void setCheckSum(String checkSum) {
-        this.checkSum = checkSum;
     }
 
     public void validate() throws UnrecoverableException {

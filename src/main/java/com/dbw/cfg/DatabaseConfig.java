@@ -1,7 +1,9 @@
 package com.dbw.cfg;
 
 import com.google.common.base.Strings;
+import lombok.Getter;
 
+@Getter
 public class DatabaseConfig {
     public static final String DEFAULT_SCHEMA = "public";
 
@@ -15,39 +17,7 @@ public class DatabaseConfig {
     private String password;
     private String driverPath;
 
-    public String getName() {
-        return name;
-    }
-
     public String getSchema() {
         return Strings.isNullOrEmpty(schema) ? DEFAULT_SCHEMA : schema;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getConnectionString() {
-        return connectionString;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getDriverPath() {
-        return driverPath;
     }
 }
