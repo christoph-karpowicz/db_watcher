@@ -10,7 +10,7 @@ public class Logger {
     }
 
     public static void log(Level level, String dbName, String msg) {
-        if (watcherManager.getWatchersSize() > 1) {
+        if (watcherManager != null && watcherManager.getWatchersSize() > 1) {
             System.out.printf("[%s] %s: %s\n", level.name(), dbName, removeNewLines(msg));
         } else {
             log(level, msg);

@@ -18,13 +18,13 @@ public class WatcherTest {
     @BeforeClass
     public static void setup() {
         WatcherManager watcherManager = ObjectCreator.create(WatcherManager.class);
-        watcher = new Watcher(watcherManager, config);
         try {
             File configFile = new File(ConfigParserTest.TEST_CONFIG_PATH);
             config = ConfigParser.fromYMLFile(configFile);
         } catch(Exception e) {
             fail(e.getMessage());
         }
+        watcher = new Watcher(watcherManager, config);
     }
     
     @Test

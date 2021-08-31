@@ -75,7 +75,6 @@ public class Watcher implements Runnable {
             this.watchedTables = include;
             System.out.println(allTables);
             System.out.println(this.watchedTables);
-
         } else {
             this.watchedTables = cfg.getTables();
         }

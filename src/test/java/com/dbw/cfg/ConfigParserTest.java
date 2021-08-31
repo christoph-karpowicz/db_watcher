@@ -1,20 +1,19 @@
 package com.dbw.cfg;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import com.google.common.collect.Sets;
+import org.junit.Test;
 
 import java.io.File;
+import java.util.Set;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class ConfigParserTest {
 
-    public static final String TEST_CONFIG_PATH = "config/test.yml";
+    public static final String TEST_CONFIG_PATH = "config/test-config.yml";
     
     @Test
-    public void shouldParseConfigFile()
-    {
+    public void shouldParseConfigFile() {
         Config config = null;
         try {
             File configFile = new File(TEST_CONFIG_PATH);
@@ -31,8 +30,8 @@ public class ConfigParserTest {
         assertEquals(dbConfig.getUser(), "christoph");
         assertEquals(dbConfig.getPassword(), "pwd1234");
 
-        Object[] tables = config.getTables().toArray();
-        Object[] expectedTables = {"film", "actor", "address", "inventory", "language", "staff"};
-        assertArrayEquals(expectedTables, tables);
+        Set<String> tables = config.getTables();
+        Set<String> expectedTables = Sets.newHashSet("film", "actor", "address", "inventory", "language", "staff");
+        expectedTables.forEach(expectedTable -> assertTrue(tables.contains(expectedTable)));
     }
 }
