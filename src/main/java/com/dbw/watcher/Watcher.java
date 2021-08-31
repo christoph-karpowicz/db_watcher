@@ -51,7 +51,11 @@ public class Watcher implements Runnable {
     }
 
     public void setDb() {
-        this.db = DatabaseFactory.getDatabase(cfg);
+        setDb(DatabaseFactory.getDatabase(cfg));
+    }
+
+    public void setDb(Database db) {
+        this.db = db;
     }
 
     public void findWatchedTables() throws SQLException {
@@ -73,8 +77,6 @@ public class Watcher implements Runnable {
                     .collect(Collectors.toSet());
             include.removeAll(exclude);
             this.watchedTables = include;
-            System.out.println(allTables);
-            System.out.println(this.watchedTables);
         } else {
             this.watchedTables = cfg.getTables();
         }
