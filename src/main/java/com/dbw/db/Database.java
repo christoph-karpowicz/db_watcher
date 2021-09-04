@@ -10,11 +10,13 @@ import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
+import com.dbw.util.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Database {
     protected DatabaseConfig dbConfig;
@@ -23,6 +25,10 @@ public abstract class Database {
 
     public Database(Config config) {
         this.dbConfig = config.getDatabase();
+    }
+
+    public Set<String> getWatchedTablesShortHashes() {
+        return getWatchedTables().stream().map(StringUtils::createShortHash).collect(Collectors.toSet());
     }
 
     public Set<String> getWatchedTables() {

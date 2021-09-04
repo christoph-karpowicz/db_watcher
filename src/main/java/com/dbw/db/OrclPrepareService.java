@@ -38,7 +38,7 @@ public class OrclPrepareService {
         try {
             String[] auditTriggers = db.selectAuditTriggers();
             for (String auditTriggerName : auditTriggers) {
-                if (!db.getWatchedTables().contains(auditTriggerName)) {
+                if (!db.getWatchedTablesShortHashes().contains(auditTriggerName)) {
                     db.dropAuditTrigger(auditTriggerName);
                 }
             }

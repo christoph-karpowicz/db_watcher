@@ -11,6 +11,7 @@ import com.dbw.log.ErrorMessages;
 import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
+import com.dbw.util.FileUtils;
 import com.dbw.watcher.WatcherManager;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -93,7 +94,7 @@ public class AppInitializer {
     private Config loadConfig(String configPath) throws IOException, NoSuchAlgorithmException {
         File configFile = new File(configPath);
         Config cfg = ConfigParser.fromYMLFile(configFile);
-        String configFileChecksum = ConfigParser.getFileChecksum(configFile);
+        String configFileChecksum = FileUtils.getFileChecksum(configFile);
         boolean configChanged = cache.compareConfigFileChecksums(cfg.getPath(), configFileChecksum);
         cfg.setChanged(configChanged);
         cfg.setCheckSum(configFileChecksum);

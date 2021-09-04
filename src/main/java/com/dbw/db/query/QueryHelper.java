@@ -1,6 +1,7 @@
 package com.dbw.db.query;
 
 import com.dbw.db.Common;
+import com.dbw.util.StringUtils;
 
 public class QueryHelper {
 
@@ -9,7 +10,8 @@ public class QueryHelper {
     }
 
     public static String buildAuditTriggerName(String tableName) {
-        return String.format(Common.DBW_PREFIX + "%s" + Common.AUDIT_POSTFIX, tableName);
+        String tableNameHash = StringUtils.createShortHash(tableName);
+        return String.format(Common.DBW_PREFIX + tableNameHash, tableName);
     }
     
 }

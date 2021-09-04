@@ -109,7 +109,7 @@ public class PostgresQueries {
 
     public static final String SELECT_AUDIT_TRIGGERS =
             "SELECT tgname AS item FROM pg_trigger WHERE NOT tgisinternal AND tgname ILIKE '" +
-            Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
+            Common.DBW_PREFIX + "%'";
 
     public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT COALESCE(MAX(id), 0) AS " + Common.MAX + " FROM " + Common.DBW_AUDIT_TABLE_NAME;
 

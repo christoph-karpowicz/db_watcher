@@ -85,7 +85,7 @@ public class OrclQueries {
     public static final String DROP_AUDIT_TRIGGER = "DROP TRIGGER %s";
 
     public static final String SELECT_AUDIT_TRIGGERS = 
-        "SELECT TRIGGER_NAME AS \"item\" from sys.all_triggers WHERE TRIGGER_NAME LIKE '" + Common.DBW_PREFIX + "%" + Common.AUDIT_POSTFIX + "'";
+        "SELECT TRIGGER_NAME AS \"item\" from sys.all_triggers WHERE TRIGGER_NAME LIKE '" + Common.DBW_PREFIX + "%'";
 
     public static final String SELECT_AUDIT_TABLE_MAX_ID = "SELECT COALESCE(MAX(ID), 0) AS \"" + Common.MAX + "\" FROM " + Common.DBW_AUDIT_TABLE_NAME;
 

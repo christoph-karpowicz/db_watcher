@@ -88,7 +88,7 @@ public class Orcl extends Database {
     }
 
     public boolean auditTriggerExists(String tableName) throws SQLException {
-        String[] stringArgs = {Common.DBW_PREFIX + tableName + Common.AUDIT_POSTFIX};
+        String[] stringArgs = {QueryHelper.buildAuditTriggerName(tableName)};
         return objectExists(OrclQueries.FIND_AUDIT_TRIGGER, stringArgs);
     }
 
@@ -135,8 +135,7 @@ public class Orcl extends Database {
         String[] auditTriggerNames = new String[auditTriggers.size()];
         for (short i = 0; i < auditTriggers.size(); i++) {
             String auditTriggerName = auditTriggers.get(i)
-                .replace(Common.DBW_PREFIX, "")
-                .replace(Common.AUDIT_POSTFIX, "");
+                .replace(Common.DBW_PREFIX, "");
             auditTriggerNames[i] = auditTriggerName;
         }
         return auditTriggerNames;

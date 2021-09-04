@@ -45,7 +45,7 @@ public class PostgresPrepareService {
     private void dropUnusedAuditTriggers() throws SQLException {
         String[] auditTriggers = db.selectAuditTriggers();
         for (String auditTriggerName : auditTriggers) {
-            if (!db.getWatchedTables().contains(auditTriggerName)) {
+            if (!db.getWatchedTablesShortHashes().contains(auditTriggerName)) {
                 try {
                     db.dropAuditTrigger(auditTriggerName);
                 } catch (SQLException e) {

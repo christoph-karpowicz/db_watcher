@@ -111,7 +111,7 @@ public class Postgres extends Database {
     }
 
     public boolean auditTriggerExists(String tableName) throws SQLException {
-        String[] stringArgs = {"dbw_" + tableName + "_audit"};
+        String[] stringArgs = {QueryHelper.buildAuditTriggerName(tableName)};
         return objectExists(PostgresQueries.FIND_AUDIT_TRIGGER, stringArgs);
     }
 
@@ -161,8 +161,7 @@ public class Postgres extends Database {
         String[] auditTriggerNames = new String[auditTriggers.size()];
         for (short i = 0; i < auditTriggers.size(); i++) {
             String auditTriggerName = auditTriggers.get(i)
-                    .replaceAll(REGEX_CASE_INSENSITIVE + Common.DBW_PREFIX, "")
-                    .replaceAll(REGEX_CASE_INSENSITIVE + Common.AUDIT_POSTFIX, "");
+                    .replaceAll(REGEX_CASE_INSENSITIVE + Common.DBW_PREFIX, "");
             auditTriggerNames[i] = auditTriggerName;
         }
         return auditTriggerNames;
