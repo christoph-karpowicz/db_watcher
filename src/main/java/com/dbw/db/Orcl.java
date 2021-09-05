@@ -87,8 +87,8 @@ public class Orcl extends Database {
         return selectSingleIntValue(OrclQueries.COUNT_AUDIT_RECORDS, Common.ROW_COUNT);
     }
 
-    public boolean auditTriggerExists(String tableName) throws SQLException {
-        String[] stringArgs = {QueryHelper.buildAuditTriggerName(tableName)};
+    public boolean auditTriggerExists(String triggerName) throws SQLException {
+        String[] stringArgs = {triggerName};
         return objectExists(OrclQueries.FIND_AUDIT_TRIGGER, stringArgs);
     }
 

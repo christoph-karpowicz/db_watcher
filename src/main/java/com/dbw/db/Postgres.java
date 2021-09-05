@@ -68,7 +68,7 @@ public class Postgres extends Database {
             return watchedTablesColumnNames;
         }
         Map<String, String[]> tableColumnNames = new HashMap<>();
-        for (String tableName : getWatchedTables()) {
+        for (String tableName : getWatchedTables().getTableNames()) {
             tableColumnNames.put(tableName, selectTableColumnNames(tableName));
         }
         watchedTablesColumnNames = ImmutableMap.copyOf(tableColumnNames);
@@ -110,15 +110,20 @@ public class Postgres extends Database {
         Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_DROPPED);
     }
 
-    public boolean auditTriggerExists(String tableName) throws SQLException {
-        String[] stringArgs = {QueryHelper.buildAuditTriggerName(tableName)};
+    public boolean auditTriggerExists(String triggerName) throws SQLException {
+        String[] stringArgs = {triggerName};
         return objectExists(PostgresQueries.FIND_AUDIT_TRIGGER, stringArgs);
     }
 
-    public void createAuditTrigger(String tableName) throws SQLException {
-        String triggerName = QueryHelper.buildAuditTriggerName(tableName);
-        executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TRIGGER, triggerName, getObjectNameWithSchema(tableName), getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
-        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
+    public void createAuditTrigger(WatchedTables.Entry tableNameAndHash) throws SQLException {
+        String triggerName = tableNameAndHash.getEntityName();
+        executeFormattedQueryUpdate(
+                PostgresQueries.CREATE_AUDIT_TRIGGER,
+                triggerName,
+                getObjectNameWithSchema(triggerName),
+                getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME)
+        );
+        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableNameAndHash.getTableName()));
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {

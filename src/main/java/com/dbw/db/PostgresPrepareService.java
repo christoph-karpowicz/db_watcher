@@ -45,9 +45,9 @@ public class PostgresPrepareService {
     private void dropUnusedAuditTriggers() throws SQLException {
         String[] auditTriggers = db.selectAuditTriggers();
         for (String auditTriggerName : auditTriggers) {
-            if (!db.getWatchedTablesShortHashes().contains(auditTriggerName)) {
+            if (!db.getWatchedTables().containsEntityName(auditTriggerName)) {
                 try {
-                    db.dropAuditTrigger(auditTriggerName);
+                    db.dropAuditTrigger(db.getWatchedTables().getTableByEntityName(auditTriggerName));
                 } catch (SQLException e) {
                     new PreparationException(e.getMessage(), e).setRecoverable().handle();
                 }
@@ -56,13 +56,13 @@ public class PostgresPrepareService {
     }
 
     private void createAuditTriggers() {
-        for (String tableName : db.getWatchedTables()) {
+        for (WatchedTables.Entry tableEntry : db.getWatchedTables().entrySet()) {
             try {
-                if (!db.auditTriggerExists(tableName)) {
-                    db.createAuditTrigger(tableName);
+                if (!db.auditTriggerExists(tableEntry.getEntityName())) {
+                    db.createAuditTrigger(tableEntry);
                 }
             } catch (SQLException e) {
-                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableName, e.getMessage());
+                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableEntry.getTableName(), e.getMessage());
                 new PreparationException(errMsg, e).setRecoverable().handle();
             }
         }

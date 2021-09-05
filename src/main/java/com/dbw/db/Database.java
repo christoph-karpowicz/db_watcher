@@ -10,33 +10,30 @@ import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
-import com.dbw.util.StringUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public abstract class Database {
+    @Getter
     protected DatabaseConfig dbConfig;
+    @Getter @Setter
     private Connection conn;
-    private Set<String> watchedTables;
+    @Getter
+    private WatchedTables watchedTables;
 
     public Database(Config config) {
         this.dbConfig = config.getDatabase();
     }
 
-    public Set<String> getWatchedTablesShortHashes() {
-        return getWatchedTables().stream().map(StringUtils::createShortHash).collect(Collectors.toSet());
-    }
-
-    public Set<String> getWatchedTables() {
-        return watchedTables;
-    }
-
     public void setWatchedTables(Set<String> watchedTables) {
-        this.watchedTables = watchedTables;
+        this.watchedTables = new WatchedTables();
+        watchedTables.forEach(tableName ->
+                this.watchedTables.put(tableName));
     }
 
     public abstract String deleteFirstNRows(String nRows) throws SQLException;
@@ -198,17 +195,5 @@ public abstract class Database {
 
     public void close() throws SQLException {
         getConn().close();
-    }
-
-    public Connection getConn() {
-        return conn;
-    }
-
-    protected void setConn(Connection conn) {
-        this.conn = conn;
-    }
-
-    public DatabaseConfig getDbConfig() {
-        return dbConfig;
     }
 }

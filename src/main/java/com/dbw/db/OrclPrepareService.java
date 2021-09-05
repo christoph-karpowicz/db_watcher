@@ -1,6 +1,5 @@
 package com.dbw.db;
 
-import com.dbw.db.query.QueryHelper;
 import com.dbw.err.PreparationException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.state.XmlStateBuilder;
@@ -38,8 +37,8 @@ public class OrclPrepareService {
         try {
             String[] auditTriggers = db.selectAuditTriggers();
             for (String auditTriggerName : auditTriggers) {
-                if (!db.getWatchedTablesShortHashes().contains(auditTriggerName)) {
-                    db.dropAuditTrigger(auditTriggerName);
+                if (!db.getWatchedTables().containsEntityName(auditTriggerName)) {
+                    db.dropAuditTrigger(db.getWatchedTables().getTableByEntityName(auditTriggerName));
                 }
             }
         } catch (SQLException e) {
@@ -48,28 +47,28 @@ public class OrclPrepareService {
     }
 
     private void createAuditTriggers() {
-        for (String tableName : db.getWatchedTables()) {
+        for (WatchedTables.Entry tableEntry : db.getWatchedTables().entrySet()) {
             try {
-                if (db.auditTriggerExists(tableName)) {
+                if (db.auditTriggerExists(tableEntry.getEntityName())) {
                     continue;
                 }
-                Column[] tableColumns = db.selectTableColumns(tableName);
+                Column[] tableColumns = db.selectTableColumns(tableEntry.getTableName());
                 String newStateConcat = xmlStateBuilder.build(OrclSpec.NEW_STATE_PREFIX, tableColumns);
                 String oldStateConcat = xmlStateBuilder.build(OrclSpec.OLD_STATE_PREFIX, tableColumns);
-                String auditTriggerName = QueryHelper.buildAuditTriggerName(tableName);
+                String auditTriggerName = tableEntry.getEntityName();
                 String auditTriggerQuery = db.formatQuery(
                     OrclQueries.CREATE_AUDIT_TRIGGER,
                     auditTriggerName,
-                    tableName,
+                    tableEntry,
                     oldStateConcat,
                     newStateConcat,
-                    tableName,
-                    tableName,
-                    tableName
+                    tableEntry,
+                    tableEntry,
+                    tableEntry
                 );
-                db.createAuditTrigger(tableName, auditTriggerQuery);
+                db.createAuditTrigger(tableEntry.getTableName(), auditTriggerQuery);
             } catch (SQLException e) {
-                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableName, e.getMessage());
+                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableEntry.getTableName(), e.getMessage());
                 new PreparationException(errMsg, e).setRecoverable().handle();
             }
         }
