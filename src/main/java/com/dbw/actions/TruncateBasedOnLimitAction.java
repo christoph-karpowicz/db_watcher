@@ -26,10 +26,10 @@ public class TruncateBasedOnLimitAction implements Runnable {
             watcher.getDb().deleteFirstNRows(recordsToRemove);
         } catch (SQLException e) {
             String errMsg = String.format(ErrorMessages.OP_LIMIT_REACHED_DELETE_ATTEMPT, recordsToRemove);
-            Logger.log(Level.ERROR, watcher.getDb().getDbConfig().getName(), errMsg);
+            Logger.log(Level.ERROR, watcher.getDb().getConfig().getName(), errMsg);
         }
         String warnMsg = String.format(WarningMessages.OP_LIMIT_REACHED, recordsToRemove, opMin);
-        Logger.log(Level.WARNING, watcher.getDb().getDbConfig().getName(), warnMsg);
+        Logger.log(Level.WARNING, watcher.getDb().getConfig().getName(), warnMsg);
         watcher.setRemovingAuditRecords(false);
     }
 }

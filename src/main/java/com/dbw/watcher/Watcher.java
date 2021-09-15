@@ -28,8 +28,9 @@ public class Watcher implements Runnable {
     private final WatcherManager watcherManager;
     @Getter
     private final Config cfg;
+    @Setter
     private Set<String> watchedTables;
-    @Getter
+    @Getter @Setter
     private Database db;
     private final String dbName;
     private int maxId;
@@ -52,55 +53,6 @@ public class Watcher implements Runnable {
 
     public void setDb() {
         setDb(DatabaseFactory.getDatabase(cfg));
-    }
-
-    public void setDb(Database db) {
-        this.db = db;
-    }
-
-    public void findWatchedTables() throws SQLException {
-        if (cfg.getSettings().getTableNamesRegex()) {
-            List<String> allTables = db.selectAllTables();
-            Set<String> excludeRegex = cfg.getTables()
-                    .stream()
-                    .filter(regex -> regex.charAt(0) == '~')
-                    .map(regex -> regex.substring(1))
-                    .collect(Collectors.toSet());
-            Set<String> includeRegex = cfg.getTables()
-                    .stream()
-                    .filter(regex -> !excludeRegex.contains(regex))
-                    .collect(Collectors.toSet());
-            Set<String> exclude = findTableNameMatches(allTables, excludeRegex);
-            Set<String> include = findTableNameMatches(allTables, includeRegex)
-                    .stream()
-                    .filter(tableName -> !tableName.equalsIgnoreCase(Common.DBW_AUDIT_TABLE_NAME))
-                    .collect(Collectors.toSet());
-            include.removeAll(exclude);
-            this.watchedTables = include;
-        } else {
-            this.watchedTables = cfg.getTables();
-        }
-    }
-
-    private Set<String> findTableNameMatches(List<String> allTables, Set<String> regexes) {
-        Set<String> matches = Sets.newHashSet();
-        for (String regex : regexes) {
-            if (regex.length() == 0) {
-                continue;
-            }
-            Pattern pattern = Pattern.compile(regex);
-            for (String tableName : allTables) {
-                Matcher matcher = pattern.matcher(tableName);
-                if (matcher.matches()) {
-                    matches.add(tableName);
-                }
-            }
-        }
-        return matches;
-    }
-
-    public void assignWatchedTablesToDb() {
-        db.setWatchedTables(this.watchedTables);
     }
 
     public Set<String> getWatchedTables() {

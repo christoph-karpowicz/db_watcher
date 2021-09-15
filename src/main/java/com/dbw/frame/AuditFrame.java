@@ -8,6 +8,8 @@ import com.dbw.diff.StateColumn;
 import com.dbw.diff.StateDiffService;
 import com.dbw.err.RecoverableException;
 import com.google.inject.Inject;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,31 +17,18 @@ import java.util.List;
 import java.util.Set;
 
 public class AuditFrame {
+    @Getter @Setter
     private AuditRecord auditRecord;
     private Diff diff;
+    @Setter
     private Database db;
     private List<StateColumn> stateColumns;
     private String timeSincePrevious;
+    @Setter
     private int frameNo;
 
     @Inject
     private StateDiffService diffService;
-
-    public AuditRecord getAuditRecord() {
-        return auditRecord;
-    }
-
-    public void setAuditRecord(AuditRecord auditRecord) {
-        this.auditRecord = auditRecord;
-    }
-
-    public void setDb(Database db) {
-        this.db = db;
-    }
-
-    public void setFrameNo(int frameNo) {
-        this.frameNo = frameNo;
-    }
 
     public void createDiff() throws RecoverableException, SQLException {
         diff = diffService.createDiff(db, auditRecord);
@@ -69,7 +58,7 @@ public class AuditFrame {
     @Override
     public String toString() {
         AuditFrameBuilder builder = ObjectCreator.create(AuditFrameBuilder.class);
-        builder.setDbConfig(db.getDbConfig());
+        builder.setDbConfig(db.getConfig());
         builder.setAuditRecord(auditRecord);
         builder.setStateColumns(stateColumns);
         builder.setTimeSincePrevious(timeSincePrevious);

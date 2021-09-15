@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ public class DatabaseManager {
         for (Database db : dbs.values()) {
             try {
                 String successMessage = db.deleteFirstNRows(nRows);
-                Logger.log(Level.INFO, db.getDbConfig().getName(), String.format(successMessage, nRows));
+                Logger.log(Level.INFO, db.getConfig().getName(), String.format(successMessage, nRows));
             } catch (SQLException e) {
                 throw new UnrecoverableException("InitialAuditRecordDelete", e.getMessage(), e);
             }
@@ -46,12 +45,13 @@ public class DatabaseManager {
 
     public void purge() throws UnrecoverableException {
         for (Map.Entry<String, Database> db : dbs.entrySet()) {
-            boolean isConfirmed = confirmPurge(db.getValue().getDbConfig().getName());
+            boolean isConfirmed = confirmPurge(db.getValue().getConfig().getName());
             if (!isConfirmed) {
                 continue;
             }
+            System.out.println(db.getValue().getWatchedTables().getTableNames());
             Set<String> tables = cache.get().getConfigTables(db.getKey());
-            String dbName = db.getValue().getDbConfig().getName();
+            String dbName = db.getValue().getConfig().getName();
             if (db.getValue().purge(tables)) {
                 Logger.log(Level.INFO, dbName, SuccessMessages.CLI_PURGE);
             } else {

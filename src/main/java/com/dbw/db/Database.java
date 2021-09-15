@@ -10,6 +10,7 @@ import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.SuccessMessages;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,17 +18,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public abstract class Database {
     @Getter
-    protected DatabaseConfig dbConfig;
+    protected DatabaseConfig config;
     @Getter @Setter
     private Connection conn;
     @Getter
     private WatchedTables watchedTables;
 
     public Database(Config config) {
-        this.dbConfig = config.getDatabase();
+        this.config = config.getDatabase();
     }
 
     public void setWatchedTables(Set<String> watchedTables) {
@@ -80,7 +84,7 @@ public abstract class Database {
 
     public void dropAuditTable(String tableName) throws SQLException {
         executeFormattedQueryUpdate("DROP TABLE " + tableName);
-        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_DROPPED);
+        Logger.log(Level.INFO, config.getName(), LogMessages.AUDIT_TABLE_DROPPED);
     }
 
     private void executePreparedStatementUpdateWithSingleInt(String query, int param) throws SQLException {

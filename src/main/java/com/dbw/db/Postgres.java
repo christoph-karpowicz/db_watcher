@@ -39,23 +39,23 @@ public class Postgres extends Database {
     public void connect() throws UnrecoverableException {
         try {
             Class.forName(DRIVER);
-            Connection conn = DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
+            Connection conn = DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
             setConn(conn);
-            Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_OPENED);
+            Logger.log(Level.INFO, config.getName(), LogMessages.DB_OPENED);
         } catch (SQLException | ClassNotFoundException e) {
             throw new UnrecoverableException("DbConnection", e.getMessage(), e);
         }
     }
 
     private String getConnectionString() {
-        if (dbConfig.getConnectionString() != null) {
-            return dbConfig.getConnectionString();
+        if (config.getConnectionString() != null) {
+            return config.getConnectionString();
         }
         
-        return "jdbc:" + dbConfig.getType() +
-                "://" + dbConfig.getHost() +
-                ":" + dbConfig.getPort() +
-                "/" + dbConfig.getName();
+        return "jdbc:" + config.getType() +
+                "://" + config.getHost() +
+                ":" + config.getPort() +
+                "/" + config.getName();
     }
 
     public void prepare() throws PreparationException {
@@ -76,13 +76,13 @@ public class Postgres extends Database {
     }
 
     public boolean auditTableExists() throws SQLException {
-        String[] stringArgs = {getDbConfig().getSchema(), Common.DBW_AUDIT_TABLE_NAME.toLowerCase()};
+        String[] stringArgs = {config.getSchema(), Common.DBW_AUDIT_TABLE_NAME.toLowerCase()};
         return objectExists(PostgresQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 
     public void createAuditTable() throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.CREATE_AUDIT_TABLE, getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME));
-        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
+        Logger.log(Level.INFO, config.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
     public int getAuditRecordCount() throws SQLException {
@@ -90,7 +90,7 @@ public class Postgres extends Database {
     }
 
     public boolean auditFunctionExists() throws SQLException {
-        String[] stringArgs = {getDbConfig().getSchema()};
+        String[] stringArgs = {config.getSchema()};
         return objectExists(PostgresQueries.FIND_AUDIT_FUNCTION, stringArgs);
     }
 
@@ -102,12 +102,12 @@ public class Postgres extends Database {
                 getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME),
                 getObjectNameWithSchema(Common.DBW_AUDIT_TABLE_NAME)
         );
-        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_CREATED);
+        Logger.log(Level.INFO, config.getName(), LogMessages.AUDIT_FUNCTION_CREATED);
     }
 
     public void dropAuditFunction() throws SQLException {
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_FUNCTION, getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME));
-        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_FUNCTION_DROPPED);
+        Logger.log(Level.INFO, config.getName(), LogMessages.AUDIT_FUNCTION_DROPPED);
     }
 
     public boolean auditTriggerExists(String triggerName) throws SQLException {
@@ -123,7 +123,7 @@ public class Postgres extends Database {
                 getObjectNameWithSchema(triggerName),
                 getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME)
         );
-        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableNameAndHash.getTableName()));
+        Logger.log(Level.INFO, config.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableNameAndHash.getTableName()));
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {
@@ -137,7 +137,7 @@ public class Postgres extends Database {
     public void dropAuditTrigger(String tableName) throws SQLException {
         String triggerName = QueryHelper.buildAuditTriggerName(tableName);
         executeFormattedQueryUpdate(PostgresQueries.DROP_AUDIT_TRIGGER, triggerName, getObjectNameWithSchema(tableName));
-        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
+        Logger.log(Level.INFO, config.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
     public boolean purge(Set<String> watchedTables) {
@@ -173,12 +173,12 @@ public class Postgres extends Database {
     }
 
     public List<String> selectAllTables() throws SQLException {
-        String[] stringArgs = {dbConfig.getName(), dbConfig.getSchema()};
+        String[] stringArgs = {config.getName(), config.getSchema()};
         return selectStringArray(PostgresQueries.FIND_ALL_TABLES, stringArgs);
     }
 
     public String[] selectTableColumnNames(String tableName) throws SQLException {
-        String[] stringArgs = {getDbConfig().getSchema(), tableName};
+        String[] stringArgs = {config.getSchema(), tableName};
         List<String> tableColumnNames = selectStringArray(PostgresQueries.FIND_TABLE_COLUMNS, stringArgs);
         return tableColumnNames.toArray(new String[0]);
     }
@@ -198,6 +198,6 @@ public class Postgres extends Database {
     }
 
     private String getObjectNameWithSchema(String objectName) {
-        return String.join(".", getDbConfig().getSchema(), objectName.toLowerCase());
+        return String.join(".", config.getSchema(), objectName.toLowerCase());
     }
 }

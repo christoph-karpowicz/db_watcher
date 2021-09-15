@@ -11,7 +11,7 @@ public class QueryHelper {
 
     public static String buildAuditTriggerName(String tableName) {
         String tableNameHash = StringUtils.createShortHash(tableName);
-        return String.format(Common.DBW_PREFIX + tableNameHash, tableName);
+        return Common.DBW_PREFIX + tableNameHash;
     }
     
 }

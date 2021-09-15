@@ -3,7 +3,6 @@ package com.dbw.diff;
 import com.dbw.app.ObjectCreator;
 import com.dbw.db.*;
 import com.dbw.err.RecoverableException;
-import com.dbw.err.RecoverableException;
 import com.dbw.err.UnrecoverableException;
 import com.dbw.log.ErrorMessages;
 import com.dbw.output.OutputBuilder;
@@ -33,7 +32,7 @@ public class StateDiffService implements DiffService {
         if (db instanceof Postgres) {
             String[] tableColumnNames = ((Postgres)db).getWatchedTablesColumnNames().get(auditRecord.getTableName());
             if (tableColumnNames.length == 0) {
-                String errMsg = String.format(ErrorMessages.TABLE_NOT_FOUND_IN_SCHEMA, auditRecord.getTableName(), db.getDbConfig().getSchema());
+                String errMsg = String.format(ErrorMessages.TABLE_NOT_FOUND_IN_SCHEMA, auditRecord.getTableName(), db.getConfig().getSchema());
                 new UnrecoverableException("StateDataProcessing", errMsg).handle();
             }
             diff = new JsonDiff(tableColumnNames);

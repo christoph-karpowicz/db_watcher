@@ -33,13 +33,13 @@ public class Orcl extends Database {
     public void connect() throws UnrecoverableException {
         try {
             Connection conn;
-            if (!Strings.isNullOrEmpty(dbConfig.getDriverPath())) {
+            if (!Strings.isNullOrEmpty(config.getDriverPath())) {
                 conn = getConnectionUsingTheDriverInstance();
             } else {
                 conn = getConnectionUsingTheDriverManager();
             }
             setConn(conn);
-            Logger.log(Level.INFO, dbConfig.getName(), LogMessages.DB_OPENED);
+            Logger.log(Level.INFO, config.getName(), LogMessages.DB_OPENED);
         } catch (SQLException e) {
             throw new UnrecoverableException("DbConnection", e.getMessage(), e);
         } catch (ClassNotFoundException | MalformedURLException | IllegalAccessException | InstantiationException e) {
@@ -51,21 +51,21 @@ public class Orcl extends Database {
     private Connection getConnectionUsingTheDriverInstance() throws SQLException, ClassNotFoundException, MalformedURLException, IllegalAccessException, InstantiationException {
         URL[] urls = {};
         DriverClassLoader classLoader = new DriverClassLoader(urls);
-        classLoader.addFile(dbConfig.getDriverPath());
+        classLoader.addFile(config.getDriverPath());
         Class driverClass = Class.forName(DRIVER, true, classLoader);
         Driver driver = (Driver)driverClass.newInstance();
         Properties props = new Properties();
-        props.put("user", dbConfig.getUser());
-        props.put("password", dbConfig.getPassword());
+        props.put("user", config.getUser());
+        props.put("password", config.getPassword());
         return driver.connect(getConnectionString(), props);
     }
 
     private Connection getConnectionUsingTheDriverManager() throws SQLException {
-        return DriverManager.getConnection(getConnectionString(), dbConfig.getUser(), dbConfig.getPassword());
+        return DriverManager.getConnection(getConnectionString(), config.getUser(), config.getPassword());
     }
 
     private String getConnectionString() {
-        return dbConfig.getConnectionString();
+        return config.getConnectionString();
     }
 
     public void prepare() throws PreparationException {
@@ -74,13 +74,13 @@ public class Orcl extends Database {
     }
 
     public boolean auditTableExists() throws SQLException {
-        String[] stringArgs = {dbConfig.getUser().toUpperCase(), Common.DBW_AUDIT_TABLE_NAME};
+        String[] stringArgs = {config.getUser().toUpperCase(), Common.DBW_AUDIT_TABLE_NAME};
         return objectExists(OrclQueries.FIND_AUDIT_TABLE, stringArgs);
     }
 
     public void createAuditTable() throws SQLException {
         executeFormattedQueryUpdate(OrclQueries.CREATE_AUDIT_TABLE, Common.DBW_AUDIT_TABLE_NAME);
-        Logger.log(Level.INFO, dbConfig.getName(), LogMessages.AUDIT_TABLE_CREATED);
+        Logger.log(Level.INFO, config.getName(), LogMessages.AUDIT_TABLE_CREATED);
     }
 
     public int getAuditRecordCount() throws SQLException {
@@ -94,7 +94,7 @@ public class Orcl extends Database {
 
     public void createAuditTrigger(String tableName, String query) throws SQLException {
         executeFormattedQueryUpdate(query);
-        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
+        Logger.log(Level.INFO, config.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableName));
     }
 
     public String deleteFirstNRows(String nRows) throws SQLException {
@@ -107,7 +107,7 @@ public class Orcl extends Database {
 
     public void dropAuditTrigger(String tableName) throws SQLException {
         executeFormattedQueryUpdate(OrclQueries.DROP_AUDIT_TRIGGER, QueryHelper.buildAuditTriggerName(tableName));
-        Logger.log(Level.INFO, dbConfig.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
+        Logger.log(Level.INFO, config.getName(), String.format(LogMessages.AUDIT_TRIGGER_DROPPED, tableName));
     }
 
     public boolean purge(Set<String> watchedTables) {
@@ -142,7 +142,7 @@ public class Orcl extends Database {
     }
 
     public List<String> selectAllTables() throws SQLException {
-        String[] stringArgs = {dbConfig.getUser()};
+        String[] stringArgs = {config.getUser()};
         return selectStringArray(OrclQueries.FIND_ALL_TABLES, stringArgs);
     }
 

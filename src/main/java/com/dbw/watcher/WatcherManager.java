@@ -5,6 +5,7 @@ import com.dbw.cache.Cache;
 import com.dbw.cfg.Config;
 import com.dbw.db.Common;
 import com.dbw.db.DatabaseManager;
+import com.dbw.db.TableRegexFinder;
 import com.dbw.err.DbwException;
 import com.dbw.err.PreparationException;
 import com.dbw.err.UnrecoverableException;
@@ -45,8 +46,10 @@ public class WatcherManager {
 
     public void findAndAssignWatchedTables() throws SQLException {
         for (Watcher watcher : watchers) {
-            watcher.findWatchedTables();
-            watcher.assignWatchedTablesToDb();
+            TableRegexFinder tableRegexFinder = new TableRegexFinder(watcher.getCfg(), watcher.getDb());
+            Set<String> watchedTables = tableRegexFinder.findWatchedTables();
+            watcher.setWatchedTables(watchedTables);
+            watcher.getDb().setWatchedTables(watchedTables);
         }
     }
 

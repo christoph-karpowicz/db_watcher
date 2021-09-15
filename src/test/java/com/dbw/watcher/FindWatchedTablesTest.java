@@ -1,10 +1,10 @@
 package com.dbw.watcher;
 
-import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
 import com.dbw.cfg.DatabaseConfig;
 import com.dbw.cfg.SettingsConfig;
 import com.dbw.db.Database;
+import com.dbw.db.TableRegexFinder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
@@ -34,9 +34,9 @@ public class FindWatchedTablesTest {
             "moons",
             "COMPUTERS",
             "frIeND",
-            "coLleGoe"
+            "coLleGoe",
+            "y_gles"
     );
-    private final static WatcherManager watcherManager = ObjectCreator.create(WatcherManager.class);
     private final static Config cfgMock = Mockito.mock(Config.class);
     private final static DatabaseConfig databaseConfigMock = Mockito.mock(DatabaseConfig.class);
     private final static SettingsConfig settingsConfigMock = Mockito.mock(SettingsConfig.class);
@@ -47,19 +47,14 @@ public class FindWatchedTablesTest {
         Mockito.when(cfgMock.getDatabase()).thenReturn(databaseConfigMock);
     }
 
-    private Watcher createWatcher(Set<String> regexPatterns) {
-        Mockito.when(cfgMock.getTables()).thenReturn(regexPatterns);
-        return new Watcher(watcherManager, cfgMock);
-    }
-    
     private void assertFoundWatchedTablesBasedOnRegex(Set<String> regexPatterns, Set<String> expectedTables) throws SQLException {
-        Watcher watcher = createWatcher(regexPatterns);
+        Mockito.when(cfgMock.getTables()).thenReturn(regexPatterns);
         Database dbMock = Mockito.mock(Database.class);
         Mockito.when(dbMock.selectAllTables()).thenReturn(tableNames);
-        watcher.setDb(dbMock);
-        watcher.findWatchedTables();
-        expectedTables.forEach(expectedTable -> assertTrue(watcher.getWatchedTables().contains(expectedTable)));
-        assertEquals(expectedTables.size(), watcher.getWatchedTables().size());
+        TableRegexFinder tableRegexFinder = new TableRegexFinder(cfgMock, dbMock);
+        Set<String> watchedTables = tableRegexFinder.findWatchedTables();
+        expectedTables.forEach(expectedTable -> assertTrue(watchedTables.contains(expectedTable)));
+        assertEquals(expectedTables.size(), watchedTables.size());
     }
 
     @Test
@@ -82,7 +77,13 @@ public class FindWatchedTablesTest {
 
     @Test
     public void shouldFindWatchedTablesBasedOnRegex4() throws SQLException {
-        Set<String> expectedTables = Sets.newHashSet("_test3224", "inventory_test");
+        Set<String> expectedTables = Sets.newHashSet("_test3224", "inventory_test", "y_gles");
         assertFoundWatchedTablesBasedOnRegex(Sets.newHashSet(".*", "~[^_]+", "~.{5}_.*"), expectedTables);
+    }
+
+    @Test
+    public void shouldFindWatchedTablesBasedOnRegex5() throws SQLException {
+        Set<String> expectedTables = Sets.newHashSet("actor_test", "LARGE_CASE", "language", "frIeND");
+        assertFoundWatchedTablesBasedOnRegex(Sets.newHashSet("[a-uA-Z]{2,5}_.+", "language", "frIeND"), expectedTables);
     }
 }
