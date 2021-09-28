@@ -1,6 +1,6 @@
 package com.dbw.db;
 
-import com.dbw.db.query.QueryHelper;
+import com.dbw.util.StringUtils;
 import com.google.common.collect.HashBiMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ public class WatchedTables {
     private final HashBiMap<String, String> tableToEntityNames = HashBiMap.create();
 
     public void put(String tableName) {
-        tableToEntityNames.put(tableName, QueryHelper.buildAuditTriggerName(tableName));
+        tableToEntityNames.put(tableName, StringUtils.createShortHash(tableName));
     }
 
     public boolean containsEntityName(String hash) {
@@ -24,6 +24,7 @@ public class WatchedTables {
     }
 
     public String getTableByEntityName(String entityName) {
+        System.out.println(tableToEntityNames);
         return tableToEntityNames.inverse().get(entityName);
     }
 

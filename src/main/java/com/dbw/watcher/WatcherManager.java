@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,6 +35,7 @@ public class WatcherManager {
     @Inject
     private WatcherCheckIn watcherCheckIn;
 
+    @Getter
     private final List<Watcher> watchers = Lists.newArrayList();
     private final LinkedBlockingQueue<AuditFrame> frameQueue = new LinkedBlockingQueue<>();
 

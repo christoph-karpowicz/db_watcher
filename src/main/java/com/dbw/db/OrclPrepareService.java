@@ -37,6 +37,7 @@ public class OrclPrepareService {
         try {
             String[] auditTriggers = db.selectAuditTriggers();
             for (String auditTriggerName : auditTriggers) {
+                System.out.println(auditTriggerName);
                 if (!db.getWatchedTables().containsEntityName(auditTriggerName)) {
                     db.dropAuditTrigger(db.getWatchedTables().getTableByEntityName(auditTriggerName));
                 }
@@ -48,27 +49,28 @@ public class OrclPrepareService {
 
     private void createAuditTriggers() {
         for (WatchedTables.Entry tableEntry : db.getWatchedTables().entrySet()) {
+            String tableName = tableEntry.getTableName();
             try {
                 if (db.auditTriggerExists(tableEntry.getEntityName())) {
                     continue;
                 }
-                Column[] tableColumns = db.selectTableColumns(tableEntry.getTableName());
+                Column[] tableColumns = db.selectTableColumns(tableName);
                 String newStateConcat = xmlStateBuilder.build(OrclSpec.NEW_STATE_PREFIX, tableColumns);
                 String oldStateConcat = xmlStateBuilder.build(OrclSpec.OLD_STATE_PREFIX, tableColumns);
                 String auditTriggerName = tableEntry.getEntityName();
                 String auditTriggerQuery = db.formatQuery(
                     OrclQueries.CREATE_AUDIT_TRIGGER,
                     auditTriggerName,
-                    tableEntry,
+                    tableName,
                     oldStateConcat,
                     newStateConcat,
-                    tableEntry,
-                    tableEntry,
-                    tableEntry
+                    tableName,
+                    tableName,
+                    tableName
                 );
-                db.createAuditTrigger(tableEntry.getTableName(), auditTriggerQuery);
+                db.createAuditTrigger(tableName, auditTriggerQuery);
             } catch (SQLException e) {
-                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableEntry.getTableName(), e.getMessage());
+                String errMsg = String.format(ErrorMessages.CREATE_AUDIT_TRIGGER, tableName, e.getMessage());
                 new PreparationException(errMsg, e).setRecoverable().handle();
             }
         }

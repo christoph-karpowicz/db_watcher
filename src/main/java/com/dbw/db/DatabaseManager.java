@@ -49,7 +49,6 @@ public class DatabaseManager {
             if (!isConfirmed) {
                 continue;
             }
-            System.out.println(db.getValue().getWatchedTables().getTableNames());
             Set<String> tables = cache.get().getConfigTables(db.getKey());
             String dbName = db.getValue().getConfig().getName();
             if (db.getValue().purge(tables)) {

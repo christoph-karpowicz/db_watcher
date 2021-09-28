@@ -12,7 +12,8 @@ import java.util.Set;
 
 public class PersistentCache implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final Map<String, ConfigCache> configs;
+    @Setter
+    private Map<String, ConfigCache> configs;
     @Getter @Setter
     private Set<String> lastUsedConfigPaths;
 
@@ -23,10 +24,6 @@ public class PersistentCache implements Serializable {
 
     public Optional<ConfigCache> getConfig(String path) {
         return Optional.ofNullable(configs.get(path));
-    }
-
-    public void setConfig(String path, ConfigCache configCache) {
-        configs.put(path, configCache);
     }
 
     public boolean isConfigPresent(String path) {

@@ -12,6 +12,7 @@ import com.dbw.log.Level;
 import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.util.FileUtils;
+import com.dbw.watcher.Watcher;
 import com.dbw.watcher.WatcherManager;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -48,7 +49,7 @@ public class AppInitializer {
             createWatchers(configs);
             databaseManager.connectDbs();
             watcherManager.findAndAssignWatchedTables();
-            persistConfigsInCacheIfChangedOrAbsent(configPaths, configs);
+            persistConfigsInCacheIfChangedOrAbsent(configPaths, watcherManager.getWatchers());
         } catch (Exception e) {
             throw new UnrecoverableException(this.getClass().getName(), e.getMessage(), e);
         }
@@ -113,21 +114,21 @@ public class AppInitializer {
         }
     }
 
-    private void persistConfigsInCacheIfChangedOrAbsent(Set<String> configPaths, List<Config> configs) {
+    private void persistConfigsInCacheIfChangedOrAbsent(Set<String> configPaths, List<Watcher> watchers) {
         boolean pathsChanged = cache.haveLastUsedConfigPathsChanged(configPaths);
-        boolean cfgsChanged = configs.stream().anyMatch(Config::isChanged);
+        boolean cfgsChanged = watchers.stream().map(Watcher::getCfg).anyMatch(Config::isChanged);
         if (!App.options.getClearCache() && (cfgsChanged || pathsChanged)) {
             cache.setLastUsedConfigPaths(configPaths);
-            persistCache(configs);
+            persistCache(watchers);
         }
     }
 
-    private void persistCache(List<Config> configs) {
+    private void persistCache(List<Watcher> watchers) {
         ConfigCachePersister configCachePersister = new ConfigCachePersister();
         configCachePersister.setCache(cache);
-        configs.stream()
-                .filter(Config::isChanged)
-                .forEach(configCachePersister::addConfig);
+        watchers.stream()
+                .filter(watcher -> watcher.getCfg().isChanged())
+                .forEach(configCachePersister::addConfigCache);
         Thread configCachePersisterThread = new Thread(configCachePersister);
         configCachePersisterThread.start();
     }

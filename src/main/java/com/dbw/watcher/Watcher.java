@@ -5,7 +5,10 @@ import com.dbw.app.App;
 import com.dbw.app.ObjectCreator;
 import com.dbw.cfg.Config;
 import com.dbw.cli.ShowLatestOperationsOption;
-import com.dbw.db.*;
+import com.dbw.db.AuditRecord;
+import com.dbw.db.Database;
+import com.dbw.db.DatabaseFactory;
+import com.dbw.db.Postgres;
 import com.dbw.err.*;
 import com.dbw.frame.AuditFrame;
 import com.dbw.log.Level;
@@ -13,16 +16,12 @@ import com.dbw.log.LogMessages;
 import com.dbw.log.Logger;
 import com.dbw.log.WarningMessages;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Watcher implements Runnable {
     private final WatcherManager watcherManager;

@@ -120,7 +120,7 @@ public class Postgres extends Database {
         executeFormattedQueryUpdate(
                 PostgresQueries.CREATE_AUDIT_TRIGGER,
                 triggerName,
-                getObjectNameWithSchema(triggerName),
+                getObjectNameWithSchema(tableNameAndHash.getTableName()),
                 getObjectNameWithSchema(Common.DBW_AUDIT_FUNC_NAME)
         );
         Logger.log(Level.INFO, config.getName(), String.format(LogMessages.AUDIT_TRIGGER_CREATED, tableNameAndHash.getTableName()));
