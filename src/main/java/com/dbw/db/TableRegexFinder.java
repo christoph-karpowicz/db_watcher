@@ -3,9 +3,7 @@ package com.dbw.db;
 import com.dbw.cfg.Config;
 import com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
-import lombok.Setter;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -17,9 +15,8 @@ public class TableRegexFinder {
     private final Config config;
     private final Database db;
 
-    public Set<String> findWatchedTables() throws SQLException {
+    public Set<String> findWatchedTables() {
         if (config.getSettings().getTableNamesRegex()) {
-            List<String> allTables = db.selectAllTables();
             Set<String> excludeRegex = config.getTables()
                     .stream()
                     .filter(regex -> regex.charAt(0) == '~')
@@ -29,8 +26,8 @@ public class TableRegexFinder {
                     .stream()
                     .filter(regex -> !excludeRegex.contains(regex))
                     .collect(Collectors.toSet());
-            Set<String> exclude = findTableNameMatches(allTables, excludeRegex);
-            Set<String> include = findTableNameMatches(allTables, includeRegex)
+            Set<String> exclude = findTableNameMatches(db.getAllTables(), excludeRegex);
+            Set<String> include = findTableNameMatches(db.getAllTables(), includeRegex)
                     .stream()
                     .filter(tableName -> !tableName.equalsIgnoreCase(Common.DBW_AUDIT_TABLE_NAME))
                     .collect(Collectors.toSet());

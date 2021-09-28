@@ -37,12 +37,11 @@ public class OrclPrepareService {
         try {
             String[] auditTriggers = db.selectAuditTriggers();
             for (String auditTriggerName : auditTriggers) {
-                System.out.println(auditTriggerName);
                 if (!db.getWatchedTables().containsEntityName(auditTriggerName)) {
                     db.dropAuditTrigger(db.getWatchedTables().getTableByEntityName(auditTriggerName));
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             new PreparationException(e.getMessage(), e).setRecoverable().handle();
         }
     }

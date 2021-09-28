@@ -48,6 +48,7 @@ public class AppInitializer {
             validateConfigs(configs);
             createWatchers(configs);
             databaseManager.connectDbs();
+            databaseManager.findAllTables();
             watcherManager.findAndAssignWatchedTables();
             persistConfigsInCacheIfChangedOrAbsent(configPaths, watcherManager.getWatchers());
         } catch (Exception e) {

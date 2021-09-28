@@ -90,6 +90,7 @@ public class WatcherManager {
                 throw new UnrecoverableException("WatcherStart", e.getMessage(), e);
             }
         }
+        databaseManager.clearAllTables();
     }
 
     public void terminateAll() throws SQLException {

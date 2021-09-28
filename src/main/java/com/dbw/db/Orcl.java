@@ -141,9 +141,9 @@ public class Orcl extends Database {
         return auditTriggerNames;
     }
 
-    public List<String> selectAllTables() throws SQLException {
+    public void findAllTables() throws SQLException {
         String[] stringArgs = {config.getUser()};
-        return selectStringArray(OrclQueries.FIND_ALL_TABLES, stringArgs);
+        this.allTables = selectStringArray(OrclQueries.FIND_ALL_TABLES, stringArgs);
     }
 
     public Column[] selectTableColumns(String tableName) throws SQLException {

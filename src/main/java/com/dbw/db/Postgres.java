@@ -172,9 +172,9 @@ public class Postgres extends Database {
         return auditTriggerNames;
     }
 
-    public List<String> selectAllTables() throws SQLException {
+    public void findAllTables() throws SQLException {
         String[] stringArgs = {config.getName(), config.getSchema()};
-        return selectStringArray(PostgresQueries.FIND_ALL_TABLES, stringArgs);
+        this.allTables = selectStringArray(PostgresQueries.FIND_ALL_TABLES, stringArgs);
     }
 
     public String[] selectTableColumnNames(String tableName) throws SQLException {

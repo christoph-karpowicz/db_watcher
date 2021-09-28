@@ -48,7 +48,7 @@ public class PostgresPrepareService {
             if (!db.getWatchedTables().containsEntityName(auditTriggerName)) {
                 try {
                     db.dropAuditTrigger(db.getWatchedTables().getTableByEntityName(auditTriggerName));
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     new PreparationException(e.getMessage(), e).setRecoverable().handle();
                 }
             }

@@ -32,6 +32,18 @@ public class DatabaseManager {
         }
     }
 
+    public void findAllTables() throws SQLException {
+        for (Database db : dbs.values()) {
+            db.findAllTables();
+        }
+    }
+
+    public void clearAllTables() {
+        for (Database db : dbs.values()) {
+            db.clearAllTables();
+        }
+    }
+
     public void deleteFirstNRows(String nRows) throws UnrecoverableException {
         for (Database db : dbs.values()) {
             try {

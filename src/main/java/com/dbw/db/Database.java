@@ -29,13 +29,15 @@ public abstract class Database {
     private Connection conn;
     @Getter
     private WatchedTables watchedTables;
+    @Getter @Setter
+    protected List<String> allTables;
 
     public Database(Config config) {
         this.config = config.getDatabase();
     }
 
     public void setWatchedTables(Set<String> watchedTables) {
-        this.watchedTables = new WatchedTables();
+        this.watchedTables = new WatchedTables(this);
         watchedTables.forEach(tableName ->
                 this.watchedTables.put(tableName));
     }
@@ -58,7 +60,11 @@ public abstract class Database {
 
     public abstract boolean purge(Set<String> watchedTables);
 
-    public abstract List<String> selectAllTables() throws SQLException;
+    public abstract void findAllTables() throws SQLException;
+
+    public void clearAllTables() {
+        this.allTables = null;
+    }
 
     protected String deleteFirstNRows(String nRows, String deleteAllQuery, String deleteAllLteQuery) throws SQLException {
         int rowCount = getAuditRecordCount();

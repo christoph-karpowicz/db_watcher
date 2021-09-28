@@ -33,7 +33,7 @@ public class StringUtils {
         for (byte aByte : bytes) {
             sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }
-        return sb.toString();
+        return sb.toString().toUpperCase();
     }
 
 }
